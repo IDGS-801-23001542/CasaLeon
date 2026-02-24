@@ -1,0 +1,134 @@
+{% extends "layout.html" %}
+{% import "_macros.html" as ui %}
+
+{% block title %}Iniciar sesión | Casa León{% endblock %}
+
+{% block body %}
+<section class="min-h-screen relative overflow-hidden bg-white">
+
+  <!-- Fondo crema suave en el centro -->
+  <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+    <div class="w-[900px] h-[900px] rounded-full blur-3xl opacity-70
+                bg-gradient-to-br from-cl-cream via-white to-emerald-50"></div>
+  </div>
+
+  <div class="relative z-10 min-h-screen flex items-center justify-center p-6">
+    <div class="w-full max-w-5xl grid lg:grid-cols-2 gap-10 items-center">
+
+      <!-- Izquierda (mensaje + marca) -->
+      <div class="hidden lg:block">
+        <div class="flex items-center gap-4">
+          <img src="{{ url_for('static', filename='img/casaLeon.png') }}"
+               class="h-12 w-auto" alt="Casa León">
+          <div>
+            <p class="text-2xl font-semibold tracking-tight text-gray-900">Casa León</p>
+            <p class="text-sm text-gray-600">Backoffice + Tienda conectados</p>
+          </div>
+        </div>
+
+        <h1 class="mt-8 text-4xl font-semibold tracking-tight text-gray-900 leading-tight">
+          Bienvenido a Casa León
+        </h1>
+        <p class="mt-3 text-gray-700 text-lg">
+          Accede a tu rol: <span class="font-semibold">Admin</span>, <span class="font-semibold">Empleado</span>
+          o <span class="font-semibold">Cliente</span>.
+        </p>
+
+        <div class="mt-8 grid grid-cols-3 gap-3 text-sm">
+          <div class="rounded-2xl bg-white/70 border border-cl-line p-4">
+            <p class="font-semibold">Admin</p>
+            <p class="text-xs text-gray-600 mt-1">Control total</p>
+          </div>
+          <div class="rounded-2xl bg-white/70 border border-cl-line p-4">
+            <p class="font-semibold">Empleado</p>
+            <p class="text-xs text-gray-600 mt-1">Ventas/Pedidos</p>
+          </div>
+          <div class="rounded-2xl bg-white/70 border border-cl-line p-4">
+            <p class="font-semibold">Cliente</p>
+            <p class="text-xs text-gray-600 mt-1">Tienda</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card glass -->
+      <div class="w-full max-w-md justify-self-center">
+        <div class="rounded-3xl border-2 border-cl-brown/70 bg-white/55 backdrop-blur-xl shadow-[0_20px_60px_-25px_rgba(0,0,0,0.35)]">
+          <div class="p-8">
+            <div class="text-center">
+              <img src="{{ url_for('static', filename='img/casaLeon.png') }}" class="h-10 mx-auto mb-3 lg:hidden" alt="Casa León">
+              <h2 class="text-2xl font-semibold text-gray-900">Bienvenido</h2>
+              <p class="text-sm text-gray-600">Inicia sesión para continuar</p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                <div class="mt-5 space-y-2">
+                  {% for category, message in messages %}
+                    {% set cls = "bg-emerald-50 text-emerald-800 border-emerald-200" if category=="success"
+                              else "bg-red-50 text-red-800 border-red-200" if category=="danger"
+                              else "bg-amber-50 text-amber-800 border-amber-200" if category=="warning"
+                              else "bg-blue-50 text-blue-800 border-blue-200" %}
+                    <div class="text-sm border rounded-xl px-3 py-2 {{ cls }}">
+                      {{ message }}
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('login') }}" class="mt-6">
+              {{ form.hidden_tag() }}
+
+              {% set email_icon %}
+              <svg class="w-4 h-4 text-gray-500" viewBox="0 0 24 24" fill="none">
+                <path d="M4 6h16v12H4V6Z" stroke="currentColor" stroke-width="1.5"/>
+                <path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+              {% endset %}
+
+              {% set lock_icon %}
+              <svg class="w-4 h-4 text-gray-500" viewBox="0 0 24 24" fill="none">
+                <path d="M7 11V8a5 5 0 0 1 10 0v3" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M6 11h12v9H6v-9Z" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+              {% endset %}
+
+              {{ ui.field(form.email, placeholder="correo@ejemplo.com", type="email", icon=email_icon) }}
+              {{ ui.field(form.password, placeholder="••••••••", type="password", icon=lock_icon) }}
+
+              <div class="flex items-center justify-between mt-2 mb-5">
+                {{ ui.checkbox(form.remember, "Recordarme") }}
+                <a href="#" class="text-sm text-emerald-800 hover:underline">¿Olvidaste tu contraseña?</a>
+              </div>
+
+              <button type="submit"
+                class="w-full rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-semibold py-3 transition focus:ring-4 focus:ring-emerald-200">
+                Entrar
+              </button>
+
+              <div class="mt-5 text-center text-sm text-gray-700">
+                ¿No tienes cuenta?
+                <a href="{{ url_for('register') }}" class="text-emerald-800 font-semibold hover:underline">
+                  Regístrate
+                </a>
+              </div>
+
+              <div class="mt-6 rounded-2xl bg-cl-cream/70 border border-cl-line p-4 text-xs text-gray-700">
+                <p class="font-semibold text-gray-900 mb-2">Accesos de prueba</p>
+                <p><span class="font-medium">Admin:</span> admin@casaleon.com</p>
+                <p><span class="font-medium">Empleado:</span> melannie@casaleon.com</p>
+                <p><span class="font-medium">Cliente:</span> martin@cliente.com</p>
+              </div>
+            </form>
+          </div>
+
+          <div class="px-8 pb-7">
+            <p class="text-center text-xs text-gray-600">Casa León · Inventario perpetuo · Kardex</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+{% endblock %}

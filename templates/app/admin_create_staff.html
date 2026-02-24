@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+{% import "_macros.html" as ui %}
+
+{% block title %}Crear Staff | Casa León{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-cl-cream">
+  <header class="bg-white/80 border-b border-cl-sand">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div>
+        <p class="font-semibold text-gray-900 leading-5">Admin · Crear usuario staff</p>
+        <p class="text-sm text-gray-600">Alta de ADMIN / EMPLEADO</p>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <a href="{{ url_for('admin_dashboard') }}" class="text-sm text-cl-green font-medium hover:underline">
+          Volver
+        </a>
+        <a href="{{ url_for('logout') }}" class="text-sm text-red-600 font-medium hover:underline">
+          Cerrar sesión
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 py-8">
+    <div class="max-w-xl bg-white/80 backdrop-blur border border-cl-sand rounded-2xl shadow-sm p-6">
+      <h1 class="text-xl font-semibold text-gray-900">A trabajar 🧑‍💼</h1>
+      <p class="text-sm text-gray-600 mt-1">Crea un usuario para backoffice.</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="mt-4 space-y-2">
+            {% for category, message in messages %}
+              {% set cls = "bg-emerald-50 text-emerald-800 border-emerald-100" if category=="success"
+                        else "bg-red-50 text-red-800 border-red-100" if category=="danger"
+                        else "bg-amber-50 text-amber-800 border-amber-100" if category=="warning"
+                        else "bg-blue-50 text-blue-800 border-blue-100" %}
+              <div class="text-sm border rounded-lg px-3 py-2 {{ cls }}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('crear_usuario_staff') }}" class="mt-6">
+        {{ form.hidden_tag() }}
+
+        {{ ui.field(form.nombre, placeholder="Ej: Ana Pérez") }}
+        {{ ui.field(form.email, placeholder="correo@casaleon.com", type="email") }}
+        {{ ui.field(form.password, placeholder="Mínimo 6 caracteres", type="password") }}
+
+        <div class="mb-4">
+          <label class="block mb-2 text-sm font-medium text-gray-900">{{ form.rol.label.text }}</label>
+          {{ form.rol(
+            class="bg-white border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5"
+          ) }}
+          {% if form.rol.errors %}
+            <p class="mt-2 text-sm text-red-600">
+              {% for e in form.rol.errors %}{{ e }}{% if not loop.last %}<br>{% endif %}{% endfor %}
+            </p>
+          {% endif %}
+        </div>
+
+        <button type="submit"
+          class="w-full text-white bg-cl-green hover:bg-cl-green2 focus:ring-4 focus:ring-emerald-200
+                 font-medium rounded-lg text-sm px-5 py-2.5 transition">
+          Crear usuario ✅
+        </button>
+      </form>
+    </div>
+  </main>
+</div>
+{% endblock %}
