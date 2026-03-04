@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="es">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,7 +11,60 @@
 </head>
 
 <body class="min-h-screen bg-white text-gray-900">
+  <header class="sticky top-0 z-20 bg-white/80 backdrop-blur border-b border-cl-line">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="{{ url_for('static', filename='img/casaLeon.png') }}" class="h-9 w-auto" alt="Casa León">
+        <div>
+          <p class="font-semibold leading-5">Casa León</p>
+          <p class="text-xs text-gray-600">Marroquinería · Hecho en León, Gto.</p>
+        </div>
+      </div>
+
+      <div class="items-center justify-between hidden w-full md:flex md:w-auto" id="navbar-cta">
+        <ul
+          class="flex flex-col p-4 mt-4 border border-gray-100 rounded-lg md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium md:border-0 dark:border-gray-700">
+          <li>
+            <a href="#"
+              class="block py-2 pl-3 pr-4 !text-black hover:!text-emerald-800 rounded-sm md:p-0"
+              aria-current="page">Home</a>
+          </li>
+          <li>
+            <a href="#"
+              class="block py-2 pl-3 pr-4 !text-black hover:!text-emerald-800 rounded-sm md:p-0">About</a>
+          </li>
+          <li>
+            <a href="#"
+              class="block py-2 pl-3 pr-4 !text-black hover:!text-emerald-800 rounded-sm md:p-0">Services</a>
+          </li>
+          <li>
+            <a href="#"
+              class="block py-2 pl-3 pr-4 !text-black hover:!text-emerald-800 rounded-sm md:p-0">Contact</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <a href="{{ url_for('login') }}"
+          class="px-4 py-2 rounded-xl border border-cl-line bg-white hover:bg-cl-cream transition text-sm font-semibold">
+          Iniciar sesión
+        </a>
+        <a href="{{ url_for('register') }}"
+          class="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 transition text-sm font-semibold text-white">
+          Registrarme
+        </a>
+      </div>
+    </div>
+  </header>
+
   {% block body %}{% endblock %}
   <script src="{{ url_for('static', filename='js/flowbite.min.js') }}"></script>
 </body>
+
+<footer class="border-t border-cl-line bg-white">
+    <div class="max-w-6xl mx-auto px-6 py-8 text-sm text-gray-600">
+      © 2026 Casa León · Marroquinería en León, Guanajuato
+    </div>
+  </footer>
+
 </html>

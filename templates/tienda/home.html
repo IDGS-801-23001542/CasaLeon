@@ -5,100 +5,8 @@
 {% block body %}
 <section class="min-h-screen bg-white">
   <!-- Header público -->
-  <header class="sticky top-0 z-20 bg-white/80 backdrop-blur border-b border-cl-line">
-    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <img src="{{ url_for('static', filename='img/casaLeon.png') }}" class="h-9 w-auto" alt="Casa León">
-        <div>
-          <p class="font-semibold leading-5">Casa León</p>
-          <p class="text-xs text-gray-600">Marroquinería · Hecho en León, Gto.</p>
-        </div>
-      </div>
+  
 
-      <div class="flex items-center gap-3">
-        <a href="{{ url_for('login') }}"
-           class="px-4 py-2 rounded-xl border border-cl-line bg-white hover:bg-cl-cream transition text-sm font-semibold">
-          Iniciar sesión
-        </a>
-        <a href="{{ url_for('register') }}"
-           class="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 transition text-sm font-semibold text-white">
-          Registrarme
-        </a>
-      </div>
-    </div>
-  </header>
-
-  <!-- Hero -->
-  <div class="bg-cl-cream border-b border-cl-line">
-    <div class="max-w-6xl mx-auto px-6 py-14 grid lg:grid-cols-2 gap-10 items-center">
-      <div>
-        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-100">
-          Nueva colección · Casa León
-        </span>
-
-        <h1 class="mt-4 text-4xl font-semibold tracking-tight leading-tight">
-          Piel auténtica. Diseño limpio. <span class="text-emerald-800">Calidad</span> que dura.
-        </h1>
-
-        <p class="mt-4 text-gray-700 text-lg">
-          Carteras, bolsos, cinturones y accesorios hechos en León, Guanajuato.
-          Compra en línea o recoge en tienda.
-        </p>
-
-        <div class="mt-6 flex flex-wrap gap-3">
-          <a href="#catalogo"
-             class="px-5 py-3 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-semibold transition">
-            Ver catálogo
-          </a>
-          <a href="{{ url_for('login') }}"
-             class="px-5 py-3 rounded-2xl border border-cl-line bg-white hover:bg-white/70 font-semibold transition">
-            Entrar a mi cuenta
-          </a>
-        </div>
-
-        <div class="mt-8 grid grid-cols-3 gap-3 text-sm">
-          <div class="rounded-2xl bg-white/70 border border-cl-line p-4">
-            <p class="font-semibold">Hecho en León</p>
-            <p class="text-xs text-gray-600 mt-1">Marroquinería</p>
-          </div>
-          <div class="rounded-2xl bg-white/70 border border-cl-line p-4">
-            <p class="font-semibold">Piel premium</p>
-            <p class="text-xs text-gray-600 mt-1">Selección</p>
-          </div>
-          <div class="rounded-2xl bg-white/70 border border-cl-line p-4">
-            <p class="font-semibold">Envíos</p>
-            <p class="text-xs text-gray-600 mt-1">Simulado (MVP)</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Imagen placeholder bonita (sin depender de assets) -->
-      <div class="relative">
-        <div class="absolute -inset-6 rounded-[2.5rem] bg-gradient-to-br from-emerald-100 via-white to-cl-cream blur-2xl opacity-80"></div>
-        <div class="relative rounded-[2.5rem] border border-cl-line bg-white p-6 shadow-sm">
-          <div class="rounded-3xl border border-cl-line bg-cl-cream p-6">
-            <p class="text-xs font-semibold text-cl-brown">Casa León</p>
-            <h3 class="mt-2 text-2xl font-semibold">Colección esencial</h3>
-            <p class="mt-2 text-gray-700">
-              Minimal y elegante. Perfecto para diario.
-            </p>
-
-            <div class="mt-6 grid grid-cols-2 gap-3 text-sm">
-              <div class="rounded-2xl bg-white border border-cl-line p-4">Carteras</div>
-              <div class="rounded-2xl bg-white border border-cl-line p-4">Bolsos</div>
-              <div class="rounded-2xl bg-white border border-cl-line p-4">Cinturones</div>
-              <div class="rounded-2xl bg-white border border-cl-line p-4">Accesorios</div>
-            </div>
-
-            <p class="mt-6 text-xs text-gray-600">
-              * Imágenes reales se agregan en el módulo de Cliente/Catálogo.
-            </p>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
 
   <!-- Catálogo preview -->
   <main id="catalogo" class="max-w-6xl mx-auto px-6 py-12">
@@ -126,10 +34,6 @@
     </div>
   </main>
 
-  <footer class="border-t border-cl-line bg-white">
-    <div class="max-w-6xl mx-auto px-6 py-8 text-sm text-gray-600">
-      © 2026 Casa León · Marroquinería en León, Guanajuato
-    </div>
-  </footer>
+  
 </section>
 {% endblock %}

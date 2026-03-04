@@ -2,7 +2,11 @@ module.exports = {
   content: [
     "./templates/**/*.{html,js}",
     "./static/**/*.{js}",
-    "./node_modules/flowbite/**/*.js"
+    "./node_modules/flowbite/**/*.js",
+    "./app/templates/**/*.{html,js}",
+    "./**/*.html",
+    "./**/*.py",
+
   ],
   theme: {
     extend: {

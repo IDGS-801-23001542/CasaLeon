@@ -7,6 +7,6 @@ class Config(object):
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:root@127.0.0.1:3306/pieles_avance"
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:root@127.0.0.1/fabrica_pieles2'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     TOKEN_EXPIRES_HOURS = 8
