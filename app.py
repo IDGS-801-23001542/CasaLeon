@@ -5,21 +5,20 @@ import secrets
 from datetime import datetime, timedelta
 from functools import wraps
 
-from flask import (
-    Flask, render_template, redirect, url_for,
-    request, flash, make_response, g
-)
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template, redirect, url_for, request
+from flask import flash, make_response, g
+
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from config import DevelopmentConfig
-from forms import LoginForm, RegisterClienteForm, CreateStaffForm
+import forms
+from models import db, Rol, Usuario, Cliente, AuthToken
 
 
 app = Flask(__name__)
 app.config.from_object(DevelopmentConfig)
 
-db = SQLAlchemy(app)
+db.init_app(app)
 TOKEN_EXPIRES_HOURS = int(app.config.get("TOKEN_EXPIRES_HOURS", 8))
 
 
@@ -52,56 +51,6 @@ def build_tailwind_once():
 # =========================
 # MODELOS (mapeo exacto a tu BD)
 # =========================
-class Rol(db.Model):
-    __tablename__ = "roles"
-    id_rol = db.Column(db.Integer, primary_key=True)
-    codigo = db.Column(db.String(30), unique=True, nullable=False)  # ADMIN / EMPLEADO
-    descripcion = db.Column(db.String(120), nullable=False)
-
-
-class Usuario(db.Model):
-    __tablename__ = "usuarios"
-    id_usuario = db.Column(db.Integer, primary_key=True)
-    id_rol = db.Column(db.Integer, db.ForeignKey("roles.id_rol"), nullable=False)
-    nombre = db.Column(db.String(120), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(255), nullable=False)
-    activo = db.Column(db.Integer, nullable=False, default=1)
-    creado_en = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    rol = db.relationship("Rol")
-
-
-class Cliente(db.Model):
-    __tablename__ = "clientes"
-    id_cliente = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(150), nullable=False)
-    rfc = db.Column(db.String(20))
-    email = db.Column(db.String(120), unique=True)
-    telefono = db.Column(db.String(30))
-    calle = db.Column(db.String(120))
-    numero = db.Column(db.String(20))
-    colonia = db.Column(db.String(120))
-    ciudad = db.Column(db.String(80))
-    estado = db.Column(db.String(80))
-    pais = db.Column(db.String(80))
-    cp = db.Column(db.String(10))
-
-    password_hash = db.Column(db.String(255))
-    creado_en = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    activo = db.Column(db.Integer, nullable=False, default=1)
-
-
-class AuthToken(db.Model):
-    __tablename__ = "auth_tokens"
-    id_token = db.Column(db.Integer, primary_key=True)
-    subject_type = db.Column(db.Enum("USUARIO", "CLIENTE"), nullable=False)
-    subject_id = db.Column(db.Integer, nullable=False)
-    token_hash = db.Column(db.String(64), unique=True, nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    expires_at = db.Column(db.DateTime, nullable=False)
-    revoked = db.Column(db.Integer, nullable=False, default=0)
-    user_agent = db.Column(db.String(255))
-    ip_addr = db.Column(db.String(45))
 
 
 # =========================
@@ -215,14 +164,15 @@ def home():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    create_form = forms.LoginForm(request.form)
     if g.user:
         return redirect(url_for("post_login"))
 
-    form = LoginForm()
+    
 
-    if form.validate_on_submit():
-        email = form.email.data.strip().lower()
-        password = form.password.data
+    if create_form.validate_on_submit():
+        email = create_form.email.data.strip().lower()
+        password = create_form.password.data
 
         # 1) STAFF
         u = Usuario.query.filter(db.func.lower(Usuario.email) == email, Usuario.activo == 1).first()
@@ -254,7 +204,7 @@ def login():
 
         flash("Credenciales inválidas.", "danger")
 
-    return render_template("auth/login.html", form=form)
+    return render_template("auth/login.html", form=create_form)
 
 
 @app.route("/post-login")
@@ -283,23 +233,23 @@ def logout():
 
 @app.route("/registro", methods=["GET", "POST"])
 def register():
+    create_form = forms.RegisterClienteForm(request.form)
     if g.user:
         return redirect(url_for("post_login"))
 
-    form = RegisterClienteForm()
-    if form.validate_on_submit():
-        email = form.email.data.strip().lower()
+    if create_form.validate_on_submit():
+        email = create_form.email.data.strip().lower()
         exists = Cliente.query.filter(db.func.lower(Cliente.email) == email).first()
         if exists:
             flash("Ese email ya está registrado.", "warning")
-            return render_template("auth/register.html", form=form)
+            return render_template("auth/register.html", form=create_form)
 
         c = Cliente(
-            nombre=form.nombre.data.strip(),
+            nombre=create_form.nombre.data.strip(),
             email=email,
-            telefono=(form.telefono.data.strip() if form.telefono.data else None),
+            telefono=(create_form.telefono.data.strip() if create_form.telefono.data else None),
             activo=1,
-            password_hash=generate_password_hash(form.password.data),
+            password_hash=generate_password_hash(create_form.password.data),
             creado_en=datetime.utcnow(),
         )
         db.session.add(c)
@@ -307,7 +257,7 @@ def register():
         flash("Cuenta creada. Ahora inicia sesión.", "success")
         return redirect(url_for("login"))
 
-    return render_template("auth/register.html", form=form)
+    return render_template("auth/register.html", form=create_form)
 
 
 # =========================
@@ -337,26 +287,26 @@ def vendedor_dashboard():
 @app.route("/app/admin/usuarios/nuevo", methods=["GET", "POST"])
 @login_required("ADMIN")
 def crear_usuario_staff():
-    form = CreateStaffForm()
+    create_form = forms.CreateStaffForm(request.form)
 
-    if form.validate_on_submit():
-        email = form.email.data.strip().lower()
+    if create_form.validate_on_submit():
+        email = create_form.email.data.strip().lower()
 
         exists = Usuario.query.filter(db.func.lower(Usuario.email) == email).first()
         if exists:
             flash("Ese email ya existe en usuarios.", "warning")
-            return render_template("app/admin_create_staff.html", form=form)
+            return render_template("app/admin_create_staff.html", form=create_form)
 
-        rol = Rol.query.filter_by(codigo=form.rol.data).first()
+        rol = Rol.query.filter_by(codigo=create_form.rol.data).first()
         if not rol:
             flash("Rol inválido.", "danger")
-            return render_template("app/admin_create_staff.html", form=form)
+            return render_template("app/admin_create_staff.html", form=create_form)
 
         u = Usuario(
             id_rol=rol.id_rol,
-            nombre=form.nombre.data.strip(),
+            nombre=create_form.nombre.data.strip(),
             email=email,
-            password_hash=generate_password_hash(form.password.data),
+            password_hash=generate_password_hash(create_form.password.data),
             activo=1,
             creado_en=datetime.utcnow(),
         )
@@ -365,9 +315,11 @@ def crear_usuario_staff():
         flash("Usuario staff creado ✅", "success")
         return redirect(url_for("admin_dashboard"))
 
-    return render_template("app/admin_create_staff.html", form=form)
+    return render_template("app/admin_create_staff.html", form=create_form)
 
 
 if __name__ == "__main__":
     build_tailwind_once()
-    app.run(debug=True)
+    with app.app_context():
+        db.create_all()
+    app.run()
