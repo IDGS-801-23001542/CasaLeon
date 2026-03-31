@@ -1,5 +1,4 @@
 import os
-import subprocess
 import hashlib
 import secrets
 from datetime import datetime, timedelta
@@ -20,37 +19,6 @@ app.config.from_object(DevelopmentConfig)
 
 db.init_app(app)
 TOKEN_EXPIRES_HOURS = int(app.config.get("TOKEN_EXPIRES_HOURS", 8))
-
-
-# =========================
-# Tailwind build (SIN 2da terminal)
-# =========================
-def build_tailwind_once():
-    """
-    Compila Tailwind a static/css/output.css al arrancar Flask.
-    No watch. No segunda terminal.
-    """
-    cmd = [
-        "npx", "@tailwindcss/cli",
-        "-i", "./static/src/input.css",
-        "-o", "./static/css/output.css",
-        "--minify"
-    ]
-    try:
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-        if result.returncode != 0:
-            print("❌ Tailwind build falló:")
-            print(result.stdout)
-            print(result.stderr)
-        else:
-            print("✅ Tailwind build OK -> static/css/output.css")
-    except Exception as e:
-        print("❌ No pude ejecutar Tailwind build:", e)
-
-
-# =========================
-# MODELOS (mapeo exacto a tu BD)
-# =========================
 
 
 # =========================
@@ -317,9 +285,20 @@ def crear_usuario_staff():
 
     return render_template("app/admin_create_staff.html", form=create_form)
 
+@app.route("/admin/usuarios")
+def usuarios_page():
+    return render_template("private/usuarios.html")
+
+@app.route("/admin/proveedores")
+def proveedores_page():
+    return render_template("private/proveedores.html")
+
+@app.route("/admin/inventario")
+def inventario_page():
+    return render_template("private/inventario.html")
+
 
 if __name__ == "__main__":
-    build_tailwind_once()
     with app.app_context():
         db.create_all()
     app.run()

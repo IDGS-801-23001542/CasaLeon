@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Casa León{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("mobile-overlay");
+
+      sidebar.classList.toggle("-translate-x-full");
+      overlay.classList.toggle("hidden");
+    }
+
+    function closeSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("mobile-overlay");
+
+      sidebar.classList.add("-translate-x-full");
+      overlay.classList.add("hidden");
+    }
+  </script>
+</head>
+<body class="min-h-screen bg-gray-100">
+  {% set current_path = request.path %}
+
+  {% set menu_items = [
+    {"label": "Dashboard", "path": "/admin", "icon": "📊"},
+    {"label": "Materia Prima", "path": "/admin/compras", "icon": "🛒"},
+    {"label": "Producción", "path": "/admin/produccion", "icon": "🏭"},
+    {"label": "Inventario", "path": "/admin/inventario", "icon": "📦"},
+    {"label": "Ventas", "path": "/admin/ventas", "icon": "📈"},
+    {"label": "Reportes", "path": "/admin/reportes", "icon": "📉"},
+    {"label": "Proveedores", "path": "/admin/proveedores", "icon": "🚚"},
+    {"label": "Usuarios", "path": "/admin/usuarios", "icon": "👥"},
+    {"label": "Auditoría", "path": "/admin/auditoria", "icon": "📄"}
+  ] %}
+
+  <!-- Mobile Header -->
+  <header class="lg:hidden fixed top-0 left-0 right-0 z-50 bg-blue-900 border-b border-blue-800 shadow-lg">
+    <div class="flex items-center justify-between px-4 py-3">
+      <button
+        onclick="toggleSidebar()"
+        class="text-white p-2 hover:bg-blue-800 rounded-lg transition-colors"
+      >
+        ☰
+      </button>
+
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 bg-amber-400 rounded-lg flex items-center justify-center">
+          <span class="text-blue-900 font-bold">CL</span>
+        </div>
+        <span class="text-white font-bold text-lg">Casa León</span>
+      </div>
+
+      <a
+        href="{{ url_for('logout') }}"
+        class="text-white p-2 hover:bg-blue-800 rounded-lg transition-colors"
+      >
+        ⎋
+      </a>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside
+    id="sidebar"
+    class="fixed top-0 left-0 h-full bg-slate-900 text-white w-64 z-40 transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0 shadow-2xl"
+  >
+    <!-- Logo -->
+    <div class="p-6 border-b border-slate-700">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-amber-400 rounded-xl flex items-center justify-center shadow-lg">
+          <span class="text-blue-900 font-bold text-xl">CL</span>
+        </div>
+        <div>
+          <h1 class="font-bold text-xl text-white">Casa León</h1>
+          <p class="text-xs text-slate-400">Marroquinería</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="p-4 space-y-2">
+      {% for item in menu_items %}
+        {% set active =
+          (item.path == "/admin" and current_path == "/admin")
+          or
+          (item.path != "/admin" and current_path.startswith(item.path))
+        %}
+
+        <a
+          href="{{ item.path }}"
+          onclick="closeSidebar()"
+          class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {% if active %}bg-slate-700 text-white shadow-lg scale-[1.02]{% else %}text-slate-300 hover:bg-slate-800 hover:text-white{% endif %}"
+        >
+          <span>{{ item.icon }}</span>
+          <span>{{ item.label }}</span>
+        </a>
+      {% endfor %}
+    </nav>
+
+    <!-- Logout Button - Desktop -->
+    <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700 hidden lg:block">
+      <a
+        href="{{ url_for('logout') }}"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-red-600 hover:text-white transition-all duration-200"
+      >
+        <span>⎋</span>
+        <span>Cerrar Sesión</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Mobile Overlay -->
+  <div
+    id="mobile-overlay"
+    class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden"
+    onclick="closeSidebar()"
+  ></div>
+
+  <!-- Main Content -->
+  <main class="lg:ml-64 min-h-screen pt-16 lg:pt-0">
+    <div class="p-4 lg:p-8">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,441 @@
+{% extends "base.html" %}
+
+{% block title %}Inventario | Casa León{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold mb-2">Inventario</h1>
+      <p class="text-gray-500">Gestiona el stock de productos terminados</p>
+    </div>
+    <button
+      type="button"
+      class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all"
+    >
+      <span class="text-xl">+</span>
+      Nuevo Producto
+    </button>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="p-2 bg-blue-100 rounded-lg">
+          <span class="text-blue-600 text-xl">📦</span>
+        </div>
+        <p class="text-sm text-gray-500">Total Productos</p>
+      </div>
+      <p class="text-2xl font-bold">5</p>
+    </div>
+
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="p-2 bg-green-100 rounded-lg">
+          <span class="text-green-600 text-xl">✅</span>
+        </div>
+        <p class="text-sm text-gray-500">Valor Inventario</p>
+      </div>
+      <p class="text-2xl font-bold">$148,650</p>
+    </div>
+
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="p-2 bg-yellow-100 rounded-lg">
+          <span class="text-yellow-600 text-xl">⚠️</span>
+        </div>
+        <p class="text-sm text-gray-500">Stock Bajo</p>
+      </div>
+      <p class="text-2xl font-bold">2</p>
+    </div>
+
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="p-2 bg-red-100 rounded-lg">
+          <span class="text-red-600 text-xl">🚨</span>
+        </div>
+        <p class="text-sm text-gray-500">Agotados</p>
+      </div>
+      <p class="text-2xl font-bold">0</p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="flex flex-col md:flex-row gap-4">
+    <div class="flex-1 relative">
+      <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+      <input
+        type="text"
+        placeholder="Buscar por nombre, ID o categoría..."
+        class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
+    <select
+      class="px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+    >
+      <option>Todas</option>
+      <option>Carteras</option>
+      <option>Bolsos</option>
+      <option>Cinturones</option>
+      <option>Billeteras</option>
+      <option>Maletines</option>
+    </select>
+  </div>
+
+  <!-- Products Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+    <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all">
+      <div class="flex items-start justify-between mb-4 gap-3">
+        <div class="flex-1">
+          <h3 class="font-bold text-lg mb-1">Cartera Ejecutiva Premium</h3>
+          <p class="text-sm text-gray-500">INV-001</p>
+        </div>
+        <span class="px-3 py-1 rounded-full text-xs flex items-center gap-1 bg-green-100 text-green-700">
+          <span>✅</span>
+          Normal
+        </span>
+      </div>
+
+      <div class="space-y-3 mb-4">
+        <div class="flex justify-between text-sm gap-3">
+          <span class="text-gray-500">Categoría:</span>
+          <span class="font-medium text-right">Carteras</span>
+        </div>
+        <div class="flex justify-between text-sm gap-3">
+          <span class="text-gray-500">Stock Actual:</span>
+          <span class="font-medium text-right">45 unidades</span>
+        </div>
+        <div class="flex justify-between text-sm gap-3">
+          <span class="text-gray-500">Stock Mínimo:</span>
+          <span class="font-medium text-right">20 unidades</span>
+        </div>
+        <div class="flex justify-between text-sm gap-3">
+          <span class="text-gray-500">Precio:</span>
+          <span class="font-medium text-right">$890</span>
+        </div>
+        <div class="flex justify-between text-sm gap-3">
+          <span class="text-gray-500">Ubicación:</span>
+          <span class="font-medium text-right">Estante A-1</span>
+        </div>
+        <div class="flex justify-between text-sm pt-2 border-t border-gray-200 gap-3">
+          <span class="text-gray-500">Valor Total:</span>
+          <span class="font-bold text-blue-600">$40,050</span>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div class="h-full bg-green-500 w-full"></div>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all"
+      >
+        Editar
+      </button>
+    </div>
+
+    <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all">
+      <div class="flex items-start justify-between mb-4 gap-3">
+        <div class="flex-1">
+          <h3 class="font-bold text-lg mb-1">Bolso Viajero Grande</h3>
+          <p class="text-sm text-gray-500">INV-002</p>
+        </div>
+        <span class="px-3 py-1 rounded-full text-xs flex items-center gap-1 bg-yellow-100 text-yellow-700">
+          <span>⚠️</span>
+          Bajo
+        </span>
+      </div>
+
+      <div class="space-y-3 mb-4">
+        <div class="flex justify-between text-sm gap-3">
+          <span class="text-gray-500">Categoría:</span>
+          <span class="font-medium text-right">Bolsos</span>
+        </div>
+        <div class="flex justify-between text-sm gap-3">
+          <span class="text-gray-500">Stock Actual:</span>
+          <span class="font-medium text-right">12 unidades</span>
+        </div>
+        <div class="flex justify-between text-sm gap-3">
+          <span class="text-gray-500">Stock Mínimo:</span>
+          <span class="font-medium text-right">15 unidades</span>
+        </div>
+        <div class="flex justify-between text-sm gap-3">
+          <span class="text-gray-500">Precio:</span>
+          <span class="font-medium text-right">$1,250</span>
+        </div>
+        <div class="flex justify-between text-sm gap-3">
+          <span class="text-gray-500">Ubicación:</span>
+          <span class="font-medium text-right">Estante B-3</span>
+        </div>
+        <div class="flex justify-between text-sm pt-2 border-t border-gray-200 gap-3">
+          <span class="text-gray-500">Valor Total:</span>
+          <span class="font-bold text-blue-600">$15,000</span>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div class="h-full bg-yellow-500 w-[40%]"></div>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all"
+      >
+        Editar
+      </button>
+    </div>
+
+    <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all">
+      <div class="flex items-start justify-between mb-4 gap-3">
+        <div class="flex-1">
+          <h3 class="font-bold text-lg mb-1">Cinturón de Cuero</h3>
+          <p class="text-sm text-gray-500">INV-003</p>
+        </div>
+        <span class="px-3 py-1 rounded-full text-xs flex items-center gap-1 bg-green-100 text-green-700">
+          <span>✅</span>
+          Normal
+        </span>
+      </div>
+
+      <div class="space-y-3 mb-4">
+        <div class="flex justify-between text-sm gap-3">
+          <span class="text-gray-500">Categoría:</span>
+          <span class="font-medium text-right">Cinturones</span>
+        </div>
+        <div class="flex justify-between text-sm gap-3">
+          <span class="text-gray-500">Stock Actual:</span>
+          <span class="font-medium text-right">85 unidades</span>
+        </div>
+        <div class="flex justify-between text-sm gap-3">
+          <span class="text-gray-500">Stock Mínimo:</span>
+          <span class="font-medium text-right">30 unidades</span>
+        </div>
+        <div class="flex justify-between text-sm gap-3">
+          <span class="text-gray-500">Precio:</span>
+          <span class="font-medium text-right">$320</span>
+        </div>
+        <div class="flex justify-between text-sm gap-3">
+          <span class="text-gray-500">Ubicación:</span>
+          <span class="font-medium text-right">Estante C-2</span>
+        </div>
+        <div class="flex justify-between text-sm pt-2 border-t border-gray-200 gap-3">
+          <span class="text-gray-500">Valor Total:</span>
+          <span class="font-bold text-blue-600">$27,200</span>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div class="h-full bg-green-500 w-full"></div>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all"
+      >
+        Editar
+      </button>
+    </div>
+
+    <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all">
+      <div class="flex items-start justify-between mb-4 gap-3">
+        <div class="flex-1">
+          <h3 class="font-bold text-lg mb-1">Billetera Clásica</h3>
+          <p class="text-sm text-gray-500">INV-004</p>
+        </div>
+        <span class="px-3 py-1 rounded-full text-xs flex items-center gap-1 bg-yellow-100 text-yellow-700">
+          <span>⚠️</span>
+          Bajo
+        </span>
+      </div>
+
+      <div class="space-y-3 mb-4">
+        <div class="flex justify-between text-sm gap-3">
+          <span class="text-gray-500">Categoría:</span>
+          <span class="font-medium text-right">Billeteras</span>
+        </div>
+        <div class="flex justify-between text-sm gap-3">
+          <span class="text-gray-500">Stock Actual:</span>
+          <span class="font-medium text-right">8 unidades</span>
+        </div>
+        <div class="flex justify-between text-sm gap-3">
+          <span class="text-gray-500">Stock Mínimo:</span>
+          <span class="font-medium text-right">25 unidades</span>
+        </div>
+        <div class="flex justify-between text-sm gap-3">
+          <span class="text-gray-500">Precio:</span>
+          <span class="font-medium text-right">$180</span>
+        </div>
+        <div class="flex justify-between text-sm gap-3">
+          <span class="text-gray-500">Ubicación:</span>
+          <span class="font-medium text-right">Estante A-4</span>
+        </div>
+        <div class="flex justify-between text-sm pt-2 border-t border-gray-200 gap-3">
+          <span class="text-gray-500">Valor Total:</span>
+          <span class="font-bold text-blue-600">$1,440</span>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div class="h-full bg-yellow-500 w-[16%]"></div>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all"
+      >
+        Editar
+      </button>
+    </div>
+
+    <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all">
+      <div class="flex items-start justify-between mb-4 gap-3">
+        <div class="flex-1">
+          <h3 class="font-bold text-lg mb-1">Maletín Ejecutivo</h3>
+          <p class="text-sm text-gray-500">INV-005</p>
+        </div>
+        <span class="px-3 py-1 rounded-full text-xs flex items-center gap-1 bg-green-100 text-green-700">
+          <span>✅</span>
+          Normal
+        </span>
+      </div>
+
+      <div class="space-y-3 mb-4">
+        <div class="flex justify-between text-sm gap-3">
+          <span class="text-gray-500">Categoría:</span>
+          <span class="font-medium text-right">Maletines</span>
+        </div>
+        <div class="flex justify-between text-sm gap-3">
+          <span class="text-gray-500">Stock Actual:</span>
+          <span class="font-medium text-right">32 unidades</span>
+        </div>
+        <div class="flex justify-between text-sm gap-3">
+          <span class="text-gray-500">Stock Mínimo:</span>
+          <span class="font-medium text-right">10 unidades</span>
+        </div>
+        <div class="flex justify-between text-sm gap-3">
+          <span class="text-gray-500">Precio:</span>
+          <span class="font-medium text-right">$2,100</span>
+        </div>
+        <div class="flex justify-between text-sm gap-3">
+          <span class="text-gray-500">Ubicación:</span>
+          <span class="font-medium text-right">Estante D-1</span>
+        </div>
+        <div class="flex justify-between text-sm pt-2 border-t border-gray-200 gap-3">
+          <span class="text-gray-500">Valor Total:</span>
+          <span class="font-bold text-blue-600">$67,200</span>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div class="h-full bg-green-500 w-full"></div>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all"
+      >
+        Editar
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Modal visual solamente -->
+  <div class="hidden fixed inset-0 bg-black/50 items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="p-6 border-b border-gray-200">
+        <h2 class="text-2xl font-bold">Nuevo Producto</h2>
+      </div>
+
+      <form class="p-6 space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="md:col-span-2">
+            <label class="block text-sm mb-2">Nombre del Producto</label>
+            <input
+              name="nombre"
+              type="text"
+              class="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label class="block text-sm mb-2">Categoría</label>
+            <input
+              name="categoria"
+              type="text"
+              class="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label class="block text-sm mb-2">Ubicación</label>
+            <input
+              name="ubicacion"
+              type="text"
+              class="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label class="block text-sm mb-2">Stock Actual</label>
+            <input
+              name="stock"
+              type="number"
+              min="0"
+              class="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label class="block text-sm mb-2">Stock Mínimo</label>
+            <input
+              name="stockMinimo"
+              type="number"
+              min="0"
+              class="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label class="block text-sm mb-2">Precio ($)</label>
+            <input
+              name="precio"
+              type="number"
+              min="0"
+              step="0.01"
+              class="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </div>
+
+        <div class="flex gap-3 pt-4">
+          <button
+            type="button"
+            class="flex-1 px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all"
+          >
+            Crear
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
