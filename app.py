@@ -20,6 +20,8 @@ from models import db, Rol, Usuario, Cliente, AuthToken
 # Por ultimo se agrega el import, lo que esta despues del import es tu variable en este archivo
 # si yo pusiera import user, en register_bluprint haria (user) no (usuario)
 from routes.usuarios.routes import usuarios
+from routes.proveedores.routes import proveedores
+from routes.productos.routes import productos
 
 
 app = Flask(__name__)
@@ -28,6 +30,8 @@ app.config.from_object(DevelopmentConfig)
 # Seccion para registrar bluprints
 # Despues del import de arriba, aqui registran el bluprint con la variable que definieron
 app.register_blueprint(usuarios)
+app.register_blueprint(proveedores)
+app.register_blueprint(productos)
 
 db.init_app(app)
 TOKEN_EXPIRES_HOURS = int(app.config.get("TOKEN_EXPIRES_HOURS", 8))
@@ -296,16 +300,6 @@ def crear_usuario_staff():
         return redirect(url_for("admin_dashboard"))
 
     return render_template("app/admin_create_staff.html", form=create_form)
-
-
-
-@app.route("/admin/proveedores")
-def proveedores_page():
-    return render_template("private/proveedores.html")
-
-@app.route("/admin/inventario")
-def inventario_page():
-    return render_template("private/inventario.html")
 
 
 if __name__ == "__main__":
