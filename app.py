@@ -13,9 +13,21 @@ from config import DevelopmentConfig
 import forms
 from models import db, Rol, Usuario, Cliente, AuthToken
 
+# Para usar los blueprints hay que importarlos
+# En este caso como estan dentro de routes, se usa "routes." al principio
+# Despues se agrega el nombre de tu modulo, en este caso fue usuarios
+# Despues de agrega el routes
+# Por ultimo se agrega el import, lo que esta despues del import es tu variable en este archivo
+# si yo pusiera import user, en register_bluprint haria (user) no (usuario)
+from routes.usuarios.routes import usuarios
+
 
 app = Flask(__name__)
 app.config.from_object(DevelopmentConfig)
+
+# Seccion para registrar bluprints
+# Despues del import de arriba, aqui registran el bluprint con la variable que definieron
+app.register_blueprint(usuarios)
 
 db.init_app(app)
 TOKEN_EXPIRES_HOURS = int(app.config.get("TOKEN_EXPIRES_HOURS", 8))
@@ -285,9 +297,7 @@ def crear_usuario_staff():
 
     return render_template("app/admin_create_staff.html", form=create_form)
 
-@app.route("/admin/usuarios")
-def usuarios_page():
-    return render_template("private/usuarios.html")
+
 
 @app.route("/admin/proveedores")
 def proveedores_page():

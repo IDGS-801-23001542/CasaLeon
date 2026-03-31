@@ -12,7 +12,7 @@
       <p class="text-gray-500">Gestiona los usuarios del sistema</p>
     </div>
     <a
-      href="{{ url_for('usuarios_page', modal=1) }}"
+      href="{{ url_for('usuarios.usuarios_page', modal=1) }}"
       class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all w-fit"
     >
       <span class="text-xl">+</span>
@@ -41,7 +41,7 @@
   </div>
 
   <!-- Filters -->
-  <form method="GET" action="{{ url_for('usuarios_page') }}" class="flex flex-col md:flex-row gap-4">
+  <form method="GET" action="{{ url_for('usuarios.usuarios_page') }}" class="flex flex-col md:flex-row gap-4">
     <div class="flex-1 relative">
       <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
       <input
@@ -114,7 +114,7 @@
 
         <div class="flex gap-2">
           <a
-            href="{{ url_for('usuarios_page', edit=usuario.id) }}"
+            href="{{ url_for('usuarios.usuarios_page', edit=usuario.id) }}"
             class="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-100 text-blue-600 rounded-xl hover:bg-blue-200 transition-colors"
           >
             Editar
