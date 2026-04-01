@@ -55,3 +55,59 @@ class AuthToken(db.Model):
     revoked = db.Column(db.Integer, nullable=False, default=0)
     user_agent = db.Column(db.String(255))
     ip_addr = db.Column(db.String(45))
+
+class Proveedor(db.Model):
+    __tablename__ = "proveedores"
+
+    id_proveedor = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(150), nullable=False)
+    rfc = db.Column(db.String(20), unique=True)
+    email = db.Column(db.String(120))
+    telefono = db.Column(db.String(30))
+    calle = db.Column(db.String(120))
+    numero = db.Column(db.String(20))
+    colonia = db.Column(db.String(120))
+    ciudad = db.Column(db.String(80))
+    estado = db.Column(db.String(80))
+    pais = db.Column(db.String(80))
+    cp = db.Column(db.String(10))
+    activo = db.Column(db.Integer, nullable=False, default=1)
+
+    def __repr__(self):
+        return f"<Proveedor {self.id_proveedor} - {self.nombre}>"
+
+
+class CategoriaProducto(db.Model):
+    __tablename__ = "categorias_producto"
+
+    id_categoria_producto = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(60), nullable=False, unique=True)
+
+    productos = db.relationship("Producto", backref="categoria", lazy=True)
+
+    def __repr__(self):
+        return f"<CategoriaProducto {self.id_categoria_producto} - {self.nombre}>"
+
+
+class Producto(db.Model):
+    __tablename__ = "productos"
+
+    id_producto = db.Column(db.Integer, primary_key=True)
+    id_categoria_producto = db.Column(
+        db.Integer,
+        db.ForeignKey("categorias_producto.id_categoria_producto"),
+        nullable=False
+    )
+
+    sku = db.Column(db.String(40), unique=True)
+    nombre = db.Column(db.String(120), nullable=False, unique=True)
+    descripcion = db.Column(db.String(255))
+
+    precio_venta = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    stock_actual = db.Column(db.Numeric(14, 4), nullable=False, default=0)
+    costo_unit_prom = db.Column(db.Numeric(12, 4), nullable=False, default=0)
+
+    activo = db.Column(db.Integer, nullable=False, default=1)
+
+    def __repr__(self):
+        return f"<Producto {self.id_producto} - {self.nombre}>"

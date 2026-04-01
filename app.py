@@ -6,6 +6,7 @@ from functools import wraps
 
 from flask import Flask, render_template, redirect, url_for, request
 from flask import flash, make_response, g
+from flask_migrate import Migrate
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -34,6 +35,7 @@ app.register_blueprint(proveedores)
 app.register_blueprint(productos)
 
 db.init_app(app)
+migrate = Migrate(app,db)
 TOKEN_EXPIRES_HOURS = int(app.config.get("TOKEN_EXPIRES_HOURS", 8))
 
 
