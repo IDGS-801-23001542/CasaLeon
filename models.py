@@ -108,6 +108,7 @@ class Producto(db.Model):
     costo_unit_prom = db.Column(db.Numeric(12, 4), nullable=False, default=0)
 
     activo = db.Column(db.Integer, nullable=False, default=1)
+    imagen = db.Column(db.String(255))
 
     def __repr__(self):
         return f"<Producto {self.id_producto} - {self.nombre}>"

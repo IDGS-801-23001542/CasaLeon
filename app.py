@@ -7,12 +7,13 @@ from functools import wraps
 from flask import Flask, render_template, redirect, url_for, request
 from flask import flash, make_response, g
 from flask_migrate import Migrate
+from sqlalchemy import text
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from config import DevelopmentConfig
 import forms
-from models import db, Rol, Usuario, Cliente, AuthToken
+from models import db, Rol, Usuario, Cliente, AuthToken, Producto, CategoriaProducto 
 
 # Para usar los blueprints hay que importarlos
 # En este caso como estan dentro de routes, se usa "routes." al principio
@@ -144,9 +145,18 @@ def login_required(roles=None):
 # =========================
 @app.route("/")
 def home():
-    # Página pública (empresa + productos preview). Por ahora placeholder bonito.
-    return render_template("tienda/home.html", public=True)
+    productos = db.session.query(
+        Producto.id_producto,
+        Producto.nombre,
+        Producto.descripcion,
+        Producto.precio_venta,
+        Producto.stock_actual,
+        Producto.imagen,   # solo si el modelo tiene el campo
+        CategoriaProducto.nombre.label('categoria')
+    ).join(CategoriaProducto, Producto.id_categoria_producto == CategoriaProducto.id_categoria_producto
+    ).filter(Producto.activo == 1).all()
 
+    return render_template("tienda/home.html", productos=productos)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
