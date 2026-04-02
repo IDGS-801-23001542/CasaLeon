@@ -9,7 +9,6 @@
     function toggleSidebar() {
       const sidebar = document.getElementById("sidebar");
       const overlay = document.getElementById("mobile-overlay");
-
       sidebar.classList.toggle("-translate-x-full");
       overlay.classList.toggle("hidden");
     }
@@ -17,7 +16,6 @@
     function closeSidebar() {
       const sidebar = document.getElementById("sidebar");
       const overlay = document.getElementById("mobile-overlay");
-
       sidebar.classList.add("-translate-x-full");
       overlay.classList.add("hidden");
     }
@@ -26,17 +24,28 @@
 <body class="min-h-screen bg-gray-100">
   {% set current_path = request.path %}
 
-  {% set menu_items = [
-    {"label": "Dashboard", "path": "/admin", "icon": "📊"},
-    {"label": "Materia Prima", "path": "/admin/compras", "icon": "🛒"},
-    {"label": "Producción", "path": "/admin/produccion", "icon": "🏭"},
-    {"label": "Productos", "path": "/private/productos", "icon": "📦"},
-    {"label": "Ventas", "path": "/admin/ventas", "icon": "📈"},
-    {"label": "Reportes", "path": "/admin/reportes", "icon": "📉"},
-    {"label": "Proveedores", "path": "/private/admin/proveedores", "icon": "🚚"},
-    {"label": "Usuarios", "path": "/private/admin/usuarios", "icon": "👥"},
-    {"label": "Auditoría", "path": "/admin/auditoria", "icon": "📄"}
-  ] %}
+  {% if g.role == "ADMIN" %}
+    {% set menu_items = [
+      {"label": "Dashboard", "path": url_for('tienda.admin_dashboard'), "icon": "📊"},
+      {"label": "Materia Prima", "path": url_for('operaciones.materia_prima'), "icon": "🛒"},
+      {"label": "Producción", "path": url_for('operaciones.produccion'), "icon": "🏭"},
+      {"label": "Inventario", "path": url_for('productos.listado_productos'), "icon": "📦"},
+      {"label": "Ventas", "path": url_for('operaciones.ventas'), "icon": "📈"},
+      {"label": "Reportes", "path": url_for('operaciones.reportes'), "icon": "📉"},
+      {"label": "Proveedores", "path": url_for('proveedores.listado_proveedores'), "icon": "🚚"},
+      {"label": "Usuarios", "path": url_for('usuarios.listado_usuarios'), "icon": "👥"},
+      {"label": "Auditoría", "path": url_for('auditoria.listado_auditoria'), "icon": "📄"},
+      {"label": "Recetas", "path": url_for('operaciones.recetas'), "icon": "🧾"}
+    ] %}
+  {% else %}
+    {% set menu_items = [
+      {"label": "Dashboard", "path": url_for('tienda.vendedor_dashboard'), "icon": "📊"},
+      {"label": "Materia Prima", "path": url_for('operaciones.materia_prima'), "icon": "🛒"},
+      {"label": "Producción", "path": url_for('operaciones.produccion'), "icon": "🏭"},
+      {"label": "Inventario", "path": url_for('productos.listado_productos'), "icon": "📦"},
+      {"label": "Ventas", "path": url_for('operaciones.ventas'), "icon": "📈"}
+    ] %}
+  {% endif %}
 
   <header class="lg:hidden fixed top-0 left-0 right-0 z-50 bg-blue-900 border-b border-blue-800 shadow-lg">
     <div class="flex items-center justify-between px-4 py-3">
@@ -81,12 +90,7 @@
 
     <nav class="p-4 space-y-2">
       {% for item in menu_items %}
-        {% set active =
-          (item.path == "/admin" and current_path == "/admin")
-          or
-          (item.path != "/admin" and current_path.startswith(item.path))
-        %}
-
+        {% set active = current_path == item.path %}
         <a
           href="{{ item.path }}"
           onclick="closeSidebar()"

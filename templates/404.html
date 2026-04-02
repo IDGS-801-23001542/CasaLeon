@@ -1,20 +1,96 @@
-{% extends "layout.html" %}
+{% macro field(form_field, placeholder="", type="text", icon=None) %}
+  <div class="mb-4">
+    <label class="block mb-2 text-sm font-medium text-gray-900">
+      {{ form_field.label.text }}
+    </label>
 
-{% block title %}Página no encontrada | Casa León{% endblock %}
+    <div class="relative">
+      {% if icon %}
+        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+          {{ icon|safe }}
+        </div>
+      {% endif %}
 
-{% block body %}
-<section class="min-h-[calc(100vh-120px)] flex items-center justify-center bg-stone-50 px-6">
-  <div class="max-w-xl text-center">
-    <p class="text-sm font-semibold uppercase tracking-widest text-emerald-700">Error 404</p>
-    <h1 class="mt-4 text-4xl font-bold text-gray-900">Página no encontrada</h1>
-    <p class="mt-4 text-gray-600">
-      La ruta que intentaste abrir no existe o fue movida.
-    </p>
-    <div class="mt-8 flex justify-center gap-4">
-      <a href="{{ url_for('home') }}" class="px-6 py-3 rounded-xl bg-emerald-800 text-white hover:bg-emerald-900 transition font-semibold">
-        Ir al inicio
-      </a>
+      {{ form_field(
+        class=(
+          "bg-white border border-gray-200 text-gray-900 text-sm rounded-xl "
+          "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full "
+          "p-3 " ~ ("ps-10" if icon else "") ~
+          " placeholder:text-gray-400"
+        ),
+        placeholder=placeholder,
+        type=type
+      ) }}
     </div>
+
+    {% if form_field.errors %}
+      <p class="mt-2 text-sm text-red-600">
+        {% for e in form_field.errors %}{{ e }}{% if not loop.last %}<br>{% endif %}{% endfor %}
+      </p>
+    {% endif %}
   </div>
-</section>
-{% endblock %}
+{% endmacro %}
+
+{% macro checkbox(form_field, text="") %}
+  <div class="flex items-center gap-2 select-none">
+    {{ form_field(class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500") }}
+    <label class="text-sm text-gray-700">{{ text or form_field.label.text }}</label>
+  </div>
+{% endmacro %}
+
+{% macro select_field(form_field, icon=None) %}
+  <div class="mb-4">
+    <label class="block mb-2 text-sm font-medium text-gray-900">
+      {{ form_field.label.text }}
+    </label>
+
+    <div class="relative">
+      {% if icon %}
+        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+          {{ icon|safe }}
+        </div>
+      {% endif %}
+
+      {{ form_field(
+        class=(
+          "bg-white border border-gray-200 text-gray-900 text-sm rounded-xl "
+          "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full "
+          "p-3 " ~ ("ps-10" if icon else "")
+        )
+      ) }}
+    </div>
+
+    {% if form_field.errors %}
+      <p class="mt-2 text-sm text-red-600">
+        {% for e in form_field.errors %}{{ e }}{% if not loop.last %}<br>{% endif %}{% endfor %}
+      </p>
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{% macro form_errors(form) %}
+  {% if form.errors %}
+    <div class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+      <p class="text-sm font-medium text-red-700 mb-1">Corrige los siguientes errores:</p>
+      <ul class="text-sm text-red-600 list-disc list-inside">
+        {% for field_name, errors in form.errors.items() %}
+          {% for error in errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+{% endmacro %}
+
+{% macro estado_badge(activo) %}
+  {% if activo == 1 %}
+    <span class="px-3 py-1 rounded-full text-xs bg-green-100 text-green-700">
+      Activo
+    </span>
+  {% else %}
+    <span class="px-3 py-1 rounded-full text-xs bg-red-100 text-red-700">
+      Inactivo
+    </span>
+  {% endif %}
+{% endmacro %}

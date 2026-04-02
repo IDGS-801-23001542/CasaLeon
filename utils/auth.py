@@ -25,8 +25,9 @@ def hash_token(raw: str) -> str:
 def issue_token(subject_type: str, subject_id: int) -> str:
     raw = secrets.token_urlsafe(48)
     token_hash = hash_token(raw)
+
     expires = datetime.utcnow() + timedelta(
-        hours=int(current_app.config.get("TOKEN_EXPIRES_HOURS", 8))
+        minutes=int(current_app.config.get("TOKEN_EXPIRES_MINUTES", 10))
     )
 
     token = AuthToken(
@@ -80,7 +81,7 @@ def build_login_response(redirect_to: str, raw_token: str):
         httponly=True,
         samesite="Lax",
         secure=bool(current_app.config.get("SESSION_COOKIE_SECURE", False)),
-        max_age=int(current_app.config.get("TOKEN_EXPIRES_HOURS", 8)) * 3600,
+        max_age=int(current_app.config.get("TOKEN_EXPIRES_MINUTES", 10)) * 60,
     )
     return resp
 

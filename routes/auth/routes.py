@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import forms
 from models import db, Usuario, Cliente
 from utils.auth import issue_token, revoke_token, build_login_response, COOKIE_NAME
+from utils.audit import log_event
 from . import auth
 
 
@@ -25,6 +26,16 @@ def login():
 
         if u and check_password_hash(u.password_hash, password):
             raw = issue_token("USUARIO", u.id_usuario)
+            log_event(
+                modulo="Autenticación",
+                accion="Inicio de sesión",
+                detalle=f"Usuario '{u.email}' inició sesión exitosamente",
+                severidad="INFO",
+                actor_tipo="USUARIO",
+                actor_id=u.id_usuario,
+                actor_nombre=u.nombre,
+                actor_email=u.email,
+            )
             resp = build_login_response(url_for("auth.post_login"), raw)
             flash(f"Bienvenido, {u.nombre}.", "success")
             return resp
@@ -36,10 +47,27 @@ def login():
 
         if c and c.password_hash and check_password_hash(c.password_hash, password):
             raw = issue_token("CLIENTE", c.id_cliente)
+            log_event(
+                modulo="Autenticación",
+                accion="Inicio de sesión",
+                detalle=f"Cliente '{c.email}' inició sesión exitosamente",
+                severidad="INFO",
+                actor_tipo="CLIENTE",
+                actor_id=c.id_cliente,
+                actor_nombre=c.nombre,
+                actor_email=c.email,
+            )
             resp = build_login_response(url_for("auth.post_login"), raw)
             flash(f"Bienvenido, {c.nombre}.", "success")
             return resp
 
+        log_event(
+            modulo="Autenticación",
+            accion="Acceso denegado",
+            detalle=f"Intento de inicio de sesión fallido para '{email}'",
+            severidad="WARNING",
+            actor_email=email,
+        )
         flash("Credenciales inválidas.", "danger")
 
     return render_template("auth/login.html", form=form)
@@ -72,6 +100,17 @@ def register():
         db.session.add(cliente)
         db.session.commit()
 
+        log_event(
+            modulo="Usuarios",
+            accion="Cliente registrado",
+            detalle=f"Nuevo cliente '{email}' creado desde registro público",
+            severidad="INFO",
+            actor_tipo="CLIENTE",
+            actor_id=cliente.id_cliente,
+            actor_nombre=cliente.nombre,
+            actor_email=cliente.email,
+        )
+
         flash("Cuenta creada correctamente. Ahora inicia sesión.", "success")
         return redirect(url_for("auth.login"))
 
@@ -95,6 +134,15 @@ def post_login():
 @auth.route("/logout")
 def logout():
     raw = request.cookies.get(COOKIE_NAME)
+
+    if g.user:
+        log_event(
+            modulo="Autenticación",
+            accion="Cierre de sesión",
+            detalle=f"Sesión cerrada por '{getattr(g.user, 'email', 'sin-email')}'",
+            severidad="INFO",
+        )
+
     revoke_token(raw)
     resp = make_response(redirect(url_for("tienda.home")))
     resp.delete_cookie(COOKIE_NAME)
