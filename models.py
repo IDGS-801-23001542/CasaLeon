@@ -1,5 +1,4 @@
 from flask_sqlalchemy import SQLAlchemy
-
 import datetime
 
 db = SQLAlchemy()
@@ -8,7 +7,7 @@ db = SQLAlchemy()
 class Rol(db.Model):
     __tablename__ = "Rol"
     id_rol = db.Column(db.Integer, primary_key=True)
-    codigo = db.Column(db.String(30), unique=True, nullable=False)  # ADMIN / EMPLEADO
+    codigo = db.Column(db.String(30), unique=True, nullable=False)
     descripcion = db.Column(db.String(120), nullable=False)
 
 
@@ -38,10 +37,11 @@ class Cliente(db.Model):
     estado = db.Column(db.String(80))
     pais = db.Column(db.String(80))
     cp = db.Column(db.String(10))
-
     password_hash = db.Column(db.String(255))
     creado_en = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
     activo = db.Column(db.Integer, nullable=False, default=1)
+
+    pedidos = db.relationship("Pedido", backref="cliente", lazy=True)
 
 
 class AuthToken(db.Model):
@@ -55,6 +55,7 @@ class AuthToken(db.Model):
     revoked = db.Column(db.Integer, nullable=False, default=0)
     user_agent = db.Column(db.String(255))
     ip_addr = db.Column(db.String(45))
+
 
 class Proveedor(db.Model):
     __tablename__ = "proveedores"
@@ -102,13 +103,57 @@ class Producto(db.Model):
     sku = db.Column(db.String(40), unique=True)
     nombre = db.Column(db.String(120), nullable=False, unique=True)
     descripcion = db.Column(db.String(255))
-
     precio_venta = db.Column(db.Numeric(12, 2), nullable=False, default=0)
     stock_actual = db.Column(db.Numeric(14, 4), nullable=False, default=0)
     costo_unit_prom = db.Column(db.Numeric(12, 4), nullable=False, default=0)
-
     activo = db.Column(db.Integer, nullable=False, default=1)
     imagen = db.Column(db.String(255))
 
     def __repr__(self):
         return f"<Producto {self.id_producto} - {self.nombre}>"
+
+
+class Pedido(db.Model):
+    __tablename__ = "pedidos"
+
+    id_pedido = db.Column(db.Integer, primary_key=True)
+    id_cliente = db.Column(db.Integer, db.ForeignKey("Cliente.id_cliente"), nullable=False)
+
+    folio = db.Column(db.String(30), unique=True, nullable=False)
+    estado = db.Column(db.String(30), nullable=False, default="Pendiente")
+    total = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+
+    nombre_envio = db.Column(db.String(150), nullable=False)
+    telefono_envio = db.Column(db.String(30))
+    calle_envio = db.Column(db.String(120), nullable=False)
+    numero_envio = db.Column(db.String(20), nullable=False)
+    colonia_envio = db.Column(db.String(120), nullable=False)
+    ciudad_envio = db.Column(db.String(80), nullable=False)
+    estado_envio = db.Column(db.String(80), nullable=False)
+    pais_envio = db.Column(db.String(80), nullable=False, default="México")
+    cp_envio = db.Column(db.String(10), nullable=False)
+
+    notas = db.Column(db.String(255))
+    creado_en = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
+
+    detalles = db.relationship(
+        "PedidoDetalle",
+        backref="pedido",
+        lazy=True,
+        cascade="all, delete-orphan"
+    )
+
+
+class PedidoDetalle(db.Model):
+    __tablename__ = "pedido_detalles"
+
+    id_pedido_detalle = db.Column(db.Integer, primary_key=True)
+    id_pedido = db.Column(db.Integer, db.ForeignKey("pedidos.id_pedido"), nullable=False)
+    id_producto = db.Column(db.Integer, db.ForeignKey("productos.id_producto"), nullable=False)
+
+    producto_nombre = db.Column(db.String(120), nullable=False)
+    precio_unitario = db.Column(db.Numeric(12, 2), nullable=False)
+    cantidad = db.Column(db.Integer, nullable=False, default=1)
+    subtotal = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+
+    producto = db.relationship("Producto")

@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+
+{% block title %}Contacto | Casa León{% endblock %}
+
+{% block body %}
+<section class="bg-stone-50">
+  <section class="bg-gradient-to-r from-emerald-900 via-emerald-700 to-stone-300">
+    <div class="max-w-screen-2xl mx-auto px-6 py-24 text-white">
+      <h1 class="text-5xl md:text-7xl font-extrabold">Contacto</h1>
+      <p class="mt-6 text-xl md:text-2xl max-w-4xl leading-relaxed">
+        Estamos listos para ayudarte con pedidos, productos personalizados y dudas sobre Casa León.
+      </p>
+    </div>
+  </section>
+
+  <section class="max-w-screen-2xl mx-auto px-6 py-16">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="bg-white border border-gray-200 rounded-3xl shadow-sm p-8">
+        <h2 class="text-2xl font-bold text-emerald-900">Correo</h2>
+        <p class="mt-4 text-gray-600 text-lg">info@casaleon.com</p>
+      </div>
+
+      <div class="bg-white border border-gray-200 rounded-3xl shadow-sm p-8">
+        <h2 class="text-2xl font-bold text-emerald-900">Teléfono</h2>
+        <p class="mt-4 text-gray-600 text-lg">+52 123-456-7890</p>
+      </div>
+
+      <div class="bg-white border border-gray-200 rounded-3xl shadow-sm p-8">
+        <h2 class="text-2xl font-bold text-emerald-900">Ubicación</h2>
+        <p class="mt-4 text-gray-600 text-lg">León, Guanajuato, México</p>
+      </div>
+    </div>
+
+    <div class="mt-10 bg-white border border-gray-200 rounded-3xl shadow-sm p-10">
+      <h2 class="text-4xl font-extrabold text-emerald-900">Atención al cliente</h2>
+      <p class="mt-4 text-gray-600 leading-8 text-lg">
+        Si necesitas información sobre disponibilidad, pedidos especiales o seguimiento de compra, puedes comunicarte con nosotros por cualquiera de nuestros canales.
+      </p>
+
+      <div class="mt-8 flex flex-wrap gap-4">
+        <a href="mailto:info@casaleon.com"
+           class="text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-bold rounded-xl text-lg px-8 py-4 text-center">
+          Enviar correo
+        </a>
+        <a href="{{ url_for('productos_publico') }}"
+           class="text-emerald-900 bg-white border border-emerald-800 hover:bg-emerald-50 focus:ring-4 focus:outline-none focus:ring-emerald-200 font-bold rounded-xl text-lg px-8 py-4 text-center">
+          Ver productos
+        </a>
+      </div>
+    </div>
+  </section>
+</section>
+{% endblock %}

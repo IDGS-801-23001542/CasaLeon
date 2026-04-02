@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+
+{% block title %}Página no encontrada | Casa León{% endblock %}
+
+{% block body %}
+<section class="min-h-[calc(100vh-120px)] flex items-center justify-center bg-stone-50 px-6">
+  <div class="max-w-xl text-center">
+    <p class="text-sm font-semibold uppercase tracking-widest text-emerald-700">Error 404</p>
+    <h1 class="mt-4 text-4xl font-bold text-gray-900">Página no encontrada</h1>
+    <p class="mt-4 text-gray-600">
+      La ruta que intentaste abrir no existe o fue movida.
+    </p>
+    <div class="mt-8 flex justify-center gap-4">
+      <a href="{{ url_for('home') }}" class="px-6 py-3 rounded-xl bg-emerald-800 text-white hover:bg-emerald-900 transition font-semibold">
+        Ir al inicio
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

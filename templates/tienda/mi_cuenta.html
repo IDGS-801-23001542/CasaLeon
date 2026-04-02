@@ -1,0 +1,81 @@
+{% extends "layout.html" %}
+
+{% block title %}Mi cuenta | Casa León{% endblock %}
+
+{% block body %}
+<section class="bg-stone-50 min-h-[calc(100vh-120px)]">
+  <div class="max-w-screen-xl mx-auto px-6 py-16">
+    <div class="mb-8">
+      <h1 class="text-4xl font-extrabold text-emerald-900">Mi cuenta</h1>
+      <p class="text-gray-600 mt-2">Actualiza tu información personal y dirección de envío.</p>
+    </div>
+
+    <div class="bg-white border border-gray-200 rounded-3xl shadow-sm p-8">
+      <form method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-5" novalidate>
+        {{ form.hidden_tag() }}
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Nombre completo</label>
+          {{ form.nombre(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-700 focus:border-emerald-700 block w-full p-4", required=True, maxlength="150", minlength="2", autocomplete="name") }}
+          {% for error in form.nombre.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Teléfono</label>
+          {{ form.telefono(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-700 focus:border-emerald-700 block w-full p-4", maxlength="15", autocomplete="tel", inputmode="tel") }}
+          {% for error in form.telefono.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Calle</label>
+          {{ form.calle(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-700 focus:border-emerald-700 block w-full p-4", maxlength="120", autocomplete="address-line1") }}
+          {% for error in form.calle.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Número</label>
+          {{ form.numero(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-700 focus:border-emerald-700 block w-full p-4", maxlength="20", autocomplete="address-line2") }}
+          {% for error in form.numero.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Colonia</label>
+          {{ form.colonia(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-700 focus:border-emerald-700 block w-full p-4", maxlength="120") }}
+          {% for error in form.colonia.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Ciudad</label>
+          {{ form.ciudad(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-700 focus:border-emerald-700 block w-full p-4", maxlength="80", autocomplete="address-level2") }}
+          {% for error in form.ciudad.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Estado</label>
+          {{ form.estado(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-700 focus:border-emerald-700 block w-full p-4", maxlength="80", autocomplete="address-level1") }}
+          {% for error in form.estado.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">País</label>
+          {{ form.pais(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-700 focus:border-emerald-700 block w-full p-4", maxlength="80", autocomplete="country-name") }}
+          {% for error in form.pais.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block mb-2 text-sm font-medium text-gray-900">Código postal</label>
+          {{ form.cp(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-700 focus:border-emerald-700 block w-full p-4", maxlength="10", inputmode="numeric", autocomplete="postal-code") }}
+          {% for error in form.cp.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div class="md:col-span-2 flex justify-end">
+          <button type="submit"
+            class="text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-bold rounded-xl text-lg px-6 py-4 text-center">
+            Guardar cambios
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

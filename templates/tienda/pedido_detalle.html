@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+
+{% block title %}Detalle de pedido | Casa León{% endblock %}
+
+{% block body %}
+<section class="bg-stone-50 min-h-[calc(100vh-120px)]">
+  <div class="max-w-screen-2xl mx-auto px-6 py-16">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
+      <div>
+        <h1 class="text-4xl font-extrabold text-emerald-900">{{ pedido.folio }}</h1>
+        <p class="text-gray-600 mt-2">Pedido registrado el {{ pedido.creado_en.strftime('%d/%m/%Y %H:%M') }}</p>
+      </div>
+
+      <a href="{{ url_for('mis_pedidos') }}"
+         class="text-emerald-900 bg-white border border-emerald-800 hover:bg-emerald-50 focus:ring-4 focus:outline-none focus:ring-emerald-200 font-medium rounded-xl text-sm px-5 py-3 text-center">
+        Volver a mis pedidos
+      </a>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+      <div class="xl:col-span-2 bg-white border border-gray-200 rounded-3xl shadow-sm p-8">
+        <h2 class="text-2xl font-bold text-emerald-900 mb-6">Productos</h2>
+
+        <div class="space-y-5">
+          {% for d in pedido.detalles %}
+            <div class="border border-gray-200 rounded-2xl p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <p class="text-xl font-bold text-emerald-900">{{ d.producto_nombre }}</p>
+                <p class="text-gray-500 mt-1">Cantidad: {{ d.cantidad }}</p>
+                <p class="text-gray-500">Precio unitario: ${{ "{:,.2f}".format(d.precio_unitario) }}</p>
+              </div>
+              <div class="text-right">
+                <p class="text-sm text-gray-500">Subtotal</p>
+                <p class="text-2xl font-extrabold text-emerald-900">${{ "{:,.2f}".format(d.subtotal) }}</p>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="space-y-6">
+        <div class="bg-white border border-gray-200 rounded-3xl shadow-sm p-6">
+          <h2 class="text-2xl font-bold text-emerald-900 mb-4">Resumen</h2>
+          <div class="space-y-3 text-gray-700">
+            <p><span class="font-semibold text-emerald-900">Estado:</span> {{ pedido.estado }}</p>
+            <p><span class="font-semibold text-emerald-900">Total:</span> ${{ "{:,.2f}".format(pedido.total) }}</p>
+          </div>
+        </div>
+
+        <div class="bg-white border border-gray-200 rounded-3xl shadow-sm p-6">
+          <h2 class="text-2xl font-bold text-emerald-900 mb-4">Envío</h2>
+          <div class="space-y-2 text-gray-700">
+            <p>{{ pedido.nombre_envio }}</p>
+            <p>{{ pedido.telefono_envio or "Sin teléfono" }}</p>
+            <p>{{ pedido.calle_envio }} {{ pedido.numero_envio }}</p>
+            <p>{{ pedido.colonia_envio }}</p>
+            <p>{{ pedido.ciudad_envio }}, {{ pedido.estado_envio }}</p>
+            <p>{{ pedido.pais_envio }} {{ pedido.cp_envio }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

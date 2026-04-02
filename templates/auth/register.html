@@ -1,67 +1,95 @@
 {% extends "layout.html" %}
-{% import "_macros.html" as ui %}
 
 {% block title %}Registro | Casa León{% endblock %}
 
 {% block body %}
-<section class="min-h-screen bg-white relative overflow-hidden">
+<section class="min-h-[calc(100vh-120px)] bg-gradient-to-r from-emerald-900 via-emerald-700 to-stone-300 flex items-center justify-center px-6 py-16">
+  <div class="w-full max-w-xl">
+    <div class="bg-white rounded-3xl shadow-2xl overflow-hidden">
+      <div class="bg-gradient-to-r from-emerald-900 to-stone-300 px-8 py-10 text-center">
+        <img src="{{ url_for('static', filename='img/casaLeon.png') }}" alt="Casa León" class="h-24 w-auto mx-auto mb-4">
+        <h1 class="text-4xl font-extrabold text-white">Crear cuenta</h1>
+        <p class="mt-2 text-white/90 text-lg">Registro para clientes</p>
+      </div>
 
-  <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-    <div class="w-[900px] h-[900px] rounded-full blur-3xl opacity-70
-                bg-gradient-to-br from-cl-cream via-white to-emerald-50"></div>
-  </div>
+      <div class="p-8">
+        <form method="POST" action="{{ url_for('register') }}" class="space-y-5" novalidate>
+          {{ form.hidden_tag() }}
 
-  <div class="relative z-10 min-h-screen flex items-center justify-center p-6">
-    <div class="w-full max-w-md">
-      <div class="rounded-3xl border-2 border-cl-brown/70 bg-white/55 backdrop-blur-xl shadow-[0_20px_60px_-25px_rgba(0,0,0,0.35)]">
-        <div class="p-8">
-          <div class="text-center">
-            <img src="{{ url_for('static', filename='img/casaLeon.png') }}" class="h-10 mx-auto mb-3" alt="Casa León">
-            <h1 class="text-2xl font-semibold text-gray-900">Crear cuenta</h1>
-            <p class="text-sm text-gray-600">Registro para clientes de la tienda</p>
+          <div>
+            <label class="block mb-2 text-sm font-medium text-gray-900">Nombre completo</label>
+            {{ form.nombre(
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-700 focus:border-emerald-700 block w-full p-4",
+              placeholder="Tu nombre completo",
+              required=True,
+              maxlength="150",
+              minlength="2",
+              autocomplete="name",
+              pattern="[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+",
+              title="Solo letras y espacios"
+            ) }}
+            {% for error in form.nombre.errors %}
+              <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+            {% endfor %}
           </div>
 
-          {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-              <div class="mt-5 space-y-2">
-                {% for category, message in messages %}
-                  {% set cls = "bg-emerald-50 text-emerald-800 border-emerald-200" if category=="success"
-                            else "bg-red-50 text-red-800 border-red-200" if category=="danger"
-                            else "bg-amber-50 text-amber-800 border-amber-200" if category=="warning"
-                            else "bg-blue-50 text-blue-800 border-blue-200" %}
-                  <div class="text-sm border rounded-xl px-3 py-2 {{ cls }}">
-                    {{ message }}
-                  </div>
-                {% endfor %}
-              </div>
-            {% endif %}
-          {% endwith %}
+          <div>
+            <label class="block mb-2 text-sm font-medium text-gray-900">Correo Electrónico</label>
+            {{ form.email(
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-700 focus:border-emerald-700 block w-full p-4",
+              placeholder="correo@ejemplo.com",
+              required=True,
+              maxlength="120",
+              autocomplete="email",
+              type="email"
+            ) }}
+            {% for error in form.email.errors %}
+              <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+            {% endfor %}
+          </div>
 
-          <form method="POST" action="{{ url_for('register') }}" class="mt-6">
-            {{ form.hidden_tag() }}
+          <div>
+            <label class="block mb-2 text-sm font-medium text-gray-900">Teléfono</label>
+            {{ form.telefono(
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-700 focus:border-emerald-700 block w-full p-4",
+              placeholder="4771234567",
+              maxlength="15",
+              autocomplete="tel",
+              inputmode="tel",
+              pattern="^\+?[0-9\s\-]+$",
+              title="Solo números, espacios, guiones y un + opcional"
+            ) }}
+            {% for error in form.telefono.errors %}
+              <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+            {% endfor %}
+          </div>
 
-            {{ ui.field(form.nombre, placeholder="Tu nombre completo") }}
-            {{ ui.field(form.email, placeholder="correo@ejemplo.com", type="email") }}
-            {{ ui.field(form.telefono, placeholder="Opcional") }}
-            {{ ui.field(form.password, placeholder="Mínimo 6 caracteres", type="password") }}
+          <div>
+            <label class="block mb-2 text-sm font-medium text-gray-900">Contraseña</label>
+            {{ form.password(
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-700 focus:border-emerald-700 block w-full p-4",
+              placeholder="Mínimo 6 caracteres",
+              required=True,
+              minlength="6",
+              maxlength="100",
+              autocomplete="new-password"
+            ) }}
+            {% for error in form.password.errors %}
+              <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+            {% endfor %}
+            <p class="mt-2 text-xs text-gray-500">Debe contener al menos una letra y un número.</p>
+          </div>
 
-            <button type="submit"
-              class="w-full rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-semibold py-3 transition focus:ring-4 focus:ring-emerald-200 mt-2">
-              Crear cuenta
-            </button>
+          <button type="submit"
+            class="w-full text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-bold rounded-xl text-lg px-5 py-4 text-center">
+            Registrarme
+          </button>
+        </form>
 
-            <div class="mt-5 text-center text-sm text-gray-700">
-              ¿Ya tienes cuenta?
-              <a href="{{ url_for('login') }}" class="text-emerald-800 font-semibold hover:underline">
-                Inicia sesión
-              </a>
-            </div>
-          </form>
-        </div>
-
-        <div class="px-8 pb-7">
-          <p class="text-center text-xs text-gray-600">Casa León · Tienda</p>
-        </div>
+        <p class="mt-6 text-center text-gray-600">
+          ¿Ya tienes cuenta?
+          <a href="{{ url_for('login') }}" class="font-semibold text-emerald-800 hover:underline">Inicia sesión</a>
+        </p>
       </div>
     </div>
   </div>
