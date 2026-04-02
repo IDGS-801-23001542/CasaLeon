@@ -13,7 +13,7 @@
       </div>
 
       <div class="p-8">
-        <form method="POST" action="{{ url_for('login') }}" class="space-y-6" novalidate>
+        <form method="POST" action="{{ url_for('auth.login') }}" class="space-y-6" novalidate>
           {{ form.hidden_tag() }}
 
           <div>
@@ -65,7 +65,7 @@
 
         <p class="mt-6 text-center text-gray-600">
           ¿No tienes cuenta?
-          <a href="{{ url_for('register') }}" class="font-semibold text-emerald-800 hover:underline">Regístrate</a>
+          <a href="{{ url_for('auth.register') }}" class="font-semibold text-emerald-800 hover:underline">Regístrate</a>
         </p>
       </div>
     </div>

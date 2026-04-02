@@ -1,41 +1,21 @@
-{% extends "layout.html" %}
-{% block title %}Empleado | Casa León{% endblock %}
+{% extends "base.html" %}
 
-{% block body %}
-<div class="min-h-screen bg-cl-cream">
-  <header class="bg-white/80 backdrop-blur border-b border-cl-line">
-    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <img src="{{ url_for('static', filename='img/casaLeon.png') }}" class="h-8" alt="Casa León">
-        <div>
-          <p class="font-semibold text-gray-900 leading-5">Panel Empleado</p>
-          <p class="text-sm text-gray-600">Ventas / Pedidos</p>
-        </div>
+{% block title %}Dashboard Admin | Casa León{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+    <div class="flex items-center justify-between gap-4">
+      <div>
+        <h1 class="text-3xl font-bold mb-2">Dashboard Admin</h1>
+        <p class="text-gray-500">Bienvenido, {{ g.user.nombre }}</p>
       </div>
-      <a href="{{ url_for('logout') }}" class="text-sm font-semibold text-red-600 hover:underline">Cerrar sesión</a>
-    </div>
-  </header>
 
-  <main class="max-w-6xl mx-auto px-6 py-10">
-    <div class="rounded-3xl border border-cl-line bg-white p-8 shadow-sm">
-      <h1 class="text-3xl font-semibold text-gray-900">A trabajar 🧾</h1>
-      <p class="mt-2 text-gray-700">POS, pedidos tienda y consulta de inventario.</p>
-
-      <div class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div class="rounded-2xl bg-cl-cream border border-cl-line p-5">
-          <p class="font-semibold text-gray-900">Ventas (POS)</p>
-          <p class="text-sm text-gray-600 mt-1">Pendiente</p>
-        </div>
-        <div class="rounded-2xl bg-cl-cream border border-cl-line p-5">
-          <p class="font-semibold text-gray-900">Pedidos</p>
-          <p class="text-sm text-gray-600 mt-1">Pendiente</p>
-        </div>
-        <div class="rounded-2xl bg-cl-cream border border-cl-line p-5">
-          <p class="font-semibold text-gray-900">Inventario</p>
-          <p class="text-sm text-gray-600 mt-1">Consulta</p>
-        </div>
-      </div>
+      <a href="{{ url_for('auth.logout') }}"
+         class="text-sm font-semibold text-red-600 hover:underline">
+        Cerrar sesión
+      </a>
     </div>
-  </main>
+  </div>
 </div>
 {% endblock %}

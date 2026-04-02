@@ -13,7 +13,7 @@
 
   <nav class="bg-white border-b border-gray-200 shadow-sm">
     <div class="max-w-screen-2xl flex flex-wrap items-center justify-between mx-auto px-6 py-4">
-      <a href="{{ url_for('home') }}" class="flex items-center space-x-3">
+      <a href="{{ url_for('tienda.home') }}" class="flex items-center space-x-3">
         <img src="{{ url_for('static', filename='img/casaLeon.png') }}" alt="Casa León" class="h-14 w-auto">
         <div>
           <span class="block text-2xl font-bold text-emerald-900">Casa León</span>
@@ -33,15 +33,15 @@
 
       <div class="hidden w-full md:block md:w-auto" id="navbar-default">
         <ul class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-white md:flex-row md:space-x-8 md:mt-0 md:border-0">
-          <li><a href="{{ url_for('home') }}" class="block py-2 px-3 text-emerald-900 font-semibold hover:text-emerald-700">Inicio</a></li>
-          <li><a href="{{ url_for('productos_publico') }}" class="block py-2 px-3 text-gray-700 hover:text-emerald-700">Productos</a></li>
-          <li><a href="{{ url_for('nosotros') }}" class="block py-2 px-3 text-gray-700 hover:text-emerald-700">Nosotros</a></li>
-          <li><a href="{{ url_for('contacto') }}" class="block py-2 px-3 text-gray-700 hover:text-emerald-700">Contacto</a></li>
+          <li><a href="{{ url_for('tienda.home') }}" class="block py-2 px-3 text-emerald-900 font-semibold hover:text-emerald-700">Inicio</a></li>
+          <li><a href="{{ url_for('tienda.productos_publico') }}" class="block py-2 px-3 text-gray-700 hover:text-emerald-700">Productos</a></li>
+          <li><a href="{{ url_for('tienda.nosotros') }}" class="block py-2 px-3 text-gray-700 hover:text-emerald-700">Nosotros</a></li>
+          <li><a href="{{ url_for('tienda.contacto') }}" class="block py-2 px-3 text-gray-700 hover:text-emerald-700">Contacto</a></li>
         </ul>
       </div>
 
       <div class="hidden md:flex items-center gap-4">
-        <a href="{{ url_for('carrito') }}" class="relative text-gray-700 hover:text-emerald-700">
+        <a href="{{ url_for('tienda.carrito') }}" class="relative text-gray-700 hover:text-emerald-700">
           <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none">
             <path d="M3 4h2l2.2 10.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.7L21 7H7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
             <circle cx="10" cy="19" r="1.5" fill="currentColor"/>
@@ -56,26 +56,26 @@
 
         {% if g.user %}
           {% if g.role == "CLIENTE" %}
-            <a href="{{ url_for('cliente_dashboard') }}"
+            <a href="{{ url_for('tienda.cliente_dashboard') }}"
                class="text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-full text-sm px-6 py-3 text-center">
               Mi cuenta
             </a>
-            <a href="{{ url_for('logout') }}"
+            <a href="{{ url_for('auth.logout') }}"
                class="text-emerald-900 bg-white border border-emerald-800 hover:bg-emerald-50 focus:ring-4 focus:outline-none focus:ring-emerald-200 font-medium rounded-full text-sm px-6 py-3 text-center">
               Cerrar sesión
             </a>
           {% else %}
-            <a href="{{ url_for('post_login') }}"
+            <a href="{{ url_for('auth.post_login') }}"
                class="text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-full text-sm px-6 py-3 text-center">
               Ir al panel
             </a>
           {% endif %}
         {% else %}
-          <a href="{{ url_for('login') }}"
+          <a href="{{ url_for('auth.login') }}"
              class="text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-full text-sm px-6 py-3 text-center">
             Iniciar Sesión
           </a>
-          <a href="{{ url_for('register') }}"
+          <a href="{{ url_for('auth.register') }}"
              class="text-emerald-900 bg-white border border-emerald-800 hover:bg-emerald-50 focus:ring-4 focus:outline-none focus:ring-emerald-200 font-medium rounded-full text-sm px-6 py-3 text-center">
             Registrarme
           </a>
@@ -121,20 +121,20 @@
         <div>
           <h2 class="mb-4 text-lg font-semibold">Cliente</h2>
           <ul class="space-y-3 text-emerald-50">
-            <li><a href="{{ url_for('productos_publico') }}" class="hover:underline">Catálogo</a></li>
-            <li><a href="{{ url_for('carrito') }}" class="hover:underline">Carrito</a></li>
-            <li><a href="{{ url_for('checkout') }}" class="hover:underline">Checkout</a></li>
-            <li><a href="{{ url_for('mis_pedidos') }}" class="hover:underline">Mis pedidos</a></li>
+            <li><a href="{{ url_for('tienda.productos_publico') }}" class="hover:underline">Catálogo</a></li>
+            <li><a href="{{ url_for('tienda.carrito') }}" class="hover:underline">Carrito</a></li>
+            <li><a href="{{ url_for('tienda.checkout') }}" class="hover:underline">Checkout</a></li>
+            <li><a href="{{ url_for('tienda.mis_pedidos') }}" class="hover:underline">Mis pedidos</a></li>
           </ul>
         </div>
 
         <div>
           <h2 class="mb-4 text-lg font-semibold">Cuenta</h2>
           <ul class="space-y-3 text-emerald-50">
-            <li><a href="{{ url_for('cliente_dashboard') }}" class="hover:underline">Dashboard</a></li>
-            <li><a href="{{ url_for('mi_cuenta') }}" class="hover:underline">Mi cuenta</a></li>
-            <li><a href="{{ url_for('login') }}" class="hover:underline">Iniciar sesión</a></li>
-            <li><a href="{{ url_for('register') }}" class="hover:underline">Registrarme</a></li>
+            <li><a href="{{ url_for('tienda.cliente_dashboard') }}" class="hover:underline">Dashboard</a></li>
+            <li><a href="{{ url_for('tienda.mi_cuenta') }}" class="hover:underline">Mi cuenta</a></li>
+            <li><a href="{{ url_for('auth.login') }}" class="hover:underline">Iniciar sesión</a></li>
+            <li><a href="{{ url_for('auth.register') }}" class="hover:underline">Registrarme</a></li>
           </ul>
         </div>
 

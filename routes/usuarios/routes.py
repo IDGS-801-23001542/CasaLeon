@@ -1,10 +1,10 @@
-from . import usuarios
-
 from flask import render_template, request, redirect, url_for, flash, g
 from werkzeug.security import generate_password_hash
 
 import forms
 from models import db, Usuario, Rol
+from utils.auth import login_required
+from . import usuarios
 
 
 def cargar_roles(form):
@@ -13,6 +13,7 @@ def cargar_roles(form):
 
 
 @usuarios.route("/private/admin/usuarios")
+@login_required("ADMIN")
 def listado_usuarios():
     create_form = forms.UsuarioForm()
     cargar_roles(create_form)
@@ -28,6 +29,7 @@ def listado_usuarios():
 
 
 @usuarios.route("/private/admin/usuarios/create", methods=["GET", "POST"])
+@login_required("ADMIN")
 def crear_usuario():
     create_form = forms.UsuarioForm()
     cargar_roles(create_form)
@@ -75,6 +77,7 @@ def crear_usuario():
 
 
 @usuarios.route("/private/admin/usuarios/update", methods=["GET", "POST"])
+@login_required("ADMIN")
 def actualizar_usuario():
     create_form = forms.UsuarioForm()
     cargar_roles(create_form)
@@ -131,7 +134,6 @@ def actualizar_usuario():
             usuario_db.id_rol = create_form.rol.data
             usuario_db.activo = 1
 
-            # Solo el mismo usuario puede cambiar su propia contraseña
             if create_form.password.data and create_form.password.data.strip():
                 if not g.user or g.user.id_usuario != usuario_db.id_usuario:
                     flash("Solo puedes cambiar tu propia contraseña.", "warning")
@@ -157,6 +159,7 @@ def actualizar_usuario():
 
 
 @usuarios.route("/private/admin/usuarios/delete", methods=["GET", "POST"])
+@login_required("ADMIN")
 def eliminar_usuario():
     create_form = forms.UsuarioForm()
     cargar_roles(create_form)

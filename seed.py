@@ -1,5 +1,74 @@
+from werkzeug.security import generate_password_hash
+
 from app import app
-from models import db, CategoriaProducto, Producto
+from models import (
+    db,
+    Rol,
+    Usuario,
+    Cliente,
+    AuthToken,
+    CategoriaProducto,
+    Producto,
+    Pedido,
+    PedidoDetalle,
+)
+
+
+def reset_data():
+    print("🧹 Reiniciando datos...")
+
+    PedidoDetalle.query.delete()
+    Pedido.query.delete()
+    AuthToken.query.delete()
+    Cliente.query.delete()
+    Usuario.query.delete()
+    Rol.query.delete()
+    Producto.query.delete()
+    CategoriaProducto.query.delete()
+
+    db.session.commit()
+    print("✔ Datos anteriores eliminados")
+
+
+def seed_roles():
+    roles = [
+        ("ADMIN", "Administrador"),
+        ("EMPLEADO", "Empleado"),
+    ]
+
+    for codigo, descripcion in roles:
+        db.session.add(Rol(codigo=codigo, descripcion=descripcion))
+
+    db.session.commit()
+    print("✔ Roles insertados")
+
+
+def seed_staff():
+    admin_rol = Rol.query.filter_by(codigo="ADMIN").first()
+    empleado_rol = Rol.query.filter_by(codigo="EMPLEADO").first()
+
+    db.session.add(
+        Usuario(
+            id_rol=admin_rol.id_rol,
+            nombre="Administrador Casa León",
+            email="admin@casaleon.com",
+            password_hash=generate_password_hash("Admin123"),
+            activo=1,
+        )
+    )
+
+    db.session.add(
+        Usuario(
+            id_rol=empleado_rol.id_rol,
+            nombre="Empleado Casa León",
+            email="empleado@casaleon.com",
+            password_hash=generate_password_hash("Empleado123"),
+            activo=1,
+        )
+    )
+
+    db.session.commit()
+    print("✔ Staff insertado")
 
 
 def seed_categorias():
@@ -18,13 +87,11 @@ def seed_categorias():
         "Porta pasaportes",
         "Estuches lentes",
         "Llaveros",
-        "Pulseras"
+        "Pulseras",
     ]
 
     for nombre in categorias:
-        existe = CategoriaProducto.query.filter_by(nombre=nombre).first()
-        if not existe:
-            db.session.add(CategoriaProducto(nombre=nombre))
+        db.session.add(CategoriaProducto(nombre=nombre))
 
     db.session.commit()
     print("✔ Categorías insertadas")
@@ -56,10 +123,6 @@ def seed_productos():
             print(f"⚠ Categoría no encontrada: {categoria_nombre}")
             continue
 
-        existe = Producto.query.filter_by(nombre=nombre).first()
-        if existe:
-            continue
-
         producto = Producto(
             id_categoria_producto=categoria.id_categoria_producto,
             nombre=nombre,
@@ -68,7 +131,7 @@ def seed_productos():
             stock_actual=stock,
             costo_unit_prom=precio * 0.4,
             activo=1,
-            imagen=imagen
+            imagen=imagen,
         )
 
         db.session.add(producto)
@@ -80,6 +143,9 @@ def seed_productos():
 def run_seed():
     with app.app_context():
         print("🌱 Ejecutando seed...")
+        reset_data()
+        seed_roles()
+        seed_staff()
         seed_categorias()
         seed_productos()
         print("✅ Seed completado")

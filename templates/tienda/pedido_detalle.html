@@ -11,7 +11,7 @@
         <p class="text-gray-600 mt-2">Pedido registrado el {{ pedido.creado_en.strftime('%d/%m/%Y %H:%M') }}</p>
       </div>
 
-      <a href="{{ url_for('mis_pedidos') }}"
+      <a href="{{ url_for('tienda.mis_pedidos') }}"
          class="text-emerald-900 bg-white border border-emerald-800 hover:bg-emerald-50 focus:ring-4 focus:outline-none focus:ring-emerald-200 font-medium rounded-xl text-sm px-5 py-3 text-center">
         Volver a mis pedidos
       </a>

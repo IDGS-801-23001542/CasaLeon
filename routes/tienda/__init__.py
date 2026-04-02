@@ -1,5 +1,5 @@
 from flask import Blueprint
 
-usuarios = Blueprint("usuarios", __name__)
+tienda = Blueprint("tienda", __name__)
 
 from . import routes
