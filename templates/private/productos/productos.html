@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}Productos | Casa León{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold mb-2">Productos</h1>
+      <p class="text-gray-500">Gestiona el catálogo y stock de productos</p>
+    </div>
+    <a
+      href="{{ url_for('productos.crear_producto') }}"
+      class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all"
+    >
+      <span class="text-xl">+</span>
+      Nuevo Producto
+    </a>
+  </div>
+
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="space-y-3">
+        {% for category, message in messages %}
+          <div class="px-4 py-3 rounded-xl border
+            {% if category == 'success' %}
+              bg-green-50 border-green-200 text-green-700
+            {% elif category == 'warning' %}
+              bg-yellow-50 border-yellow-200 text-yellow-700
+            {% elif category == 'danger' %}
+              bg-red-50 border-red-200 text-red-700
+            {% else %}
+              bg-blue-50 border-blue-200 text-blue-700
+            {% endif %}
+          ">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Stats -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="p-2 bg-blue-100 rounded-lg">
+          <span class="text-blue-600 text-xl">📦</span>
+        </div>
+        <p class="text-sm text-gray-500">Total Productos</p>
+      </div>
+      <p class="text-2xl font-bold">{{ total_productos }}</p>
+    </div>
+
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="p-2 bg-green-100 rounded-lg">
+          <span class="text-green-600 text-xl">💰</span>
+        </div>
+        <p class="text-sm text-gray-500">Valor Inventario</p>
+      </div>
+      <p class="text-2xl font-bold">${{ valor_inventario }}</p>
+    </div>
+
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="p-2 bg-green-100 rounded-lg">
+          <span class="text-green-600 text-xl">✅</span>
+        </div>
+        <p class="text-sm text-gray-500">Activos</p>
+      </div>
+      <p class="text-2xl font-bold">{{ productos_activos }}</p>
+    </div>
+
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="p-2 bg-red-100 rounded-lg">
+          <span class="text-red-600 text-xl">🚫</span>
+        </div>
+        <p class="text-sm text-gray-500">Inactivos</p>
+      </div>
+      <p class="text-2xl font-bold">{{ productos_inactivos }}</p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="flex flex-col md:flex-row gap-4">
+    <form method="GET" action="{{ url_for('productos.listado_productos') }}" class="contents">
+      <div class="flex-1 relative">
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+        <input
+          type="text"
+          name="search"
+          value="{{ search }}"
+          placeholder="Buscar por nombre, SKU o categoría..."
+          class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      <button
+        type="submit"
+        class="px-4 py-3 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all"
+      >
+        Filtrar
+      </button>
+    </form>
+  </div>
+
+  <!-- Products Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    {% for producto in productos_db %}
+
+      {% set stock_num = producto.stock_actual|float %}
+      {% set stock_label = 'Sin stock' if stock_num == 0 else 'Disponible' %}
+      {% set stock_bg = 'bg-red-100 text-red-700' if stock_num == 0 else 'bg-green-100 text-green-700' %}
+      {% set stock_icon = '⚠️' if stock_num == 0 else '✅' %}
+      {% set barra_bg = 'bg-red-500' if stock_num == 0 else 'bg-green-500' %}
+      {% set barra_width = 100 if stock_num > 0 else 4 %}
+
+      <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all">
+        <div class="flex items-start justify-between mb-4 gap-3">
+          <div class="flex-1">
+            <h3 class="font-bold text-lg mb-1">{{ producto.nombre }}</h3>
+            <p class="text-sm text-gray-500">
+              {{ producto.sku if producto.sku else 'Sin SKU' }}
+            </p>
+          </div>
+          <span class="px-3 py-1 rounded-full text-xs flex items-center gap-1 {{ stock_bg }}">
+            <span>{{ stock_icon }}</span>
+            {{ stock_label }}
+          </span>
+        </div>
+
+        <div class="space-y-3 mb-4">
+          <div class="flex justify-between text-sm gap-3">
+            <span class="text-gray-500">Categoría:</span>
+            <span class="font-medium text-right">
+              {{ producto.categoria.nombre if producto.categoria else 'Sin categoría' }}
+            </span>
+          </div>
+
+          <div class="flex justify-between text-sm gap-3">
+            <span class="text-gray-500">Stock Actual:</span>
+            <span class="font-medium text-right">{{ producto.stock_actual }}</span>
+          </div>
+
+          <div class="flex justify-between text-sm gap-3">
+            <span class="text-gray-500">Costo Unitario:</span>
+            <span class="font-medium text-right">${{ producto.costo_unit_prom }}</span>
+          </div>
+
+          <div class="flex justify-between text-sm gap-3">
+            <span class="text-gray-500">Precio Venta:</span>
+            <span class="font-medium text-right">${{ producto.precio_venta }}</span>
+          </div>
+
+          <div class="flex justify-between text-sm gap-3">
+            <span class="text-gray-500">Estatus:</span>
+            <span class="font-medium text-right">
+              {{ 'Activo' if producto.activo == 1 else 'Inactivo' }}
+            </span>
+          </div>
+
+          <div class="flex justify-between text-sm pt-2 border-t border-gray-200 gap-3">
+            <span class="text-gray-500">Valor Total:</span>
+            <span class="font-bold text-blue-600">
+              ${{ (producto.stock_actual * producto.costo_unit_prom) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div
+              class="h-full {{ barra_bg }}"
+              style="width: {{ barra_width }}%;"
+            ></div>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <p class="text-sm text-gray-500">
+            {{ producto.descripcion if producto.descripcion else 'Sin descripción' }}
+          </p>
+        </div>
+
+        <div class="flex gap-2">
+          <a
+            href="{{ url_for('productos.actualizar_producto', id=producto.id_producto) }}"
+            class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all"
+          >
+            Editar
+          </a>
+        </div>
+      </div>
+
+    {% else %}
+      <div class="md:col-span-2 lg:col-span-3 bg-white rounded-2xl p-8 border border-gray-200 shadow-md text-center">
+        <p class="text-lg font-semibold text-gray-700 mb-2">No hay productos registrados</p>
+        <p class="text-gray-500">Cuando agregues productos, aparecerán aquí.</p>
+      </div>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}
