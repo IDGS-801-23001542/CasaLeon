@@ -804,3 +804,153 @@ class ProductoForm(FlaskForm):
             NumberRange(min=0, message="El costo debe ser mayor o igual a 0"),
         ],
     )
+
+
+#MATERIA PRIMA
+class MateriaPrimaForm(FlaskForm):
+    nombre = StringField(
+        "Nombre",
+        validators=[
+            DataRequired(message="El nombre es requerido"),
+            Length(
+                min=3,
+                max=120,
+                message="El nombre debe tener entre 3 y 120 caracteres",
+            ),
+        ],
+    )
+
+    categoria = StringField(
+        "Categoría",
+        validators=[
+            DataRequired(message="La categoría es requerida"),
+            Length(
+                min=2,
+                max=60,
+                message="La categoría debe tener entre 2 y 60 caracteres",
+            ),
+        ],
+    )
+
+    unidad_medida = StringField(
+        "Unidad de Medida",
+        validators=[
+            DataRequired(message="La unidad de medida es requerida"),
+            Length(
+                min=1,
+                max=20,
+                message="La unidad de medida no puede exceder 20 caracteres",
+            ),
+        ],
+    )
+
+    stock_actual = DecimalField(
+        "Stock Actual",
+        validators=[
+            DataRequired(message="El stock actual es requerido"),
+            NumberRange(min=0, message="El stock debe ser mayor o igual a 0"),
+        ],
+    )
+
+    stock_minimo = DecimalField(
+        "Stock Mínimo",
+        validators=[
+            DataRequired(message="El stock mínimo es requerido"),
+            NumberRange(min=0, message="El stock mínimo debe ser mayor o igual a 0"),
+        ],
+    )
+
+    costo_unit_prom = DecimalField(
+        "Costo Unitario Promedio",
+        validators=[
+            DataRequired(message="El costo unitario es requerido"),
+            NumberRange(min=0, message="El costo debe ser mayor o igual a 0"),
+        ],
+    )
+
+    merma_pct = DecimalField(
+        "Merma %",
+        validators=[
+            DataRequired(message="La merma es requerida"),
+            NumberRange(min=0, message="La merma debe ser mayor o igual a 0"),
+        ],
+    )
+
+    def validate_nombre(self, field):
+        field.data = _normalize_spaces(field.data)
+
+    def validate_categoria(self, field):
+        field.data = _normalize_spaces(field.data)
+
+    def validate_unidad_medida(self, field):
+        field.data = _normalize_spaces(field.data)
+
+# RECETAS
+class RecetaForm(FlaskForm):
+    id_producto = SelectField(
+        "Producto",
+        coerce=int,
+        validators=[DataRequired(message="El producto es requerido")],
+        choices=[],
+    )
+
+    nombre = StringField(
+        "Nombre de la Receta",
+        validators=[
+            DataRequired(message="El nombre de la receta es requerido"),
+            Length(
+                min=3,
+                max=150,
+                message="El nombre debe tener entre 3 y 150 caracteres",
+            ),
+        ],
+    )
+
+    rendimiento = DecimalField(
+        "Rendimiento",
+        validators=[
+            DataRequired(message="El rendimiento es requerido"),
+            NumberRange(min=1, message="El rendimiento debe ser mayor o igual a 1"),
+        ],
+    )
+
+    def validate_nombre(self, field):
+        field.data = _normalize_spaces(field.data)
+
+
+# PRODUCCIÓN
+class ProduccionForm(FlaskForm):
+    id_producto = SelectField(
+        "Producto",
+        coerce=int,
+        validators=[DataRequired(message="El producto es requerido")],
+        choices=[],
+    )
+
+    cantidad = DecimalField(
+        "Cantidad a producir",
+        validators=[
+            DataRequired(message="La cantidad es requerida"),
+            NumberRange(min=1, message="La cantidad debe ser mayor o igual a 1"),
+        ],
+    )
+
+    estado = SelectField(
+        "Estado",
+        validators=[DataRequired(message="El estado es requerido")],
+        choices=[
+            ("PENDIENTE", "Pendiente"),
+            ("EN_PROCESO", "En proceso"),
+            ("COMPLETADA", "Completada"),
+            ("CANCELADA", "Cancelada"),
+        ],
+        default="PENDIENTE",
+    )
+
+    observaciones = TextAreaField(
+        "Observaciones",
+        validators=[
+            Optional(),
+            Length(max=255, message="Las observaciones no pueden exceder 255 caracteres."),
+        ],
+    )

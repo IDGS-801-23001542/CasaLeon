@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% import "_macros.html" as ui %}
+
+{% block title %}Desactivar Materia Prima | Casa León{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold mb-2">Desactivar Materia Prima</h1>
+      <p class="text-gray-500">Confirma la desactivación del material</p>
+    </div>
+    <a href="{{ url_for('operaciones.materia_prima') }}"
+       class="px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
+      Volver
+    </a>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+    <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 mb-6">
+      <p class="text-sm text-red-700">
+        Esta acción no eliminará físicamente el registro. La materia prima será marcada como inactiva.
+      </p>
+    </div>
+
+    <form method="POST" action="{{ url_for('operaciones.eliminar_materia_prima', id=materia_db.id_materia_prima) }}" class="space-y-4">
+      {{ form.hidden_tag() }}
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Nombre</label>
+          <input type="text" value="{{ materia_db.nombre }}" disabled
+                 class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Categoría</label>
+          <input type="text" value="{{ materia_db.categoria }}" disabled
+                 class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Unidad de Medida</label>
+          <input type="text" value="{{ materia_db.unidad_medida }}" disabled
+                 class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Stock Actual</label>
+          <input type="text" value="{{ materia_db.stock_actual }}" disabled
+                 class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Stock Mínimo</label>
+          <input type="text" value="{{ materia_db.stock_minimo }}" disabled
+                 class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Costo Unitario</label>
+          <input type="text" value="{{ materia_db.costo_unit_prom }}" disabled
+                 class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Merma %</label>
+          <input type="text" value="{{ materia_db.merma_pct }}" disabled
+                 class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Estado actual</label>
+          <input type="text" value="{{ 'Activa' if materia_db.activo == 1 else 'Inactiva' }}" disabled
+                 class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 pt-4">
+        <a href="{{ url_for('operaciones.materia_prima') }}"
+           class="flex-1 px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
+          Cancelar
+        </a>
+        <button type="submit"
+                class="flex-1 px-4 py-2 bg-red-600 text-white rounded-xl hover:shadow-lg transition-all">
+          Desactivar Materia Prima
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

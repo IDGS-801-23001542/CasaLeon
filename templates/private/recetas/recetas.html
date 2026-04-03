@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block title %}Recetas | Casa León{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold mb-2">Recetas</h1>
+      <p class="text-gray-500">Gestiona las recetas de producción de cada producto</p>
+    </div>
+    <a
+      href="{{ url_for('operaciones.crear_receta') }}"
+      class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all"
+    >
+      <span class="text-xl">+</span>
+      Nueva Receta
+    </a>
+  </div>
+
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="space-y-3">
+        {% for category, message in messages %}
+          <div class="px-4 py-3 rounded-xl border
+            {% if category == 'success' %}
+              bg-green-50 border-green-200 text-green-700
+            {% elif category == 'warning' %}
+              bg-yellow-50 border-yellow-200 text-yellow-700
+            {% elif category == 'danger' %}
+              bg-red-50 border-red-200 text-red-700
+            {% else %}
+              bg-blue-50 border-blue-200 text-blue-700
+            {% endif %}
+          ">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Stats -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="p-2 bg-blue-100 rounded-lg">
+          <span class="text-blue-600 text-xl">📘</span>
+        </div>
+        <p class="text-sm text-gray-500">Total Recetas</p>
+      </div>
+      <p class="text-2xl font-bold">{{ total_recetas }}</p>
+    </div>
+
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="p-2 bg-green-100 rounded-lg">
+          <span class="text-green-600 text-xl">💵</span>
+        </div>
+        <p class="text-sm text-gray-500">Costo Total</p>
+      </div>
+      <p class="text-2xl font-bold">${{ costo_total }}</p>
+    </div>
+
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="p-2 bg-green-100 rounded-lg">
+          <span class="text-green-600 text-xl">✅</span>
+        </div>
+        <p class="text-sm text-gray-500">Activas</p>
+      </div>
+      <p class="text-2xl font-bold">{{ recetas_activas }}</p>
+    </div>
+
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="p-2 bg-purple-100 rounded-lg">
+          <span class="text-purple-600 text-xl">🧾</span>
+        </div>
+        <p class="text-sm text-gray-500">Insumos Totales</p>
+      </div>
+      <p class="text-2xl font-bold">
+        {{ recetas_db | map(attribute='detalles') | map('length') | sum }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="flex flex-col md:flex-row gap-4">
+    <form method="GET" action="{{ url_for('operaciones.recetas') }}" class="contents">
+      <div class="flex-1 relative">
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+        <input
+          type="text"
+          name="search"
+          value="{{ search }}"
+          placeholder="Buscar por receta o producto..."
+          class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      <button
+        type="submit"
+        class="px-4 py-3 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all"
+      >
+        Filtrar
+      </button>
+    </form>
+  </div>
+
+  <!-- Recetas Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    {% for receta in recetas_db %}
+
+      {% set total_insumos = receta.detalles | length %}
+
+      <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all">
+        <div class="flex items-start justify-between mb-4 gap-3">
+          <div class="flex-1">
+            <h3 class="font-bold text-lg mb-1">{{ receta.nombre }}</h3>
+            <p class="text-sm text-gray-500">
+              {{ receta.producto.nombre if receta.producto else 'Sin producto' }}
+            </p>
+          </div>
+
+          {% if receta.activo == 1 %}
+            <span class="px-3 py-1 rounded-full text-xs flex items-center gap-1 bg-green-100 text-green-700">
+              ✅ Activa
+            </span>
+          {% else %}
+            <span class="px-3 py-1 rounded-full text-xs flex items-center gap-1 bg-red-100 text-red-700">
+              🚫 Inactiva
+            </span>
+          {% endif %}
+        </div>
+
+        <div class="space-y-3 mb-4">
+          <div class="flex justify-between text-sm gap-3">
+            <span class="text-gray-500">Producto:</span>
+            <span class="font-medium text-right">
+              {{ receta.producto.nombre if receta.producto else 'Sin producto' }}
+            </span>
+          </div>
+
+          <div class="flex justify-between text-sm gap-3">
+            <span class="text-gray-500">Rendimiento:</span>
+            <span class="font-medium text-right">{{ receta.rendimiento }}</span>
+          </div>
+
+          <div class="flex justify-between text-sm gap-3">
+            <span class="text-gray-500">Costo Estimado:</span>
+            <span class="font-medium text-right">${{ receta.costo_estimado }}</span>
+          </div>
+
+          <div class="flex justify-between text-sm gap-3">
+            <span class="text-gray-500">Insumos:</span>
+            <span class="font-medium text-right">{{ total_insumos }}</span>
+          </div>
+
+          <div class="flex justify-between text-sm gap-3">
+            <span class="text-gray-500">Estado:</span>
+            <span class="font-medium text-right">
+              {{ 'Activa' if receta.activo == 1 else 'Inactiva' }}
+            </span>
+          </div>
+
+          <div class="pt-2 border-t border-gray-200">
+            <p class="text-sm text-gray-500 mb-2">Materiales de la receta:</p>
+
+            {% if receta.detalles %}
+              <div class="space-y-2 max-h-44 overflow-y-auto pr-1">
+                {% for detalle in receta.detalles %}
+                  <div class="rounded-xl bg-gray-50 border border-gray-200 p-3">
+                    <div class="flex justify-between gap-3">
+                      <p class="text-sm font-medium text-gray-800">
+                        {{ detalle.materia_prima.nombre if detalle.materia_prima else 'Materia prima no disponible' }}
+                      </p>
+                      <p class="text-sm font-semibold text-blue-600 text-right">
+                        {{ detalle.cantidad }}
+                        {% if detalle.materia_prima %}
+                          {{ detalle.materia_prima.unidad_medida }}
+                        {% endif %}
+                      </p>
+                    </div>
+
+                    {% if detalle.materia_prima %}
+                      <p class="text-xs text-gray-500 mt-1">
+                        Costo unitario: ${{ detalle.materia_prima.costo_unit_prom }}
+                      </p>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="rounded-xl bg-yellow-50 border border-yellow-200 p-3">
+                <p class="text-sm text-yellow-700">
+                  Esta receta no tiene insumos registrados.
+                </p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+          <a
+            href="{{ url_for('operaciones.actualizar_receta', id=receta.id_receta) }}"
+            class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all"
+          >
+            Editar
+          </a>
+
+          <a
+            href="{{ url_for('operaciones.eliminar_receta', id=receta.id_receta) }}"
+            class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl hover:shadow-lg transition-all"
+          >
+            Desactivar
+          </a>
+        </div>
+      </div>
+
+    {% else %}
+      <div class="md:col-span-2 lg:col-span-3 bg-white rounded-2xl p-8 border border-gray-200 shadow-md text-center">
+        <p class="text-lg font-semibold text-gray-700 mb-2">No hay recetas registradas</p>
+        <p class="text-gray-500">Cuando agregues recetas, aparecerán aquí.</p>
+      </div>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}

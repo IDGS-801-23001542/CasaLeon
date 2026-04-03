@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% import "_macros.html" as ui %}
+
+{% block title %}Crear Materia Prima | Casa León{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold mb-2">Nueva Materia Prima</h1>
+      <p class="text-gray-500">Registra un nuevo material para inventario</p>
+    </div>
+    <a href="{{ url_for('operaciones.materia_prima') }}"
+       class="px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
+      Volver
+    </a>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+    <form method="POST" action="{{ url_for('operaciones.crear_materia_prima') }}" class="space-y-4">
+      {{ form.hidden_tag() }}
+      {{ ui.form_errors(form) }}
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {{ ui.field(form.nombre, placeholder="Nombre de la materia prima") }}
+        {{ ui.field(form.categoria, placeholder="Categoría") }}
+        {{ ui.field(form.unidad_medida, placeholder="Unidad de medida") }}
+        {{ ui.field(form.stock_actual, placeholder="Stock actual") }}
+        {{ ui.field(form.stock_minimo, placeholder="Stock mínimo") }}
+        {{ ui.field(form.costo_unit_prom, placeholder="Costo unitario promedio") }}
+        {{ ui.field(form.merma_pct, placeholder="Merma %") }}
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Estado</label>
+          <input
+            type="text"
+            value="Activa"
+            disabled
+            class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed"
+          />
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 pt-4">
+        <a href="{{ url_for('operaciones.materia_prima') }}"
+           class="flex-1 px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
+          Cancelar
+        </a>
+        <button type="submit"
+                class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all">
+          Crear Materia Prima
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

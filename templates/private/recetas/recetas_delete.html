@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% import "_macros.html" as ui %}
+
+{% block title %}Desactivar Receta | Casa León{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold mb-2">Desactivar Receta</h1>
+      <p class="text-gray-500">Confirma la desactivación de la receta</p>
+    </div>
+    <a href="{{ url_for('operaciones.recetas') }}"
+       class="px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
+      Volver
+    </a>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+    <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 mb-6">
+      <p class="text-sm text-red-700">
+        Esta acción no eliminará físicamente el registro. La receta será marcada como inactiva.
+      </p>
+    </div>
+
+    <form method="POST" action="{{ url_for('operaciones.eliminar_receta', id=receta_db.id_receta) }}" class="space-y-4">
+      {{ form.hidden_tag() }}
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Producto</label>
+          <input
+            type="text"
+            value="{{ receta_db.producto.nombre if receta_db.producto else '' }}"
+            disabled
+            class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed"
+          />
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Nombre de la receta</label>
+          <input
+            type="text"
+            value="{{ receta_db.nombre }}"
+            disabled
+            class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed"
+          />
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Rendimiento</label>
+          <input
+            type="text"
+            value="{{ receta_db.rendimiento }}"
+            disabled
+            class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed"
+          />
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Costo estimado</label>
+          <input
+            type="text"
+            value="{{ receta_db.costo_estimado }}"
+            disabled
+            class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed"
+          />
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Estado actual</label>
+          <input
+            type="text"
+            value="{{ 'Activa' if receta_db.activo == 1 else 'Inactiva' }}"
+            disabled
+            class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed"
+          />
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Cantidad de insumos</label>
+          <input
+            type="text"
+            value="{{ receta_db.detalles | length }}"
+            disabled
+            class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed"
+          />
+        </div>
+      </div>
+
+      <div class="pt-4">
+        <h2 class="text-lg font-semibold text-gray-800 mb-3">Insumos registrados</h2>
+
+        {% if receta_db.detalles %}
+          <div class="space-y-2">
+            {% for detalle in receta_db.detalles %}
+              <div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                  <p class="font-medium text-gray-800">
+                    {{ detalle.materia_prima.nombre if detalle.materia_prima else 'Materia prima no disponible' }}
+                  </p>
+                  <p class="text-sm text-blue-600 font-semibold">
+                    {{ detalle.cantidad }}
+                    {% if detalle.materia_prima %}
+                      {{ detalle.materia_prima.unidad_medida }}
+                    {% endif %}
+                  </p>
+                </div>
+
+                {% if detalle.materia_prima %}
+                  <p class="text-sm text-gray-500 mt-1">
+                    Costo unitario: ${{ detalle.materia_prima.costo_unit_prom }}
+                  </p>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="rounded-xl bg-yellow-50 border border-yellow-200 p-4">
+            <p class="text-sm text-yellow-700">
+              Esta receta no tiene insumos registrados.
+            </p>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 pt-4">
+        <a href="{{ url_for('operaciones.recetas') }}"
+           class="flex-1 px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
+          Cancelar
+        </a>
+        <button type="submit"
+                class="flex-1 px-4 py-2 bg-red-600 text-white rounded-xl hover:shadow-lg transition-all">
+          Desactivar Receta
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

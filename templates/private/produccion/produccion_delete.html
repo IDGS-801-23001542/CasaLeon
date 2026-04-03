@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Cancelar Producción | Casa León{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold mb-2">Cancelar Producción</h1>
+      <p class="text-gray-500">Las órdenes de producción registradas no se eliminan para mantener trazabilidad</p>
+    </div>
+    <a href="{{ url_for('operaciones.produccion') }}"
+       class="px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
+      Volver
+    </a>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+    <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+      <p class="text-sm text-red-700">
+        Por trazabilidad, las órdenes de producción no se eliminan. Si en el futuro manejas estados como cancelada o revertida, esa operación debería quedar registrada sin borrar el historial.
+      </p>
+    </div>
+
+    <div class="pt-6">
+      <a href="{{ url_for('operaciones.produccion') }}"
+         class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all">
+        Regresar al listado
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

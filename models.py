@@ -219,6 +219,63 @@ class RecetaDetalle(db.Model):
     materia_prima = db.relationship("MateriaPrima")
 
 
+class OrdenProduccion(db.Model):
+    __tablename__ = "ordenes_produccion"
+
+    id_orden_produccion = db.Column(db.Integer, primary_key=True)
+    id_producto = db.Column(
+        db.Integer,
+        db.ForeignKey("productos.id_producto"),
+        nullable=False,
+    )
+
+    folio = db.Column(db.String(30), unique=True, nullable=False)
+    cantidad = db.Column(db.Numeric(14, 4), nullable=False, default=0)
+    estado = db.Column(db.String(30), nullable=False, default="COMPLETADA")
+    costo_estimado = db.Column(db.Numeric(12, 4), nullable=False, default=0)
+    observaciones = db.Column(db.String(255))
+    creado_en = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
+
+    producto = db.relationship("Producto")
+    detalles = db.relationship(
+        "OrdenProduccionDetalle",
+        backref="orden_produccion",
+        lazy=True,
+        cascade="all, delete-orphan",
+    )
+
+    def __repr__(self):
+        return f"<OrdenProduccion {self.id_orden_produccion} - {self.folio}>"
+
+
+class OrdenProduccionDetalle(db.Model):
+    __tablename__ = "ordenes_produccion_detalles"
+
+    id_orden_produccion_detalle = db.Column(db.Integer, primary_key=True)
+    id_orden_produccion = db.Column(
+        db.Integer,
+        db.ForeignKey("ordenes_produccion.id_orden_produccion"),
+        nullable=False,
+    )
+    id_materia_prima = db.Column(
+        db.Integer,
+        db.ForeignKey("materias_primas.id_materia_prima"),
+        nullable=False,
+    )
+
+    materia_prima_nombre = db.Column(db.String(120), nullable=False)
+    unidad_medida = db.Column(db.String(20), nullable=False)
+    cantidad_base = db.Column(db.Numeric(14, 4), nullable=False, default=0)
+    cantidad_consumida = db.Column(db.Numeric(14, 4), nullable=False, default=0)
+    costo_unitario = db.Column(db.Numeric(12, 4), nullable=False, default=0)
+    subtotal = db.Column(db.Numeric(12, 4), nullable=False, default=0)
+
+    materia_prima = db.relationship("MateriaPrima")
+
+    def __repr__(self):
+        return f"<OrdenProduccionDetalle {self.id_orden_produccion_detalle}>"
+
+
 class AuditoriaLog(db.Model):
     __tablename__ = "auditoria_logs"
 

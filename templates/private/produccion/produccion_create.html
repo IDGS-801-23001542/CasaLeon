@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% import "_macros.html" as ui %}
+
+{% block title %}Nueva Producción | Casa León{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold mb-2">Nueva Producción</h1>
+      <p class="text-gray-500">Genera una orden de producción y consume materia prima automáticamente</p>
+    </div>
+    <a href="{{ url_for('operaciones.produccion') }}"
+       class="px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
+      Volver
+    </a>
+  </div>
+
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="space-y-3">
+        {% for category, message in messages %}
+          <div class="px-4 py-3 rounded-xl border
+            {% if category == 'success' %}
+              bg-green-50 border-green-200 text-green-700
+            {% elif category == 'warning' %}
+              bg-yellow-50 border-yellow-200 text-yellow-700
+            {% elif category == 'danger' %}
+              bg-red-50 border-red-200 text-red-700
+            {% else %}
+              bg-blue-50 border-blue-200 text-blue-700
+            {% endif %}
+          ">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <!-- Formulario -->
+    <div class="xl:col-span-1">
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+        <form method="POST" action="{{ url_for('operaciones.crear_produccion') }}" class="space-y-4">
+          {{ form.hidden_tag() }}
+          {{ ui.form_errors(form) }}
+
+          {{ ui.select_field(form.id_producto) }}
+          {{ ui.field(form.cantidad, placeholder="Cantidad a producir") }}
+
+          <div>
+            <label class="block mb-2 text-sm font-medium text-gray-900">
+              {{ form.observaciones.label.text }}
+            </label>
+            {{ form.observaciones(
+              class="bg-white/80 border border-cl-line text-gray-900 text-sm rounded-xl focus:ring-2 focus:ring-emerald-300 focus:border-emerald-300 block w-full p-3 placeholder:text-gray-400",
+              placeholder="Observaciones opcionales",
+              rows="4"
+            ) }}
+            {% if form.observaciones.errors %}
+              <p class="mt-2 text-sm text-red-600">
+                {% for e in form.observaciones.errors %}{{ e }}{% if not loop.last %}<br>{% endif %}{% endfor %}
+              </p>
+            {% endif %}
+          </div>
+
+          <div class="pt-2">
+            <button type="submit"
+                    class="w-full px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all">
+              Registrar Producción
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Resumen -->
+    <div class="xl:col-span-2">
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-800">Resumen de producción</h2>
+            <p class="text-gray-500 text-sm mt-1">
+              Aquí verás la receta utilizada y el consumo proyectado de materiales.
+            </p>
+          </div>
+
+          {% if producto_db %}
+            <div class="px-4 py-2 rounded-xl bg-blue-50 text-blue-700 text-sm font-medium">
+              Producto: {{ producto_db.nombre }}
+            </div>
+          {% endif %}
+        </div>
+
+        {% if receta_db %}
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
+              <p class="text-sm text-gray-500 mb-1">Receta</p>
+              <p class="font-semibold text-gray-800">{{ receta_db.nombre }}</p>
+            </div>
+
+            <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
+              <p class="text-sm text-gray-500 mb-1">Rendimiento base</p>
+              <p class="font-semibold text-gray-800">{{ receta_db.rendimiento }}</p>
+            </div>
+
+            <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
+              <p class="text-sm text-gray-500 mb-1">Costo estimado total</p>
+              <p class="font-semibold text-green-700">${{ "%.2f"|format(costo_total|float) }}</p>
+            </div>
+          </div>
+        {% endif %}
+
+        {% if resumen_materiales %}
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 border-y border-gray-200">
+                <tr>
+                  <th class="text-left px-4 py-3 font-semibold text-gray-700">Materia prima</th>
+                  <th class="text-left px-4 py-3 font-semibold text-gray-700">Cantidad base</th>
+                  <th class="text-left px-4 py-3 font-semibold text-gray-700">Cantidad requerida</th>
+                  <th class="text-left px-4 py-3 font-semibold text-gray-700">Stock actual</th>
+                  <th class="text-left px-4 py-3 font-semibold text-gray-700">Costo unitario</th>
+                  <th class="text-left px-4 py-3 font-semibold text-gray-700">Subtotal</th>
+                  <th class="text-left px-4 py-3 font-semibold text-gray-700">Estatus</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in resumen_materiales %}
+                  <tr class="border-b border-gray-100">
+                    <td class="px-4 py-3">
+                      <div class="font-medium text-gray-800">{{ item.nombre }}</div>
+                      <div class="text-xs text-gray-500">{{ item.unidad_medida }}</div>
+                    </td>
+                    <td class="px-4 py-3">{{ item.cantidad_base }}</td>
+                    <td class="px-4 py-3 font-medium">{{ item.cantidad_requerida }}</td>
+                    <td class="px-4 py-3">{{ item.stock_actual }}</td>
+                    <td class="px-4 py-3">${{ item.costo_unitario }}</td>
+                    <td class="px-4 py-3 text-blue-700 font-semibold">${{ item.subtotal }}</td>
+                    <td class="px-4 py-3">
+                      {% if item.suficiente %}
+                        <span class="px-3 py-1 rounded-full text-xs bg-green-100 text-green-700">
+                          Suficiente
+                        </span>
+                      {% else %}
+                        <span class="px-3 py-1 rounded-full text-xs bg-red-100 text-red-700">
+                          Insuficiente
+                        </span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mt-6 rounded-xl border border-gray-200 bg-gray-50 p-4">
+            <p class="text-sm text-gray-500">
+              Si todos los insumos tienen stock suficiente, al registrar la producción se descontarán automáticamente del inventario de materia prima y se aumentará el stock del producto terminado.
+            </p>
+          </div>
+        {% else %}
+          <div class="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
+            <p class="text-lg font-semibold text-gray-700 mb-2">Aún no hay resumen disponible</p>
+            <p class="text-gray-500">
+              Selecciona un producto y una cantidad, luego registra la producción para validar la receta y el consumo de materiales.
+            </p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
