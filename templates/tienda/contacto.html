@@ -3,51 +3,206 @@
 {% block title %}Contacto | Casa León{% endblock %}
 
 {% block body %}
-<section class="bg-stone-50">
-  <section class="bg-gradient-to-r from-emerald-900 via-emerald-700 to-stone-300">
-    <div class="max-w-screen-2xl mx-auto px-6 py-24 text-white">
-      <h1 class="text-5xl md:text-7xl font-extrabold">Contacto</h1>
-      <p class="mt-6 text-xl md:text-2xl max-w-4xl leading-relaxed">
+<section class="bg-stone-50 overflow-x-hidden">
+
+  <!-- Hero con efecto parallax suave -->
+  <div class="relative bg-gradient-to-r from-emerald-900 via-emerald-700 to-stone-300">
+    <div class="absolute inset-0 bg-black/20 z-10"></div>
+    <div class="relative z-20 max-w-screen-2xl mx-auto px-6 py-32 md:py-40 text-white">
+      <h1 class="text-5xl md:text-7xl font-extrabold animate-fade-in-up">Contacto</h1>
+      <p class="mt-6 text-xl md:text-2xl max-w-4xl leading-relaxed animate-fade-in-up animation-delay-200">
         Estamos listos para ayudarte con pedidos, productos personalizados y dudas sobre Casa León.
       </p>
     </div>
-  </section>
+    <div class="absolute bottom-0 left-0 right-0 h-16 bg-stone-50 rounded-t-3xl z-20"></div>
+  </div>
 
-  <section class="max-w-screen-2xl mx-auto px-6 py-16">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div class="bg-white border border-gray-200 rounded-3xl shadow-sm p-8">
+  <!-- Tarjetas de información de contacto con íconos y hover -->
+  <div class="max-w-screen-2xl mx-auto px-6 py-16 -mt-8 relative z-30">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      
+      <div class="bg-white rounded-3xl border border-gray-200 shadow-md p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl group">
+        <div class="text-emerald-700 text-5xl mb-4 group-hover:scale-110 transition-transform">📧</div>
         <h2 class="text-2xl font-bold text-emerald-900">Correo</h2>
-        <p class="mt-4 text-gray-600 text-lg">info@casaleon.com</p>
+        <p class="mt-4 text-gray-600 text-lg break-words">info@casaleon.com</p>
+        <a href="mailto:info@casaleon.com" class="mt-4 inline-block text-emerald-600 hover:text-emerald-800 font-semibold">Enviar mensaje →</a>
       </div>
 
-      <div class="bg-white border border-gray-200 rounded-3xl shadow-sm p-8">
+      <div class="bg-white rounded-3xl border border-gray-200 shadow-md p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl group">
+        <div class="text-emerald-700 text-5xl mb-4 group-hover:scale-110 transition-transform">📞</div>
         <h2 class="text-2xl font-bold text-emerald-900">Teléfono</h2>
         <p class="mt-4 text-gray-600 text-lg">+52 123-456-7890</p>
+        <a href="tel:+521234567890" class="mt-4 inline-block text-emerald-600 hover:text-emerald-800 font-semibold">Llamar ahora →</a>
       </div>
 
-      <div class="bg-white border border-gray-200 rounded-3xl shadow-sm p-8">
+      <div class="bg-white rounded-3xl border border-gray-200 shadow-md p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl group">
+        <div class="text-emerald-700 text-5xl mb-4 group-hover:scale-110 transition-transform">📍</div>
         <h2 class="text-2xl font-bold text-emerald-900">Ubicación</h2>
         <p class="mt-4 text-gray-600 text-lg">León, Guanajuato, México</p>
+        <a href="#mapa" class="mt-4 inline-block text-emerald-600 hover:text-emerald-800 font-semibold">Ver mapa →</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Sección de formulario de contacto y mapa -->
+  <div class="max-w-screen-2xl mx-auto px-6 py-10">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+      
+      <!-- Formulario -->
+      <div class="bg-white rounded-3xl border border-gray-200 shadow-md p-8 transition-all duration-500 hover:shadow-lg">
+        <h2 class="text-3xl font-bold text-emerald-900">Escríbenos</h2>
+        <p class="mt-2 text-gray-600">Déjanos tu mensaje y te responderemos a la brevedad.</p>
+        
+        <form id="contactForm" class="mt-6 space-y-5">
+          <div>
+            <label for="nombre" class="block text-gray-700 font-medium mb-1">Nombre completo *</label>
+            <input type="text" id="nombre" name="nombre" required
+                   class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition">
+          </div>
+          <div>
+            <label for="email" class="block text-gray-700 font-medium mb-1">Correo electrónico *</label>
+            <input type="email" id="email" name="email" required
+                   class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition">
+          </div>
+          <div>
+            <label for="telefono" class="block text-gray-700 font-medium mb-1">Teléfono (opcional)</label>
+            <input type="tel" id="telefono" name="telefono"
+                   class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition">
+          </div>
+          <div>
+            <label for="mensaje" class="block text-gray-700 font-medium mb-1">Mensaje *</label>
+            <textarea id="mensaje" name="mensaje" rows="4" required
+                      class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"></textarea>
+          </div>
+          <button type="submit"
+                  class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 px-6 rounded-xl transition transform hover:scale-105 shadow-md">
+            Enviar mensaje
+          </button>
+          <p id="formStatus" class="text-center text-sm mt-3 hidden"></p>
+        </form>
+      </div>
+
+      <!-- Mapa interactivo (embed de Google Maps) -->
+      <div id="mapa" class="bg-white rounded-3xl border border-gray-200 shadow-md p-2 overflow-hidden transition-all duration-500 hover:shadow-lg">
+        <iframe 
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d238185.4977615428!2d-101.79910936951809!3d21.097120858906527!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x842bb46f4c6619cd%3A0xefb03b8bf7d44cbb!2sLe%C3%B3n%2C%20Gto.%2C%20M%C3%A9xico!5e0!3m2!1ses!2sus!4v1712091234567!5m2!1ses!2sus" 
+          width="100%" 
+          height="400" 
+          style="border:0; border-radius: 1rem;" 
+          allowfullscreen="" 
+          loading="lazy" 
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+        <div class="p-4 text-center">
+          <p class="text-gray-600"><span class="font-bold text-emerald-800">📍 León, Guanajuato</span> — Centro histórico, a unas cuadras del Arco de la Calzada.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Atención al cliente con botones mejorados -->
+  <div class="max-w-screen-2xl mx-auto px-6 py-10">
+    <div class="bg-white rounded-3xl border border-gray-200 shadow-md p-10 transition-all duration-500 hover:shadow-lg">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+        <div>
+          <h2 class="text-3xl font-extrabold text-emerald-900">Atención al cliente</h2>
+          <p class="mt-3 text-gray-600 leading-8 max-w-2xl">
+            ¿Necesitas información sobre disponibilidad, pedidos especiales o seguimiento de compra? 
+            Contáctanos por cualquiera de nuestros canales.
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-4">
+          <a href="mailto:info@casaleon.com"
+             class="inline-flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl px-6 py-3 transition transform hover:scale-105 shadow">
+            ✉️ Enviar correo
+          </a>
+          <a href="{{ url_for('tienda.productos_publico') }}"
+             class="inline-flex items-center gap-2 bg-white border-2 border-emerald-700 text-emerald-700 hover:bg-emerald-50 font-bold rounded-xl px-6 py-3 transition transform hover:scale-105">
+            🛍️ Ver productos
+          </a>
+        </div>
       </div>
     </div>
+  </div>
 
-    <div class="mt-10 bg-white border border-gray-200 rounded-3xl shadow-sm p-10">
-      <h2 class="text-4xl font-extrabold text-emerald-900">Atención al cliente</h2>
-      <p class="mt-4 text-gray-600 leading-8 text-lg">
-        Si necesitas información sobre disponibilidad, pedidos especiales o seguimiento de compra, puedes comunicarte con nosotros por cualquiera de nuestros canales.
-      </p>
-
-      <div class="mt-8 flex flex-wrap gap-4">
-        <a href="mailto:info@casaleon.com"
-           class="text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-bold rounded-xl text-lg px-8 py-4 text-center">
-          Enviar correo
-        </a>
-        <a href="{{ url_for('tienda.productos_publico') }}"
-           class="text-emerald-900 bg-white border border-emerald-800 hover:bg-emerald-50 focus:ring-4 focus:outline-none focus:ring-emerald-200 font-bold rounded-xl text-lg px-8 py-4 text-center">
-          Ver productos
-        </a>
+  <!-- Redes sociales (opcional) -->
+  <div class="max-w-screen-2xl mx-auto px-6 py-10">
+    <div class="text-center">
+      <h3 class="text-2xl font-semibold text-emerald-900">Síguenos en redes</h3>
+      <div class="flex justify-center gap-6 mt-4">
+        <a href="#" class="text-3xl text-gray-600 hover:text-emerald-700 transition">📘</a>
+        <a href="#" class="text-3xl text-gray-600 hover:text-emerald-700 transition">📷</a>
+        <a href="#" class="text-3xl text-gray-600 hover:text-emerald-700 transition">🐦</a>
       </div>
     </div>
-  </section>
+  </div>
+
 </section>
+
+<!-- Script para manejo del formulario (simulación) y animaciones -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('contactForm');
+    const status = document.getElementById('formStatus');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Validación simple
+      const nombre = document.getElementById('nombre').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const mensaje = document.getElementById('mensaje').value.trim();
+      
+      if (!nombre || !email || !mensaje) {
+        status.textContent = '⚠️ Por favor completa todos los campos obligatorios.';
+        status.classList.remove('hidden', 'text-green-600');
+        status.classList.add('text-red-600');
+        return;
+      }
+      
+      // Simular envío (aquí puedes integrar AJAX real)
+      status.textContent = '✉️ Enviando mensaje...';
+      status.classList.remove('hidden', 'text-red-600');
+      status.classList.add('text-emerald-600');
+      
+      setTimeout(() => {
+        status.textContent = '✅ ¡Mensaje enviado! Te contactaremos pronto.';
+        form.reset();
+        setTimeout(() => {
+          status.classList.add('hidden');
+        }, 5000);
+      }, 1500);
+    });
+  });
+</script>
+
+<!-- Estilos adicionales para animaciones -->
+<style>
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-fade-in-up {
+    animation: fadeInUp 0.8s ease-out forwards;
+  }
+  .animation-delay-200 {
+    animation-delay: 0.2s;
+    opacity: 0;
+    animation-fill-mode: forwards;
+  }
+  .transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+  }
+</style>
+
 {% endblock %}

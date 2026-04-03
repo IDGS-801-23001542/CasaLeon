@@ -1,0 +1,395 @@
+{% extends "layout.html" %}
+
+{% block title %}Personaliza tu producto | Casa León{% endblock %}
+
+{% block body %}
+<section class="bg-stone-50 py-10">
+  <div class="max-w-6xl mx-auto px-4">
+
+    <div class="text-center mb-10">
+      <h1 class="text-4xl md:text-5xl font-bold text-emerald-900">Personaliza tu producto</h1>
+      <p class="text-gray-600 mt-2">Arrastra el texto sobre la imagen para colocarlo exactamente donde quieras</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-10">
+
+      <!-- Canvas interactivo -->
+      <div class="bg-white rounded-2xl shadow-lg p-6">
+        <div class="relative mx-auto" style="max-width: 400px;">
+          <canvas id="productCanvas" width="400" height="400" class="rounded-xl border border-gray-200 w-full h-auto cursor-move"></canvas>
+        </div>
+        <p class="text-sm text-gray-500 text-center mt-3">* Haz clic y arrastra el texto para colocarlo exactamente donde quieras.</p>
+      </div>
+
+      <!-- Controles -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 space-y-6">
+        
+        <!-- Selección de producto -->
+        <div>
+          <label class="block text-gray-700 font-bold mb-2">Tipo de producto</label>
+          <select id="productoSelect" class="w-full border border-gray-300 rounded-xl px-4 py-2">
+            <option value="cartera" data-precio="450" data-img="/static/img/Cartera.png" data-posx="200" data-posy="350">Cartera - $450</option>
+            <option value="bolso" data-precio="1200" data-img="/static/img/Bolso.png" data-posx="200" data-posy="280">Bolso - $1,200</option>
+            <option value="cinturon" data-precio="380" data-img="/static/img/Cinturon.png" data-posx="200" data-posy="320">Cinturón - $380</option>
+            <option value="billetera" data-precio="320" data-img="/static/img/Billetera.png" data-posx="200" data-posy="340">Billetera - $320</option>
+            <option value="maletin" data-precio="2500" data-img="/static/img/Maletin.png" data-posx="200" data-posy="220">Maletín - $2,500</option>
+          </select>
+          <p class="text-xs text-gray-400 mt-1">Cada producto tiene una posición sugerida, pero puedes moverla arrastrando</p>
+        </div>
+
+        <!-- Nombre -->
+        <div>
+          <label class="block text-gray-700 font-bold mb-2">Nombre a grabar</label>
+          <input type="text" id="nombreInput" maxlength="25" placeholder="Ej: María" 
+                 class="w-full border border-gray-300 rounded-xl px-4 py-2">
+        </div>
+
+        <!-- Color -->
+        <div>
+          <label class="block text-gray-700 font-bold mb-2">Color del grabado</label>
+          <div class="flex items-center gap-3">
+            <input type="color" id="colorPicker" value="#d4af37" class="w-12 h-12 rounded border cursor-pointer">
+            <span class="text-gray-600">Dorado (#d4af37) es el más popular</span>
+          </div>
+        </div>
+
+        <!-- Tamaño y fuente -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-gray-700 font-bold mb-2">Tamaño: <span id="tamanoValor">28</span>px</label>
+            <input type="range" id="tamanoSlider" min="16" max="64" value="28" step="1" class="w-full">
+          </div>
+          <div>
+            <label class="block text-gray-700 font-bold mb-2">Estilo</label>
+            <select id="fuenteSelect" class="w-full border border-gray-300 rounded-xl px-2 py-2">
+              <option value="'Brush Script MT', 'Pacifico', cursive">Cursiva</option>
+              <option value="'Georgia', serif">Serif</option>
+              <option value="'Arial', sans-serif">Sans-serif</option>
+              <option value="'Courier New', monospace">Mono</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Posiciones numéricas (sincronizadas) -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-gray-700 font-bold mb-2">Posición X: <span id="posXValor">200</span>px</label>
+            <input type="range" id="posXSlider" min="10" max="390" value="200" step="1" class="w-full">
+          </div>
+          <div>
+            <label class="block text-gray-700 font-bold mb-2">Posición Y: <span id="posYValor">200</span>px</label>
+            <input type="range" id="posYSlider" min="20" max="380" value="200" step="1" class="w-full">
+          </div>
+        </div>
+
+        <!-- Precio y botón -->
+        <div class="border-t pt-4">
+          <div class="flex justify-between text-lg">
+            <span class="font-bold">Precio base:</span>
+            <span id="precioMostrado" class="text-emerald-700 font-bold">$450</span>
+          </div>
+        </div>
+
+        <button id="agregarCarritoBtn" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 rounded-xl transition transform hover:scale-105 shadow-md">
+          🛒 Agregar al carrito
+        </button>
+        <p id="mensajeCarrito" class="text-center text-sm hidden"></p>
+
+      </div>
+    </div>
+
+    <div class="mt-12 bg-emerald-50 rounded-xl p-6 text-center">
+      <h3 class="text-xl font-bold text-emerald-800">¡Arrastra el texto!</h3>
+      <p class="text-gray-700 mt-2">Simplemente haz clic sobre el nombre dibujado y arrastra para moverlo. La posición se actualiza automáticamente.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function() {
+    // ---------- Elementos DOM ----------
+    const canvas = document.getElementById('productCanvas');
+    const ctx = canvas.getContext('2d');
+    const productoSelect = document.getElementById('productoSelect');
+    const nombreInput = document.getElementById('nombreInput');
+    const colorPicker = document.getElementById('colorPicker');
+    const tamanoSlider = document.getElementById('tamanoSlider');
+    const tamanoValor = document.getElementById('tamanoValor');
+    const fuenteSelect = document.getElementById('fuenteSelect');
+    const posXSlider = document.getElementById('posXSlider');
+    const posXValor = document.getElementById('posXValor');
+    const posYSlider = document.getElementById('posYSlider');
+    const posYValor = document.getElementById('posYValor');
+    const precioMostrado = document.getElementById('precioMostrado');
+    const agregarBtn = document.getElementById('agregarCarritoBtn');
+    const mensajeDiv = document.getElementById('mensajeCarrito');
+
+    canvas.width = 400;
+    canvas.height = 400;
+    let currentImage = new Image();
+    let imageLoaded = false;
+
+    // Variables para arrastre
+    let isDragging = false;
+    let dragOffsetX = 0, dragOffsetY = 0; // offset desde el punto de anclaje del texto
+
+    // Posición actual del texto (coordenada central)
+    let currentPosX = 200;
+    let currentPosY = 200;
+
+    function getSelectedOption() {
+      return productoSelect.options[productoSelect.selectedIndex];
+    }
+
+    function getImagenUrl() {
+      return getSelectedOption().getAttribute('data-img');
+    }
+
+    function actualizarPrecio() {
+      const precio = getSelectedOption().getAttribute('data-precio');
+      precioMostrado.textContent = `$${parseInt(precio).toLocaleString()}`;
+    }
+
+    // Cargar posición sugerida del producto seleccionado
+    function cargarPosicionSugerida() {
+      const option = getSelectedOption();
+      let posX = parseInt(option.getAttribute('data-posx'));
+      let posY = parseInt(option.getAttribute('data-posy'));
+      if (isNaN(posX)) posX = 200;
+      if (isNaN(posY)) posY = 200;
+      currentPosX = posX;
+      currentPosY = posY;
+      posXSlider.value = currentPosX;
+      posXValor.textContent = currentPosX;
+      posYSlider.value = currentPosY;
+      posYValor.textContent = currentPosY;
+      redibujar();
+    }
+
+    // Dibujar imagen y texto en la posición actual
+    function dibujarCanvas() {
+      if (!imageLoaded) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
+      
+      let texto = nombreInput.value.trim();
+      if (texto === "") return;
+      
+      const color = colorPicker.value;
+      const fontSize = tamanoSlider.value;
+      const fontFamily = fuenteSelect.value;
+      
+      ctx.font = `italic ${fontSize}px ${fontFamily}`;
+      ctx.fillStyle = color;
+      ctx.shadowColor = "rgba(0,0,0,0.5)";
+      ctx.shadowBlur = 2;
+      ctx.shadowOffsetX = 1;
+      ctx.shadowOffsetY = 1;
+      
+      const textoWidth = ctx.measureText(texto).width;
+      const textoHeight = fontSize;
+      // Calcular esquina superior izquierda (centrado en currentPosX, currentPosY)
+      let x = currentPosX - textoWidth / 2;
+      let y = currentPosY + textoHeight / 3; // pequeño ajuste vertical
+      
+      // Limitar bordes
+      if (x < 5) x = 5;
+      if (x + textoWidth > canvas.width - 5) x = canvas.width - textoWidth - 5;
+      if (y - textoHeight < 5) y = textoHeight + 5;
+      if (y > canvas.height - 5) y = canvas.height - 5;
+      
+      ctx.fillText(texto, x, y);
+      ctx.shadowColor = "transparent";
+    }
+
+    // Detectar si el mouse está dentro del área del texto (para arrastrar)
+    function isPointInText(mouseX, mouseY) {
+      let texto = nombreInput.value.trim();
+      if (texto === "") return false;
+      const fontSize = tamanoSlider.value;
+      const fontFamily = fuenteSelect.value;
+      ctx.font = `italic ${fontSize}px ${fontFamily}`;
+      const textoWidth = ctx.measureText(texto).width;
+      const textoHeight = fontSize;
+      let x = currentPosX - textoWidth / 2;
+      let y = currentPosY + textoHeight / 3;
+      // Área de colisión con un margen
+      return (mouseX >= x - 5 && mouseX <= x + textoWidth + 5 &&
+              mouseY >= y - textoHeight - 5 && mouseY <= y + 5);
+    }
+
+    // Eventos de arrastre
+    function onMouseDown(e) {
+      if (!imageLoaded) return;
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      let mouseX = (e.clientX - rect.left) * scaleX;
+      let mouseY = (e.clientY - rect.top) * scaleY;
+      if (isPointInText(mouseX, mouseY)) {
+        isDragging = true;
+        canvas.style.cursor = 'grabbing';
+        // Calcular offset entre el clic y la esquina superior izquierda del texto
+        const fontSize = tamanoSlider.value;
+        const fontFamily = fuenteSelect.value;
+        ctx.font = `italic ${fontSize}px ${fontFamily}`;
+        const textoWidth = ctx.measureText(nombreInput.value.trim()).width;
+        const textoHeight = fontSize;
+        let x = currentPosX - textoWidth / 2;
+        let y = currentPosY + textoHeight / 3;
+        dragOffsetX = mouseX - x;
+        dragOffsetY = mouseY - y;
+        e.preventDefault();
+      }
+    }
+
+    function onMouseMove(e) {
+      if (!isDragging || !imageLoaded) return;
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      let mouseX = (e.clientX - rect.left) * scaleX;
+      let mouseY = (e.clientY - rect.top) * scaleY;
+      
+      // Nueva posición de la esquina superior izquierda
+      let newX = mouseX - dragOffsetX;
+      let newY = mouseY - dragOffsetY;
+      
+      // Convertir a posición central del texto
+      const fontSize = tamanoSlider.value;
+      const fontFamily = fuenteSelect.value;
+      ctx.font = `italic ${fontSize}px ${fontFamily}`;
+      const texto = nombreInput.value.trim();
+      const textoWidth = ctx.measureText(texto).width;
+      const textoHeight = fontSize;
+      
+      let centerX = newX + textoWidth / 2;
+      let centerY = newY - textoHeight / 3;
+      
+      // Limitar bordes
+      let minCenterX = textoWidth / 2 + 5;
+      let maxCenterX = canvas.width - textoWidth / 2 - 5;
+      let minCenterY = textoHeight / 2 + 5;
+      let maxCenterY = canvas.height - 5;
+      centerX = Math.min(maxCenterX, Math.max(minCenterX, centerX));
+      centerY = Math.min(maxCenterY, Math.max(minCenterY, centerY));
+      
+      currentPosX = centerX;
+      currentPosY = centerY;
+      
+      // Sincronizar sliders
+      posXSlider.value = Math.round(currentPosX);
+      posXValor.textContent = Math.round(currentPosX);
+      posYSlider.value = Math.round(currentPosY);
+      posYValor.textContent = Math.round(currentPosY);
+      
+      redibujar();
+    }
+
+    function onMouseUp() {
+      isDragging = false;
+      canvas.style.cursor = 'move';
+    }
+
+    canvas.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+
+    // Cargar imagen
+    function cargarImagen() {
+      const imgUrl = getImagenUrl();
+      currentImage.src = imgUrl;
+      currentImage.onload = function() {
+        imageLoaded = true;
+        cargarPosicionSugerida();
+      };
+      currentImage.onerror = function() {
+        console.error("Error cargando: " + imgUrl);
+        ctx.fillStyle = "#f3f4f6";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#9ca3af";
+        ctx.font = "16px sans-serif";
+        ctx.fillText("Imagen no encontrada", 20, canvas.height/2);
+        imageLoaded = false;
+      };
+    }
+
+    function redibujar() {
+      if (imageLoaded) dibujarCanvas();
+    }
+
+    // Eventos de controles
+    tamanoSlider.addEventListener('input', () => {
+      tamanoValor.textContent = tamanoSlider.value;
+      redibujar();
+    });
+    posXSlider.addEventListener('input', () => {
+      currentPosX = parseInt(posXSlider.value);
+      posXValor.textContent = currentPosX;
+      redibujar();
+    });
+    posYSlider.addEventListener('input', () => {
+      currentPosY = parseInt(posYSlider.value);
+      posYValor.textContent = currentPosY;
+      redibujar();
+    });
+    productoSelect.addEventListener('change', () => {
+      actualizarPrecio();
+      cargarImagen();
+    });
+    nombreInput.addEventListener('input', redibujar);
+    colorPicker.addEventListener('input', redibujar);
+    fuenteSelect.addEventListener('change', redibujar);
+
+    // Inicializar
+    actualizarPrecio();
+    cargarImagen();
+    tamanoValor.textContent = tamanoSlider.value;
+    posXValor.textContent = posXSlider.value;
+    posYValor.textContent = posYSlider.value;
+    canvas.style.cursor = 'move';
+
+    // Botón agregar al carrito
+    agregarBtn.addEventListener('click', function() {
+      const option = getSelectedOption();
+      const productoNombre = option.textContent.split(' - ')[0];
+      const precio = parseInt(option.getAttribute('data-precio'));
+      const nombreGrabado = nombreInput.value.trim();
+      const colorGrabado = colorPicker.value;
+      const tamanioLetra = tamanoSlider.value;
+      const tipoLetra = fuenteSelect.options[fuenteSelect.selectedIndex].text;
+      
+      if (nombreGrabado === "") {
+        mensajeDiv.textContent = "⚠️ Escribe el nombre para grabar.";
+        mensajeDiv.classList.remove("hidden", "text-green-600");
+        mensajeDiv.classList.add("text-red-600");
+        setTimeout(() => mensajeDiv.classList.add("hidden"), 3000);
+        return;
+      }
+      
+      const itemPersonalizado = {
+        id_producto: option.value,
+        nombre: productoNombre,
+        precio: precio,
+        personalizacion: {
+          texto: nombreGrabado,
+          color: colorGrabado,
+          tamano: tamanioLetra,
+          fuente: tipoLetra,
+          posX: currentPosX,
+          posY: currentPosY
+        },
+        cantidad: 1,
+        imagen: option.getAttribute('data-img')
+      };
+      
+      console.log("Agregar al carrito:", itemPersonalizado);
+      mensajeDiv.textContent = `✅ "${productoNombre}" con grabado "${nombreGrabado}" agregado.`;
+      mensajeDiv.classList.remove("hidden", "text-red-600");
+      mensajeDiv.classList.add("text-green-600");
+      setTimeout(() => mensajeDiv.classList.add("hidden"), 3000);
+    });
+  })();
+</script>
+
+{% endblock %}

@@ -3,61 +3,212 @@
 {% block title %}Nosotros | Casa León{% endblock %}
 
 {% block body %}
-<section class="bg-stone-50">
-  <section class="bg-gradient-to-r from-emerald-900 via-emerald-700 to-stone-300">
-    <div class="max-w-screen-2xl mx-auto px-6 py-24 text-white">
-      <h1 class="text-5xl md:text-7xl font-extrabold">Nosotros</h1>
-      <p class="mt-6 text-xl md:text-2xl max-w-4xl leading-relaxed">
+<section class="bg-stone-50 overflow-x-hidden">
+
+  <!-- Hero con imagen de fondo y overlay -->
+  <div class="relative bg-gradient-to-r from-emerald-900 via-emerald-700 to-stone-300">
+    <div class="absolute inset-0 bg-black/30 z-10"></div>
+    <div class="relative z-20 max-w-screen-2xl mx-auto px-6 py-32 md:py-40 text-white">
+      <h1 class="text-5xl md:text-7xl font-extrabold animate-fade-in-up">Nosotros</h1>
+      <p class="mt-6 text-xl md:text-2xl max-w-4xl leading-relaxed animate-fade-in-up animation-delay-200">
         En Casa León transformamos la tradición marroquinera de León, Guanajuato, en productos funcionales, elegantes y duraderos.
       </p>
     </div>
-  </section>
+    <!-- Figura decorativa (opcional) -->
+    <div class="absolute bottom-0 left-0 right-0 h-16 bg-stone-50 rounded-t-3xl z-20"></div>
+  </div>
 
-  <section class="max-w-screen-2xl mx-auto px-6 py-16">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div class="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
+  <!-- Sección de historia, misión, visión con íconos y hover -->
+  <div class="max-w-screen-2xl mx-auto px-6 py-16 -mt-8 relative z-30">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      
+      <div class="bg-white rounded-3xl border border-gray-200 shadow-md p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl group">
+        <div class="text-emerald-700 text-5xl mb-4 group-hover:scale-110 transition-transform">📜</div>
         <h2 class="text-3xl font-bold text-emerald-900">Nuestra historia</h2>
         <p class="mt-4 text-gray-600 leading-8">
           Nacimos con el propósito de representar la calidad del trabajo artesanal leonés en una experiencia moderna de compra.
         </p>
       </div>
 
-      <div class="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
+      <div class="bg-white rounded-3xl border border-gray-200 shadow-md p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl group">
+        <div class="text-emerald-700 text-5xl mb-4 group-hover:scale-110 transition-transform">🎯</div>
         <h2 class="text-3xl font-bold text-emerald-900">Nuestra misión</h2>
         <p class="mt-4 text-gray-600 leading-8">
           Ofrecer artículos de marroquinería con gran diseño, excelente manufactura y materiales de alta calidad.
         </p>
       </div>
 
-      <div class="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
+      <div class="bg-white rounded-3xl border border-gray-200 shadow-md p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl group">
+        <div class="text-emerald-700 text-5xl mb-4 group-hover:scale-110 transition-transform">👁️</div>
         <h2 class="text-3xl font-bold text-emerald-900">Nuestra visión</h2>
         <p class="mt-4 text-gray-600 leading-8">
           Ser una marca reconocida por unir tradición, innovación y experiencia digital en el sector del cuero.
         </p>
       </div>
-    </div>
 
-    <div class="mt-10 bg-white rounded-3xl border border-gray-200 shadow-sm p-10">
-      <h2 class="text-4xl font-extrabold text-emerald-900">¿Qué nos distingue?</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-        <div class="p-6 rounded-2xl bg-stone-50 border border-stone-200">
-          <h3 class="text-2xl font-bold text-emerald-900">Tradición artesanal</h3>
-          <p class="mt-3 text-gray-600 leading-8">Cada línea de producto parte de la esencia marroquinera de León.</p>
+    </div>
+  </div>
+
+  <!-- Sección ¿Qué nos distingue? con íconos más elaborados -->
+  <div class="max-w-screen-2xl mx-auto px-6 py-10">
+    <div class="bg-white rounded-3xl border border-gray-200 shadow-sm p-10 transition-all duration-500 hover:shadow-lg">
+      <h2 class="text-4xl font-extrabold text-emerald-900 text-center md:text-left">¿Qué nos distingue?</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
+        
+        <div class="flex items-start gap-5 p-5 rounded-2xl bg-stone-50 border border-stone-200 transition-all duration-300 hover:bg-white hover:shadow-md group">
+          <div class="text-4xl text-emerald-700 group-hover:scale-110 transition-transform">🧵</div>
+          <div>
+            <h3 class="text-2xl font-bold text-emerald-900">Tradición artesanal</h3>
+            <p class="mt-2 text-gray-600 leading-7">Cada línea de producto parte de la esencia marroquinera de León.</p>
+          </div>
         </div>
-        <div class="p-6 rounded-2xl bg-stone-50 border border-stone-200">
-          <h3 class="text-2xl font-bold text-emerald-900">Diseño funcional</h3>
-          <p class="mt-3 text-gray-600 leading-8">Creamos piezas útiles, resistentes y atractivas para el día a día.</p>
+
+        <div class="flex items-start gap-5 p-5 rounded-2xl bg-stone-50 border border-stone-200 transition-all duration-300 hover:bg-white hover:shadow-md group">
+          <div class="text-4xl text-emerald-700 group-hover:scale-110 transition-transform">✂️</div>
+          <div>
+            <h3 class="text-2xl font-bold text-emerald-900">Diseño funcional</h3>
+            <p class="mt-2 text-gray-600 leading-7">Creamos piezas útiles, resistentes y atractivas para el día a día.</p>
+          </div>
         </div>
-        <div class="p-6 rounded-2xl bg-stone-50 border border-stone-200">
-          <h3 class="text-2xl font-bold text-emerald-900">Calidad premium</h3>
-          <p class="mt-3 text-gray-600 leading-8">Usamos materiales y acabados pensados para durar.</p>
+
+        <div class="flex items-start gap-5 p-5 rounded-2xl bg-stone-50 border border-stone-200 transition-all duration-300 hover:bg-white hover:shadow-md group">
+          <div class="text-4xl text-emerald-700 group-hover:scale-110 transition-transform">🏆</div>
+          <div>
+            <h3 class="text-2xl font-bold text-emerald-900">Calidad premium</h3>
+            <p class="mt-2 text-gray-600 leading-7">Usamos materiales y acabados pensados para durar.</p>
+          </div>
         </div>
-        <div class="p-6 rounded-2xl bg-stone-50 border border-stone-200">
-          <h3 class="text-2xl font-bold text-emerald-900">Experiencia digital</h3>
-          <p class="mt-3 text-gray-600 leading-8">Llevamos la marroquinería a una plataforma clara, visual y funcional.</p>
+
+        <div class="flex items-start gap-5 p-5 rounded-2xl bg-stone-50 border border-stone-200 transition-all duration-300 hover:bg-white hover:shadow-md group">
+          <div class="text-4xl text-emerald-700 group-hover:scale-110 transition-transform">💻</div>
+          <div>
+            <h3 class="text-2xl font-bold text-emerald-900">Experiencia digital</h3>
+            <p class="mt-2 text-gray-600 leading-7">Llevamos la marroquinería a una plataforma clara, visual y funcional.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección de estadísticas animadas (contador) -->
+  <div class="max-w-screen-2xl mx-auto px-6 py-16">
+    <div class="bg-gradient-to-r from-emerald-800 to-emerald-600 rounded-3xl p-10 text-white shadow-xl">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+        <div class="counter-item">
+          <div class="text-5xl font-extrabold counter" data-target="15">0</div>
+          <p class="text-lg mt-2 opacity-90">Años de experiencia</p>
+        </div>
+        <div class="counter-item">
+          <div class="text-5xl font-extrabold counter" data-target="5000">0</div>
+          <p class="text-lg mt-2 opacity-90">Clientes felices</p>
+        </div>
+        <div class="counter-item">
+          <div class="text-5xl font-extrabold counter" data-target="200">0</div>
+          <p class="text-lg mt-2 opacity-90">Diseños únicos</p>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+
+  <!-- Galería de imágenes / taller (animación de aparición) -->
+  <div class="max-w-screen-2xl mx-auto px-6 py-10">
+    <h2 class="text-3xl md:text-4xl font-bold text-emerald-900 text-center mb-10">Nuestro taller</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-500 hover:scale-105">
+        <img src="https://placehold.co/600x400/EEE/31343C?text=Taller+1" alt="Taller artesanal" class="w-full h-48 object-cover">
+      </div>
+      <div class="overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-500 hover:scale-105">
+        <img src="https://placehold.co/600x400/EEE/31343C?text=Pieles+de+calidad" alt="Materiales premium" class="w-full h-48 object-cover">
+      </div>
+      <div class="overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-500 hover:scale-105">
+        <img src="https://placehold.co/600x400/EEE/31343C?text=Proceso+manual" alt="Proceso manual" class="w-full h-48 object-cover">
+      </div>
+      <div class="overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-500 hover:scale-105">
+        <img src="https://placehold.co/600x400/EEE/31343C?text=Producto+terminado" alt="Producto terminado" class="w-full h-48 object-cover">
+      </div>
+    </div>
+  </div>
+
+  <!-- Llamada a la acción final -->
+  <div class="max-w-screen-2xl mx-auto px-6 py-16">
+    <div class="bg-stone-100 rounded-3xl p-12 text-center border border-stone-200">
+      <h3 class="text-3xl font-bold text-emerald-900">¿Listo para conocer nuestra colección?</h3>
+      <p class="mt-4 text-gray-600 max-w-2xl mx-auto">Descubre productos que combinan tradición y diseño funcional.</p>
+      <div class="mt-8">
+        <a href="/catalogo" class="inline-block bg-emerald-700 text-white px-8 py-3 rounded-full font-semibold hover:bg-emerald-800 transition shadow-md hover:shadow-lg transform hover:-translate-y-1">
+          Ver catálogo
+        </a>
+      </div>
+    </div>
+  </div>
+
 </section>
+
+<!-- Script para contador animado (al hacer scroll) -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const counters = document.querySelectorAll('.counter');
+    const speed = 200; // velocidad de animación
+
+    const animateCounter = (counter) => {
+      const updateCount = () => {
+        const target = parseInt(counter.getAttribute('data-target'));
+        const count = parseInt(counter.innerText);
+        const increment = Math.ceil(target / speed);
+        if (count < target) {
+          counter.innerText = count + increment;
+          setTimeout(updateCount, 20);
+        } else {
+          counter.innerText = target;
+        }
+      };
+      updateCount();
+    };
+
+    // Intersection Observer para disparar cuando los contadores sean visibles
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const counter = entry.target;
+          animateCounter(counter);
+          observer.unobserve(counter);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    counters.forEach(counter => {
+      observer.observe(counter);
+    });
+  });
+</script>
+
+<!-- Estilos adicionales para animaciones -->
+<style>
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-fade-in-up {
+    animation: fadeInUp 0.8s ease-out forwards;
+  }
+  .animation-delay-200 {
+    animation-delay: 0.2s;
+    opacity: 0; /* start invisible */
+    animation-fill-mode: forwards;
+  }
+  /* Asegurar que las tarjetas y elementos tengan transiciones suaves */
+  .transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+  }
+</style>
+
 {% endblock %}

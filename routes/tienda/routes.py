@@ -283,3 +283,8 @@ def admin_dashboard():
 @login_required("EMPLEADO")
 def vendedor_dashboard():
     return render_template("app/vendedor_dashboard.html")
+
+
+@tienda.route('/personalizar')
+def personalizar():
+    return render_template('tienda/personalizar.html')

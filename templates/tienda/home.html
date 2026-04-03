@@ -113,5 +113,28 @@
       {% endif %}
     </div>
   </section>
+
+
+  <!-- 🆕 SECCIÓN PROMOCIONAL: Personalización -->
+  <section class="max-w-screen-2xl mx-auto px-6 py-16">
+    <div class="bg-gradient-to-r from-amber-100 to-emerald-100 rounded-3xl p-8 md:p-12 text-center shadow-md">
+      <div class="max-w-3xl mx-auto">
+        <span class="text-5xl">✨🎁</span>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-emerald-900 mt-4">¿Buscas un regalo único?</h2>
+        <p class="text-xl text-gray-700 mt-3">
+          Personaliza carteras, bolsos, cinturones y más con el nombre que quieras.  
+          <strong>¡Grabado sin costo extra!</strong>
+        </p>
+        <div class="mt-8">
+          <a href="{{ url_for('tienda.personalizar') }}"
+             class="inline-block bg-emerald-800 hover:bg-emerald-900 text-white font-bold rounded-xl text-lg px-8 py-4 transition transform hover:scale-105 shadow-lg">
+            Comienza a personalizar →
+          </a>
+        </div>
+        <p class="text-sm text-gray-500 mt-6">Elige producto, escribe el nombre y el color del grabado. Mira la simulación en vivo.</p>
+      </div>
+    </div>
+  </section>
+
 </section>
 {% endblock %}
