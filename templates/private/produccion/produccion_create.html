@@ -10,7 +10,7 @@
       <h1 class="text-3xl font-bold mb-2">Nueva Producción</h1>
       <p class="text-gray-500">Genera una orden de producción y consume materia prima automáticamente</p>
     </div>
-    <a href="{{ url_for('operaciones.produccion') }}"
+    <a href="{{ url_for('produccion.produccion_view') }}"
        class="px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
       Volver
     </a>
@@ -43,7 +43,7 @@
     <!-- Formulario -->
     <div class="xl:col-span-1">
       <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-        <form method="POST" action="{{ url_for('operaciones.crear_produccion') }}" class="space-y-4">
+        <form method="POST" action="{{ url_for('produccion.crear_produccion') }}" class="space-y-4">
           {{ form.hidden_tag() }}
           {{ ui.form_errors(form) }}
 

@@ -12,7 +12,7 @@
       <p class="text-gray-500">Gestiona el inventario y stock de materia prima</p>
     </div>
     <a
-      href="{{ url_for('operaciones.crear_materia_prima') }}"
+      href="{{ url_for('materia_prima.crear_materia_prima') }}"
       class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all"
     >
       <span class="text-xl">+</span>
@@ -88,7 +88,7 @@
 
   <!-- Filters -->
   <div class="flex flex-col md:flex-row gap-4">
-    <form method="GET" action="{{ url_for('operaciones.materia_prima') }}" class="contents">
+    <form method="GET" action="{{ url_for('materia_prima.materia_prima_view') }}" class="contents">
       <div class="flex-1 relative">
         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
         <input
@@ -142,7 +142,7 @@
           <div class="flex-1">
             <h3 class="font-bold text-lg mb-1">{{ materia.nombre }}</h3>
             <p class="text-sm text-gray-500">
-              {{ materia.categoria }}
+              {{ materia.categoria_mp.nombre if materia.categoria_mp else 'Sin categoría' }}
             </p>
           </div>
           <span class="px-3 py-1 rounded-full text-xs flex items-center gap-1 {{ stock_bg }}">
@@ -154,7 +154,9 @@
         <div class="space-y-3 mb-4">
           <div class="flex justify-between text-sm gap-3">
             <span class="text-gray-500">Unidad:</span>
-            <span class="font-medium text-right">{{ materia.unidad_medida }}</span>
+            <span class="font-medium text-right">
+              {{ materia.unidad_medida_rel.nombre if materia.unidad_medida_rel else 'Sin unidad' }}
+            </span>
           </div>
 
           <div class="flex justify-between text-sm gap-3">
@@ -204,7 +206,7 @@
         <div class="flex flex-col gap-2">
           <form
             method="POST"
-            action="{{ url_for('operaciones.movimiento_materia_prima') }}"
+            action="{{ url_for('materia_prima.movimiento_materia_prima') }}"
             class="grid grid-cols-1 sm:grid-cols-3 gap-2"
           >
             <input type="hidden" name="id" value="{{ materia.id_materia_prima }}">
@@ -247,7 +249,7 @@
 
           <div class="flex gap-2">
             <a
-              href="{{ url_for('operaciones.actualizar_materia_prima', id=materia.id_materia_prima) }}"
+              href="{{ url_for('materia_prima.actualizar_materia_prima', id=materia.id_materia_prima) }}"
               class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all"
             >
               Editar
@@ -255,7 +257,7 @@
 
             {% if g.role == 'ADMIN' %}
             <a
-              href="{{ url_for('operaciones.eliminar_materia_prima', id=materia.id_materia_prima) }}"
+              href="{{ url_for('materia_prima.eliminar_materia_prima', id=materia.id_materia_prima) }}"
               class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl hover:shadow-lg transition-all"
             >
               Desactivar

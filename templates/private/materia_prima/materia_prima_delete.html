@@ -10,7 +10,7 @@
       <h1 class="text-3xl font-bold mb-2">Desactivar Materia Prima</h1>
       <p class="text-gray-500">Confirma la desactivación del material</p>
     </div>
-    <a href="{{ url_for('operaciones.materia_prima') }}"
+    <a href="{{ url_for('materia_prima.materia_prima_view') }}"
        class="px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
       Volver
     </a>
@@ -23,7 +23,7 @@
       </p>
     </div>
 
-    <form method="POST" action="{{ url_for('operaciones.eliminar_materia_prima', id=materia_db.id_materia_prima) }}" class="space-y-4">
+    <form method="POST" action="{{ url_for('materia_prima.eliminar_materia_prima', id=materia_db.id_materia_prima) }}" class="space-y-4">
       {{ form.hidden_tag() }}
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -35,13 +35,13 @@
 
         <div>
           <label class="block mb-2 text-sm font-medium text-gray-900">Categoría</label>
-          <input type="text" value="{{ materia_db.categoria }}" disabled
+          <input type="text" value="{{ materia_db.categoria_mp.nombre if materia_db.categoria_mp else '' }}" disabled
                  class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
         </div>
 
         <div>
           <label class="block mb-2 text-sm font-medium text-gray-900">Unidad de Medida</label>
-          <input type="text" value="{{ materia_db.unidad_medida }}" disabled
+          <input type="text" value="{{ materia_db.unidad_medida_rel.nombre if materia_db.unidad_medida_rel else '' }}" disabled
                  class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
         </div>
 
@@ -77,7 +77,7 @@
       </div>
 
       <div class="flex flex-col sm:flex-row gap-3 pt-4">
-        <a href="{{ url_for('operaciones.materia_prima') }}"
+        <a href="{{ url_for('materia_prima.materia_prima_view') }}"
            class="flex-1 px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
           Cancelar
         </a>

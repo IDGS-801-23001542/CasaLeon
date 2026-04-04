@@ -10,7 +10,7 @@
       <h1 class="text-3xl font-bold mb-2">Desactivar Receta</h1>
       <p class="text-gray-500">Confirma la desactivación de la receta</p>
     </div>
-    <a href="{{ url_for('operaciones.recetas') }}"
+    <a href="{{ url_for('recetas.recetas_view') }}"
        class="px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
       Volver
     </a>
@@ -23,7 +23,7 @@
       </p>
     </div>
 
-    <form method="POST" action="{{ url_for('operaciones.eliminar_receta', id=receta_db.id_receta) }}" class="space-y-4">
+    <form method="POST" action="{{ url_for('recetas.eliminar_receta', id=receta_db.id_receta) }}" class="space-y-4">
       {{ form.hidden_tag() }}
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -102,7 +102,7 @@
                   <p class="text-sm text-blue-600 font-semibold">
                     {{ detalle.cantidad }}
                     {% if detalle.materia_prima %}
-                      {{ detalle.materia_prima.unidad_medida }}
+                      {{ detalle.materia_prima.unidad_medida_rel.nombre }}
                     {% endif %}
                   </p>
                 </div>
@@ -125,7 +125,7 @@
       </div>
 
       <div class="flex flex-col sm:flex-row gap-3 pt-4">
-        <a href="{{ url_for('operaciones.recetas') }}"
+        <a href="{{ url_for('recetas.recetas_view') }}"
            class="flex-1 px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
           Cancelar
         </a>

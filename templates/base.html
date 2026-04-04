@@ -27,21 +27,21 @@
   {% if g.role == "ADMIN" %}
     {% set menu_items = [
       {"label": "Dashboard", "path": url_for('tienda.admin_dashboard'), "icon": "📊"},
-      {"label": "Materia Prima", "path": url_for('operaciones.materia_prima'), "icon": "🛒"},
-      {"label": "Producción", "path": url_for('operaciones.produccion'), "icon": "🏭"},
+      {"label": "Materia Prima", "path": url_for('materia_prima.materia_prima_view'), "icon": "🛒"},
+      {"label": "Producción", "path": url_for('produccion.produccion_view'), "icon": "🏭"},
       {"label": "Inventario", "path": url_for('productos.listado_productos'), "icon": "📦"},
       {"label": "Ventas", "path": url_for('operaciones.ventas'), "icon": "📈"},
       {"label": "Reportes", "path": url_for('operaciones.reportes'), "icon": "📉"},
       {"label": "Proveedores", "path": url_for('proveedores.listado_proveedores'), "icon": "🚚"},
       {"label": "Usuarios", "path": url_for('usuarios.listado_usuarios'), "icon": "👥"},
       {"label": "Auditoría", "path": url_for('auditoria.listado_auditoria'), "icon": "📄"},
-      {"label": "Recetas", "path": url_for('operaciones.recetas'), "icon": "🧾"}
+      {"label": "Recetas", "path": url_for('recetas.recetas_view'), "icon": "🧾"}
     ] %}
   {% else %}
     {% set menu_items = [
       {"label": "Dashboard", "path": url_for('tienda.vendedor_dashboard'), "icon": "📊"},
-      {"label": "Materia Prima", "path": url_for('operaciones.materia_prima'), "icon": "🛒"},
-      {"label": "Producción", "path": url_for('operaciones.produccion'), "icon": "🏭"},
+      {"label": "Materia Prima", "path": url_for('materia_prima.materia_prima_view'), "icon": "🛒"},
+      {"label": "Producción", "path": url_for('produccion.produccion_view'), "icon": "🏭"},
       {"label": "Inventario", "path": url_for('productos.listado_productos'), "icon": "📦"},
       {"label": "Ventas", "path": url_for('operaciones.ventas'), "icon": "📈"}
     ] %}

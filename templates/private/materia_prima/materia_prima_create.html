@@ -10,21 +10,21 @@
       <h1 class="text-3xl font-bold mb-2">Nueva Materia Prima</h1>
       <p class="text-gray-500">Registra un nuevo material para inventario</p>
     </div>
-    <a href="{{ url_for('operaciones.materia_prima') }}"
+    <a href="{{ url_for('materia_prima.materia_prima_view') }}"
        class="px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
       Volver
     </a>
   </div>
 
   <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-    <form method="POST" action="{{ url_for('operaciones.crear_materia_prima') }}" class="space-y-4">
+    <form method="POST" action="{{ url_for('materia_prima.crear_materia_prima') }}" class="space-y-4">
       {{ form.hidden_tag() }}
       {{ ui.form_errors(form) }}
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {{ ui.field(form.nombre, placeholder="Nombre de la materia prima") }}
-        {{ ui.field(form.categoria, placeholder="Categoría") }}
-        {{ ui.field(form.unidad_medida, placeholder="Unidad de medida") }}
+        {{ ui.select_field(form.id_categoria_materia_prima) }}
+        {{ ui.select_field(form.id_unidad_medida) }}
         {{ ui.field(form.stock_actual, placeholder="Stock actual") }}
         {{ ui.field(form.stock_minimo, placeholder="Stock mínimo") }}
         {{ ui.field(form.costo_unit_prom, placeholder="Costo unitario promedio") }}
@@ -42,7 +42,7 @@
       </div>
 
       <div class="flex flex-col sm:flex-row gap-3 pt-4">
-        <a href="{{ url_for('operaciones.materia_prima') }}"
+        <a href="{{ url_for('materia_prima.materia_prima_view') }}"
            class="flex-1 px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
           Cancelar
         </a>

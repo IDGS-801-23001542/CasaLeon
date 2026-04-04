@@ -168,13 +168,49 @@ class PedidoDetalle(db.Model):
 # Nuevos modelos para cerrar proyecto
 # =========================
 
+class CategoriaMateriaPrima(db.Model):
+    __tablename__ = "categorias_materia_prima"
+
+    id_categoria_materia_prima = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(60), nullable=False, unique=True)
+    activo = db.Column(db.Integer, nullable=False, default=1)
+
+    materias_primas = db.relationship("MateriaPrima", backref="categoria_mp", lazy=True)
+
+    def __repr__(self):
+        return f"<CategoriaMateriaPrima {self.id_categoria_materia_prima} - {self.nombre}>"
+
+
+class UnidadMedida(db.Model):
+    __tablename__ = "unidades_medida"
+
+    id_unidad_medida = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(20), nullable=False, unique=True)
+    activo = db.Column(db.Integer, nullable=False, default=1)
+
+    materias_primas = db.relationship("MateriaPrima", backref="unidad_medida_rel", lazy=True)
+
+    def __repr__(self):
+        return f"<UnidadMedida {self.id_unidad_medida} - {self.nombre}>"
+
 class MateriaPrima(db.Model):
     __tablename__ = "materias_primas"
 
     id_materia_prima = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(120), nullable=False, unique=True)
-    categoria = db.Column(db.String(60), nullable=False)
-    unidad_medida = db.Column(db.String(20), nullable=False)
+
+    id_categoria_materia_prima = db.Column(
+        db.Integer,
+        db.ForeignKey("categorias_materia_prima.id_categoria_materia_prima"),
+        nullable=False,
+    )
+
+    id_unidad_medida = db.Column(
+        db.Integer,
+        db.ForeignKey("unidades_medida.id_unidad_medida"),
+        nullable=False,
+    )
+
     stock_actual = db.Column(db.Numeric(14, 4), nullable=False, default=0)
     stock_minimo = db.Column(db.Numeric(14, 4), nullable=False, default=0)
     costo_unit_prom = db.Column(db.Numeric(12, 4), nullable=False, default=0)

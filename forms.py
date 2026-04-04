@@ -820,28 +820,18 @@ class MateriaPrimaForm(FlaskForm):
         ],
     )
 
-    categoria = StringField(
+    id_categoria_materia_prima = SelectField(
         "Categoría",
-        validators=[
-            DataRequired(message="La categoría es requerida"),
-            Length(
-                min=2,
-                max=60,
-                message="La categoría debe tener entre 2 y 60 caracteres",
-            ),
-        ],
+        coerce=int,
+        validators=[DataRequired(message="La categoría es requerida")],
+        choices=[],
     )
 
-    unidad_medida = StringField(
+    id_unidad_medida = SelectField(
         "Unidad de Medida",
-        validators=[
-            DataRequired(message="La unidad de medida es requerida"),
-            Length(
-                min=1,
-                max=20,
-                message="La unidad de medida no puede exceder 20 caracteres",
-            ),
-        ],
+        coerce=int,
+        validators=[DataRequired(message="La unidad de medida es requerida")],
+        choices=[],
     )
 
     stock_actual = DecimalField(
@@ -877,12 +867,6 @@ class MateriaPrimaForm(FlaskForm):
     )
 
     def validate_nombre(self, field):
-        field.data = _normalize_spaces(field.data)
-
-    def validate_categoria(self, field):
-        field.data = _normalize_spaces(field.data)
-
-    def validate_unidad_medida(self, field):
         field.data = _normalize_spaces(field.data)
 
 # RECETAS

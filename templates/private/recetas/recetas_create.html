@@ -10,14 +10,14 @@
       <h1 class="text-3xl font-bold mb-2">Nueva Receta</h1>
       <p class="text-gray-500">Registra una receta con uno o varios insumos</p>
     </div>
-    <a href="{{ url_for('operaciones.recetas') }}"
+    <a href="{{ url_for('recetas.recetas_view') }}"
        class="px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
       Volver
     </a>
   </div>
 
   <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-    <form method="POST" action="{{ url_for('operaciones.crear_receta') }}" class="space-y-6">
+    <form method="POST" action="{{ url_for('recetas.crear_receta') }}" class="space-y-6">
       {{ form.hidden_tag() }}
       {{ ui.form_errors(form) }}
 
@@ -83,7 +83,7 @@
                           value="{{ materia.id_materia_prima }}"
                           {% if detalle.id_materia_prima|string == materia.id_materia_prima|string %}selected{% endif %}
                         >
-                          {{ materia.nombre }} ({{ materia.unidad_medida }})
+                          {{ materia.nombre }} ({{ materia.unidad_medida_rel.nombre }})
                         </option>
                       {% endfor %}
                     </select>
@@ -125,7 +125,7 @@
                     <option value="">Selecciona una materia prima</option>
                     {% for materia in materias_primas %}
                       <option value="{{ materia.id_materia_prima }}">
-                        {{ materia.nombre }} ({{ materia.unidad_medida }})
+                        {{ materia.nombre }} ({{ materia.unidad_medida_rel.nombre }})
                       </option>
                     {% endfor %}
                   </select>
@@ -163,7 +163,7 @@
       </div>
 
       <div class="flex flex-col sm:flex-row gap-3 pt-2">
-        <a href="{{ url_for('operaciones.recetas') }}"
+        <a href="{{ url_for('recetas.recetas_view') }}"
            class="flex-1 px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
           Cancelar
         </a>
@@ -189,7 +189,7 @@
         <option value="">Selecciona una materia prima</option>
         {% for materia in materias_primas %}
           <option value="{{ materia.id_materia_prima }}">
-            {{ materia.nombre }} ({{ materia.unidad_medida }})
+            {{ materia.nombre }} ({{ materia.unidad_medida_rel.nombre }})
           </option>
         {% endfor %}
       </select>
@@ -224,6 +224,45 @@
   const btnAgregarInsumo = document.getElementById("agregar-insumo");
   const templateInsumo = document.getElementById("template-insumo");
 
+  function obtenerValoresSeleccionados() {
+    const selects = document.querySelectorAll('select[name="id_materia_prima[]"]');
+    return Array.from(selects)
+      .map(select => select.value)
+      .filter(value => value !== "");
+  }
+
+  function actualizarOpcionesDisponibles() {
+    const selects = document.querySelectorAll('select[name="id_materia_prima[]"]');
+    const seleccionados = obtenerValoresSeleccionados();
+
+    selects.forEach((selectActual) => {
+      const valorActual = selectActual.value;
+
+      Array.from(selectActual.options).forEach((option) => {
+        if (option.value === "") {
+          option.disabled = false;
+          return;
+        }
+
+        if (option.value === valorActual) {
+          option.disabled = false;
+          return;
+        }
+
+        option.disabled = seleccionados.includes(option.value);
+      });
+    });
+  }
+
+  function bindSelectEvents() {
+    const selects = document.querySelectorAll('select[name="id_materia_prima[]"]');
+    selects.forEach((select) => {
+      select.onchange = function () {
+        actualizarOpcionesDisponibles();
+      };
+    });
+  }
+
   function bindEliminarButtons() {
     const botones = document.querySelectorAll(".eliminar-insumo");
 
@@ -237,6 +276,7 @@
         }
 
         this.closest(".insumo-row").remove();
+        actualizarOpcionesDisponibles();
       };
     });
   }
@@ -245,8 +285,12 @@
     const clon = templateInsumo.content.cloneNode(true);
     contenedorInsumos.appendChild(clon);
     bindEliminarButtons();
+    bindSelectEvents();
+    actualizarOpcionesDisponibles();
   });
 
   bindEliminarButtons();
+  bindSelectEvents();
+  actualizarOpcionesDisponibles();
 </script>
 {% endblock %}

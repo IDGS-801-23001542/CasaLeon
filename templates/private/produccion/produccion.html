@@ -12,7 +12,7 @@
       <p class="text-gray-500">Gestiona órdenes de producción y trazabilidad de fabricación</p>
     </div>
     <a
-      href="{{ url_for('operaciones.crear_produccion') }}"
+      href="{{ url_for('produccion.crear_produccion') }}"
       class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all"
     >
       <span class="text-xl">+</span>
@@ -188,7 +188,7 @@
 
         <div class="flex gap-2">
           <a
-            href="{{ url_for('operaciones.actualizar_produccion', id=orden.id_orden_produccion) }}"
+            href="{{ url_for('produccion.actualizar_produccion', id=orden.id_orden_produccion) }}"
             class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all"
           >
             Ver / Editar
@@ -196,7 +196,7 @@
 
           {% if g.role == 'ADMIN' %}
           <a
-            href="{{ url_for('operaciones.eliminar_produccion', id=orden.id_orden_produccion) }}"
+            href="{{ url_for('produccion.eliminar_produccion', id=orden.id_orden_produccion) }}"
             class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl hover:shadow-lg transition-all"
           >
             Cancelar

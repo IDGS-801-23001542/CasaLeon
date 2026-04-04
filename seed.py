@@ -17,15 +17,24 @@ from models import (
     Receta,
     RecetaDetalle,
     AuditoriaLog,
+    CategoriaMateriaPrima,
+    UnidadMedida,
+    OrdenProduccion,
+    OrdenProduccionDetalle,
 )
 
 
 def reset_data():
     print("🧹 Reiniciando datos...")
 
+    OrdenProduccionDetalle.query.delete()
+    OrdenProduccion.query.delete()
+
     RecetaDetalle.query.delete()
     Receta.query.delete()
     MateriaPrima.query.delete()
+    CategoriaMateriaPrima.query.delete()
+    UnidadMedida.query.delete()
     AuditoriaLog.query.delete()
 
     PedidoDetalle.query.delete()
@@ -43,6 +52,39 @@ def reset_data():
 
     db.session.commit()
     print("✔ Datos anteriores eliminados")
+
+
+def seed_categorias_materia_prima():
+    categorias = [
+        "Cuero",
+        "Forro",
+        "Herrajes",
+        "Químicos",
+        "Costura",
+        "Relleno",
+    ]
+
+    for nombre in categorias:
+        db.session.add(CategoriaMateriaPrima(nombre=nombre, activo=1))
+
+    db.session.commit()
+    print("✔ Categorías de materia prima insertadas")
+
+
+def seed_unidades_medida():
+    unidades = [
+        "m2",
+        "m",
+        "pieza",
+        "litro",
+        "cono",
+    ]
+
+    for nombre in unidades:
+        db.session.add(UnidadMedida(nombre=nombre, activo=1))
+
+    db.session.commit()
+    print("✔ Unidades de medida insertadas")
 
 
 def seed_roles():
@@ -273,12 +315,15 @@ def seed_materias_primas():
         ("Espuma de protección", "Relleno", "m", 80, 10, 30, 1),
     ]
 
-    for nombre, categoria, unidad, stock, minimo, costo, merma in materias:
+    for nombre, categoria_nombre, unidad_nombre, stock, minimo, costo, merma in materias:
+        categoria = CategoriaMateriaPrima.query.filter_by(nombre=categoria_nombre).first()
+        unidad = UnidadMedida.query.filter_by(nombre=unidad_nombre).first()
+
         db.session.add(
             MateriaPrima(
                 nombre=nombre,
-                categoria=categoria,
-                unidad_medida=unidad,
+                id_categoria_materia_prima=categoria.id_categoria_materia_prima,
+                id_unidad_medida=unidad.id_unidad_medida,
                 stock_actual=stock,
                 stock_minimo=minimo,
                 costo_unit_prom=costo,
@@ -347,6 +392,19 @@ def seed_recetas():
             ],
         ),
         (
+            "Bolsa Tote Siena",
+            "Receta Bolsa Tote Siena",
+            1,
+            [
+                ("Cuero vacuno premium café", 0.90),
+                ("Forro textil beige", 0.45),
+                ("Cierre metálico 35cm", 1),
+                ("Pegamento industrial", 0.08),
+                ("Hilo encerado café", 0.16),
+                ("Espuma de protección", 0.25),
+            ],
+        ),
+        (
             "Bolso de Mano Verona",
             "Receta Bolso de Mano Verona",
             1,
@@ -360,10 +418,122 @@ def seed_recetas():
                 ("Espuma de protección", 0.20),
             ],
         ),
+        (
+            "Mochila Andanza",
+            "Receta Mochila Andanza",
+            1,
+            [
+                ("Cuero vacuno negro", 1.20),
+                ("Forro textil negro", 0.80),
+                ("Cierre metálico 35cm", 3),
+                ("Broche magnético", 2),
+                ("Pegamento industrial", 0.12),
+                ("Hilo encerado negro", 0.25),
+                ("Espuma de protección", 0.35),
+            ],
+        ),
+        (
+            "Mariconera Urbana",
+            "Receta Mariconera Urbana",
+            1,
+            [
+                ("Cuero vacuno negro", 0.50),
+                ("Forro textil negro", 0.25),
+                ("Cierre metálico 20cm", 2),
+                ("Pegamento industrial", 0.05),
+                ("Hilo encerado negro", 0.10),
+                ("Broche magnético", 1),
+            ],
+        ),
+        (
+            "Portafolio Ejecutivo",
+            "Receta Portafolio Ejecutivo",
+            1,
+            [
+                ("Cuero vacuno premium café", 1.40),
+                ("Forro textil beige", 0.90),
+                ("Cierre metálico 35cm", 2),
+                ("Broche magnético", 2),
+                ("Pegamento industrial", 0.15),
+                ("Hilo encerado café", 0.30),
+                ("Espuma de protección", 0.40),
+                ("Remache decorativo", 6),
+            ],
+        ),
+        (
+            "Neceser Voyage",
+            "Receta Neceser Voyage",
+            1,
+            [
+                ("Cuero vacuno negro", 0.30),
+                ("Forro textil negro", 0.20),
+                ("Cierre metálico 20cm", 1),
+                ("Pegamento industrial", 0.03),
+                ("Hilo encerado negro", 0.06),
+            ],
+        ),
+        (
+            "Funda Laptop 15",
+            "Receta Funda Laptop 15",
+            1,
+            [
+                ("Cuero vacuno negro", 0.80),
+                ("Forro textil negro", 0.50),
+                ("Cierre metálico 35cm", 2),
+                ("Pegamento industrial", 0.08),
+                ("Hilo encerado negro", 0.12),
+                ("Espuma de protección", 0.50),
+            ],
+        ),
+        (
+            "Porta Pasaporte Atlas",
+            "Receta Porta Pasaporte Atlas",
+            1,
+            [
+                ("Cuero vacuno premium café", 0.18),
+                ("Forro textil beige", 0.08),
+                ("Pegamento industrial", 0.02),
+                ("Hilo encerado café", 0.04),
+            ],
+        ),
+        (
+            "Estuche Óptico Classic",
+            "Receta Estuche Óptico Classic",
+            1,
+            [
+                ("Cuero vacuno negro", 0.20),
+                ("Forro textil negro", 0.10),
+                ("Broche magnético", 1),
+                ("Pegamento industrial", 0.02),
+                ("Hilo encerado negro", 0.04),
+                ("Espuma de protección", 0.05),
+            ],
+        ),
+        (
+            "Llavero Artesanal",
+            "Receta Llavero Artesanal",
+            1,
+            [
+                ("Cuero vacuno premium café", 0.03),
+                ("Remache decorativo", 1),
+                ("Hilo encerado café", 0.01),
+            ],
+        ),
+        (
+            "Pulsera Trenzada León",
+            "Receta Pulsera Trenzada León",
+            1,
+            [
+                ("Cuero vacuno negro", 0.05),
+                ("Broche magnético", 1),
+                ("Hilo encerado negro", 0.01),
+            ],
+        ),
     ]
 
     for producto_nombre, nombre_receta, rendimiento, detalles in recetas_data:
         producto = Producto.query.filter_by(nombre=producto_nombre).first()
+
         receta = Receta(
             id_producto=producto.id_producto,
             nombre=nombre_receta,
@@ -471,6 +641,8 @@ def run_seed():
         seed_proveedores()
         seed_categorias()
         seed_productos()
+        seed_categorias_materia_prima()
+        seed_unidades_medida()
         seed_materias_primas()
         seed_recetas()
         seed_pedidos()

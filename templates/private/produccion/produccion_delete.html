@@ -9,7 +9,7 @@
       <h1 class="text-3xl font-bold mb-2">Cancelar Producción</h1>
       <p class="text-gray-500">Las órdenes de producción registradas no se eliminan para mantener trazabilidad</p>
     </div>
-    <a href="{{ url_for('operaciones.produccion') }}"
+    <a href="{{ url_for('produccion.produccion_view') }}"
        class="px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
       Volver
     </a>
@@ -23,7 +23,7 @@
     </div>
 
     <div class="pt-6">
-      <a href="{{ url_for('operaciones.produccion') }}"
+      <a href="{{ url_for('produccion.produccion_view') }}"
          class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all">
         Regresar al listado
       </a>

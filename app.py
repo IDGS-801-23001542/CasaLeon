@@ -12,6 +12,9 @@ from routes.proveedores import proveedores
 from routes.productos import productos
 from routes.auditoria import auditoria
 from routes.operaciones import operaciones
+from routes.materia_prima import materia_prima
+from routes.recetas import recetas
+from routes.produccion import produccion
 
 migrate = Migrate()
 
@@ -30,6 +33,9 @@ def create_app():
     app.register_blueprint(productos)
     app.register_blueprint(auditoria)
     app.register_blueprint(operaciones)
+    app.register_blueprint(materia_prima)
+    app.register_blueprint(recetas)
+    app.register_blueprint(produccion)
 
     @app.before_request
     def load_identity():
