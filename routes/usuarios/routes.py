@@ -179,6 +179,11 @@ def eliminar_usuario():
         flash("Usuario no encontrado.", "danger")
         return redirect(url_for("usuarios.listado_usuarios"))
 
+    # No permitir que el usuario de sesión se elimine a sí mismo
+    if not g.user or g.user.id_usuario == usuario_db.id_usuario:
+        flash("No puedes desactivar tu propio usuario.", "warning")
+        return redirect(url_for("usuarios.listado_usuarios"))
+
     if request.method == "GET":
         create_form.nombre.data = usuario_db.nombre
         create_form.email.data = usuario_db.email
