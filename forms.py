@@ -872,10 +872,11 @@ class MateriaPrimaForm(FlaskForm):
 # RECETAS
 class RecetaForm(FlaskForm):
     id_producto = SelectField(
-        "Producto",
+        "Producto (opcional)",
         coerce=int,
-        validators=[DataRequired(message="El producto es requerido")],
+        validators=[Optional()],
         choices=[],
+        default=0,
     )
 
     nombre = StringField(

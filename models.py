@@ -225,7 +225,7 @@ class Receta(db.Model):
     __tablename__ = "recetas"
 
     id_receta = db.Column(db.Integer, primary_key=True)
-    id_producto = db.Column(db.Integer, db.ForeignKey("productos.id_producto"), nullable=False, unique=True)
+    id_producto = db.Column(db.Integer, db.ForeignKey("productos.id_producto"), nullable=True, unique=True)
     nombre = db.Column(db.String(150), nullable=False)
     rendimiento = db.Column(db.Integer, nullable=False, default=1)
     costo_estimado = db.Column(db.Numeric(12, 4), nullable=False, default=0)
