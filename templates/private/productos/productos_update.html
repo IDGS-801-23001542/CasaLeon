@@ -23,6 +23,7 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {{ ui.select_field(form.id_categoria_producto) }}
+        {{ ui.select_field(form.id_receta) }}
         {{ ui.field(form.sku, placeholder="SKU") }}
         {{ ui.field(form.nombre, placeholder="Nombre del producto") }}
 
@@ -31,8 +32,27 @@
         </div>
 
         {{ ui.field(form.precio_venta, placeholder="Precio de venta") }}
-        {{ ui.field(form.stock_actual, placeholder="Stock actual") }}
-        {{ ui.field(form.costo_unit_prom, placeholder="Costo unitario promedio") }}
+        {{ ui.field(form.imagen, placeholder="Ruta o URL de la imagen") }}
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Stock actual</label>
+          <input
+            type="text"
+            value="{{ producto_db.stock_actual }}"
+            disabled
+            class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed"
+          />
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Costo unitario promedio</label>
+          <input
+            type="text"
+            value="{{ producto_db.costo_unit_prom }}"
+            disabled
+            class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed"
+          />
+        </div>
 
         <div>
           <label class="block mb-2 text-sm font-medium text-gray-900">Estado</label>
@@ -43,6 +63,12 @@
             class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed"
           />
         </div>
+      </div>
+
+      <div class="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3">
+        <p class="text-sm text-blue-700">
+          El stock no se edita aquí. Solo cambia mediante órdenes de producción. El costo unitario promedio depende del costo estimado de la receta asociada.
+        </p>
       </div>
 
       <div class="flex flex-col sm:flex-row gap-3 pt-4">

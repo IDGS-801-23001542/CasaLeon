@@ -46,6 +46,12 @@
         </div>
 
         <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Receta asociada</label>
+          <input type="text" value="{{ receta_actual.nombre if receta_actual else 'Sin receta' }}" disabled
+                 class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
+        </div>
+
+        <div>
           <label class="block mb-2 text-sm font-medium text-gray-900">Precio</label>
           <input type="text" value="{{ producto_db.precio_venta }}" disabled
                  class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
@@ -54,6 +60,12 @@
         <div>
           <label class="block mb-2 text-sm font-medium text-gray-900">Stock Actual</label>
           <input type="text" value="{{ producto_db.stock_actual }}" disabled
+                 class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Costo unitario promedio</label>
+          <input type="text" value="{{ producto_db.costo_unit_prom }}" disabled
                  class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
         </div>
 

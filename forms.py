@@ -150,9 +150,7 @@ class RegisterClienteForm(FlaskForm):
             field.data = _normalize_spaces(field.data)
             digitos = "".join(char for char in field.data if char.isdigit())
             if len(digitos) < 10 or len(digitos) > 15:
-                raise ValidationError(
-                    "Ingresa un teléfono válido de 10 a 15 dígitos."
-                )
+                raise ValidationError("Ingresa un teléfono válido de 10 a 15 dígitos.")
 
     def validate_password(self, field):
         field.data = (field.data or "").strip()
@@ -318,9 +316,7 @@ class CheckoutForm(FlaskForm):
             field.data = _normalize_spaces(field.data)
             digitos = "".join(char for char in field.data if char.isdigit())
             if len(digitos) < 10 or len(digitos) > 15:
-                raise ValidationError(
-                    "Ingresa un teléfono válido de 10 a 15 dígitos."
-                )
+                raise ValidationError("Ingresa un teléfono válido de 10 a 15 dígitos.")
 
     def validate_calle(self, field):
         field.data = _normalize_spaces(field.data)
@@ -495,9 +491,7 @@ class UpdateClienteForm(FlaskForm):
             field.data = _normalize_spaces(field.data)
             digitos = "".join(char for char in field.data if char.isdigit())
             if len(digitos) < 10 or len(digitos) > 15:
-                raise ValidationError(
-                    "Ingresa un teléfono válido de 10 a 15 dígitos."
-                )
+                raise ValidationError("Ingresa un teléfono válido de 10 a 15 dígitos.")
 
     def validate_calle(self, field):
         if field.data:
@@ -750,6 +744,13 @@ class ProductoForm(FlaskForm):
         choices=[],
     )
 
+    id_receta = SelectField(
+        "Receta",
+        coerce=int,
+        validators=[DataRequired(message="La receta es requerida")],
+        choices=[],
+    )
+
     sku = StringField(
         "SKU",
         validators=[
@@ -789,24 +790,33 @@ class ProductoForm(FlaskForm):
         ],
     )
 
-    stock_actual = DecimalField(
-        "Stock Actual",
+    imagen = StringField(
+        "Imagen",
         validators=[
-            DataRequired(message="El stock actual es requerido"),
-            NumberRange(min=0, message="El stock debe ser mayor o igual a 0"),
+            Optional(),
+            Length(
+                max=255, message="La ruta de imagen no puede exceder 255 caracteres"
+            ),
         ],
     )
 
-    costo_unit_prom = DecimalField(
-        "Costo Unitario Promedio",
-        validators=[
-            DataRequired(message="El costo unitario es requerido"),
-            NumberRange(min=0, message="El costo debe ser mayor o igual a 0"),
-        ],
-    )
+    def validate_nombre(self, field):
+        field.data = _normalize_spaces(field.data)
+
+    def validate_sku(self, field):
+        if field.data:
+            field.data = _normalize_spaces(field.data).upper()
+
+    def validate_descripcion(self, field):
+        if field.data:
+            field.data = _normalize_spaces(field.data)
+
+    def validate_imagen(self, field):
+        if field.data:
+            field.data = _normalize_spaces(field.data)
 
 
-#MATERIA PRIMA
+# MATERIA PRIMA
 class MateriaPrimaForm(FlaskForm):
     nombre = StringField(
         "Nombre",
@@ -868,6 +878,7 @@ class MateriaPrimaForm(FlaskForm):
 
     def validate_nombre(self, field):
         field.data = _normalize_spaces(field.data)
+
 
 # RECETAS
 class RecetaForm(FlaskForm):
@@ -936,6 +947,8 @@ class ProduccionForm(FlaskForm):
         "Observaciones",
         validators=[
             Optional(),
-            Length(max=255, message="Las observaciones no pueden exceder 255 caracteres."),
+            Length(
+                max=255, message="Las observaciones no pueden exceder 255 caracteres."
+            ),
         ],
     )
