@@ -8,6 +8,7 @@ from wtforms import (
     SelectField,
     TextAreaField,
     DecimalField,
+    FileField,
 )
 from wtforms.validators import (
     DataRequired,
@@ -18,6 +19,8 @@ from wtforms.validators import (
     ValidationError,
     Regexp,
 )
+
+from flask_wtf.file import FileAllowed
 
 
 def validar_rfc(form, field):
@@ -790,12 +793,21 @@ class ProductoForm(FlaskForm):
         ],
     )
 
-    imagen = StringField(
+    stock_actual = DecimalField(
+        "Stock Actual",
+        validators=[
+            DataRequired(message="El stock actual es requerido"),
+            NumberRange(min=0, message="El stock debe ser mayor o igual a 0"),
+        ],
+    )
+
+    imagen = FileField(
         "Imagen",
         validators=[
             Optional(),
-            Length(
-                max=255, message="La ruta de imagen no puede exceder 255 caracteres"
+            FileAllowed(
+                ["jpg", "jpeg", "png", "webp"],
+                message="Solo se permiten imágenes JPG, JPEG, PNG o WEBP",
             ),
         ],
     )
@@ -808,10 +820,6 @@ class ProductoForm(FlaskForm):
             field.data = _normalize_spaces(field.data).upper()
 
     def validate_descripcion(self, field):
-        if field.data:
-            field.data = _normalize_spaces(field.data)
-
-    def validate_imagen(self, field):
         if field.data:
             field.data = _normalize_spaces(field.data)
 

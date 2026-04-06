@@ -144,17 +144,17 @@
 
           <div class="flex justify-between text-sm gap-3">
             <span class="text-gray-500">Stock Actual:</span>
-            <span class="font-medium text-right">{{ producto.stock_actual }}</span>
+            <span class="font-medium text-right">{{ "%.2f"|format(producto.stock_actual or 0) }}</span>
           </div>
 
           <div class="flex justify-between text-sm gap-3">
             <span class="text-gray-500">Costo Unitario:</span>
-            <span class="font-medium text-right">${{ producto.costo_unit_prom }}</span>
+            <span class="font-medium text-right">${{ "%.2f"|format(producto.costo_unit_prom or 0) }}</span>
           </div>
 
           <div class="flex justify-between text-sm gap-3">
             <span class="text-gray-500">Precio Venta:</span>
-            <span class="font-medium text-right">${{ producto.precio_venta }}</span>
+            <span class="font-medium text-right">${{ "%.2f"|format(producto.precio_venta or 0) }}</span>
           </div>
 
           <div class="flex justify-between text-sm gap-3">
@@ -167,7 +167,7 @@
           <div class="flex justify-between text-sm pt-2 border-t border-gray-200 gap-3">
             <span class="text-gray-500">Valor Total:</span>
             <span class="font-bold text-blue-600">
-              ${{ (producto.stock_actual * producto.costo_unit_prom) }}
+              ${{ "%.2f"|format((producto.stock_actual or 0) * (producto.costo_unit_prom or 0)) }}
             </span>
           </div>
         </div>

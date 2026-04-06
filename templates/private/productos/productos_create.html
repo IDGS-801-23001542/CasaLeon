@@ -17,7 +17,12 @@
   </div>
 
   <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-    <form method="POST" action="{{ url_for('productos.crear_producto') }}" class="space-y-4">
+    <form
+      method="POST"
+      action="{{ url_for('productos.crear_producto') }}"
+      enctype="multipart/form-data"
+      class="space-y-4"
+    >
       {{ form.hidden_tag() }}
       {{ ui.form_errors(form) }}
 
@@ -26,23 +31,9 @@
         {{ ui.select_field(form.id_receta) }}
         {{ ui.field(form.sku, placeholder="SKU") }}
         {{ ui.field(form.nombre, placeholder="Nombre del producto") }}
-
-        <div class="md:col-span-2">
-          {{ ui.field(form.descripcion, placeholder="Descripción") }}
-        </div>
-
+        {{ ui.field(form.descripcion, placeholder="Descripción") }}
         {{ ui.field(form.precio_venta, placeholder="Precio de venta") }}
-        {{ ui.field(form.imagen, placeholder="Ruta o URL de la imagen") }}
-
-        <div>
-          <label class="block mb-2 text-sm font-medium text-gray-900">Stock actual</label>
-          <input
-            type="text"
-            value="0"
-            disabled
-            class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed"
-          />
-        </div>
+        {{ ui.field(form.stock_actual, placeholder="Stock actual") }}
 
         <div>
           <label class="block mb-2 text-sm font-medium text-gray-900">Costo unitario promedio</label>
@@ -63,11 +54,27 @@
             class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed"
           />
         </div>
+
+        <div class="md:col-span-2">
+          <label class="block mb-2 text-sm font-medium text-gray-900">
+            {{ form.imagen.label.text }}
+          </label>
+
+          {{ form.imagen(
+            class="bg-white border border-cl-line text-gray-900 text-sm rounded-xl focus:ring-2 focus:ring-emerald-300 focus:border-emerald-300 block w-full p-3 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          ) }}
+
+          {% if form.imagen.errors %}
+            <p class="mt-2 text-sm text-red-600">
+              {% for e in form.imagen.errors %}{{ e }}{% if not loop.last %}<br>{% endif %}{% endfor %}
+            </p>
+          {% endif %}
+        </div>
       </div>
 
       <div class="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3">
         <p class="text-sm text-blue-700">
-          El producto debe vincularse a una receta activa. El stock inicial siempre será 0 y solo cambiará mediante órdenes de producción.
+          El producto debe vincularse a una receta activa.
         </p>
       </div>
 

@@ -1,9 +1,55 @@
 from . import productos
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, current_app
+import os
+import uuid
+
+from werkzeug.utils import secure_filename
+
 import forms
 from models import db, Producto, CategoriaProducto, Receta
 from utils.auth import login_required
 from utils.audit import log_event
+
+
+ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
+
+
+def allowed_image(filename):
+    return (
+        filename
+        and "." in filename
+        and filename.rsplit(".", 1)[1].lower() in ALLOWED_IMAGE_EXTENSIONS
+    )
+
+
+def save_product_image(file_storage):
+    if not file_storage or not file_storage.filename:
+        return None
+
+    if not allowed_image(file_storage.filename):
+        return "INVALID_EXTENSION"
+
+    filename = secure_filename(file_storage.filename)
+    extension = filename.rsplit(".", 1)[1].lower()
+    unique_name = f"{uuid.uuid4().hex}.{extension}"
+
+    upload_folder = os.path.join(current_app.root_path, "static", "uploads", "productos")
+    os.makedirs(upload_folder, exist_ok=True)
+
+    save_path = os.path.join(upload_folder, unique_name)
+    file_storage.save(save_path)
+
+    return f"uploads/productos/{unique_name}"
+
+
+def delete_product_image(relative_path):
+    if not relative_path:
+        return
+
+    absolute_path = os.path.join(current_app.root_path, "static", relative_path)
+
+    if os.path.isfile(absolute_path):
+        os.remove(absolute_path)
 
 
 def cargar_categorias(form):
@@ -30,7 +76,7 @@ def cargar_recetas_disponibles(form, producto_id_actual=None):
     form.id_receta.choices = [(r.id_receta, r.nombre) for r in recetas]
 
 
-@productos.route("/private/productos")
+@productos.route("/private/productos", methods=["GET"])
 @login_required(["ADMIN", "EMPLEADO"])
 def listado_productos():
     create_form = forms.ProductoForm()
@@ -117,16 +163,23 @@ def crear_producto():
                 flash("La receta seleccionada ya está asignada a otro producto.", "warning")
                 return render_template("private/productos/productos_create.html", form=create_form)
 
+            image_file = request.files.get("imagen")
+            image_relative_path = save_product_image(image_file)
+
+            if image_relative_path == "INVALID_EXTENSION":
+                flash("La imagen debe ser png, jpg, jpeg o webp.", "warning")
+                return render_template("private/productos/productos_create.html", form=create_form)
+
             producto = Producto(
                 id_categoria_producto=create_form.id_categoria_producto.data,
                 sku=sku,
                 nombre=nombre,
                 descripcion=create_form.descripcion.data.strip() if create_form.descripcion.data else None,
                 precio_venta=create_form.precio_venta.data,
-                stock_actual=0,
+                stock_actual=create_form.stock_actual.data,
                 costo_unit_prom=receta_db.costo_estimado or 0,
                 activo=1,
-                imagen=create_form.imagen.data.strip() if create_form.imagen.data else None,
+                imagen=image_relative_path,
             )
 
             db.session.add(producto)
@@ -173,8 +226,7 @@ def actualizar_producto():
         create_form.nombre.data = producto_db.nombre
         create_form.descripcion.data = producto_db.descripcion
         create_form.precio_venta.data = producto_db.precio_venta
-        create_form.costo_unit_prom.data = producto_db.costo_unit_prom
-        create_form.imagen.data = producto_db.imagen
+        create_form.stock_actual.data = producto_db.stock_actual
         create_form.id_receta.data = receta_actual.id_receta if receta_actual else None
 
         return render_template(
@@ -246,13 +298,29 @@ def actualizar_producto():
 
         receta_nueva.id_producto = producto_db.id_producto
 
+        image_file = request.files.get("imagen")
+        new_image_relative_path = save_product_image(image_file)
+
+        if new_image_relative_path == "INVALID_EXTENSION":
+            flash("La imagen debe ser png, jpg, jpeg o webp.", "warning")
+            return render_template(
+                "private/productos/productos_update.html",
+                form=create_form,
+                producto_db=producto_db,
+                receta_actual=receta_actual,
+            )
+
+        if new_image_relative_path:
+            delete_product_image(producto_db.imagen)
+            producto_db.imagen = new_image_relative_path
+
         producto_db.id_categoria_producto = create_form.id_categoria_producto.data
         producto_db.sku = sku
         producto_db.nombre = nombre
         producto_db.descripcion = create_form.descripcion.data.strip() if create_form.descripcion.data else None
         producto_db.precio_venta = create_form.precio_venta.data
+        producto_db.stock_actual = create_form.stock_actual.data
         producto_db.costo_unit_prom = receta_nueva.costo_estimado or producto_db.costo_unit_prom
-        producto_db.imagen = create_form.imagen.data.strip() if create_form.imagen.data else None
 
         db.session.add(receta_nueva)
         db.session.add(producto_db)
@@ -299,8 +367,7 @@ def eliminar_producto():
         create_form.nombre.data = producto_db.nombre
         create_form.descripcion.data = producto_db.descripcion
         create_form.precio_venta.data = producto_db.precio_venta
-        create_form.costo_unit_prom.data = producto_db.costo_unit_prom
-        create_form.imagen.data = producto_db.imagen
+        create_form.stock_actual.data = producto_db.stock_actual
         create_form.id_receta.data = receta_actual.id_receta if receta_actual else None
 
         return render_template(
