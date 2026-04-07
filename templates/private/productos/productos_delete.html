@@ -26,6 +26,19 @@
     <form method="POST" action="{{ url_for('productos.eliminar_producto', id=producto_db.id_producto) }}" class="space-y-4">
       {{ form.hidden_tag() }}
 
+      {% if producto_db.imagen %}
+      <div>
+        <label class="block mb-2 text-sm font-medium text-gray-900">Imagen actual</label>
+        <div class="w-full md:w-72 h-48 rounded-2xl overflow-hidden border border-gray-200 bg-stone-100">
+          <img
+            src="{{ url_for('static', filename=producto_db.imagen) }}"
+            alt="{{ producto_db.nombre }}"
+            class="w-full h-full object-cover"
+          />
+        </div>
+      </div>
+      {% endif %}
+
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label class="block mb-2 text-sm font-medium text-gray-900">Nombre</label>
@@ -53,13 +66,13 @@
 
         <div>
           <label class="block mb-2 text-sm font-medium text-gray-900">Precio</label>
-          <input type="text" value="{{ producto_db.precio_venta }}" disabled
+          <input type="text" value="${{ producto_db.precio_venta|money }}" disabled
                  class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
         </div>
 
         <div>
           <label class="block mb-2 text-sm font-medium text-gray-900">Stock Actual</label>
-          <input type="text" value="{{ producto_db.stock_actual }}" disabled
+          <input type="text" value="{{ producto_db.stock_actual|num(4) }}" disabled
                  class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
         </div>
 

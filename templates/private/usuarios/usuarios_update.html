@@ -9,7 +9,7 @@
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <h1 class="text-3xl font-bold mb-2">Editar Usuario</h1>
-            <p class="text-gray-500">Actualiza la información del usuario</p>
+            <p class="text-gray-500">Actualiza la información, rol y estado del usuario</p>
         </div>
 
         <a href="{{ url_for('usuarios.listado_usuarios') }}"
@@ -42,24 +42,15 @@
 
     <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
         <form method="POST" action="{{ url_for('usuarios.actualizar_usuario', id=usuario_db.id_usuario) }}"
-            class="space-y-4">
+            class="space-y-6">
             {{ form.hidden_tag() }}
-
             {{ ui.form_errors(form) }}
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {{ ui.field(form.nombre, placeholder="Nombre completo") }}
                 {{ ui.field(form.email, placeholder="correo@casaleon.com", type="email") }}
-
                 {{ ui.select_field(form.rol) }}
-
-                <div class="mb-4">
-                    <label class="block mb-2 text-sm font-medium text-gray-900">
-                        Estado
-                    </label>
-                    <input type="text" value="Activo" disabled
-                        class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
-                </div>
+                {{ ui.select_field(form.activo) }}
 
                 <div class="md:col-span-2">
                     {{ ui.field(form.password, placeholder="Déjala vacía si no deseas cambiarla", type="password") }}
@@ -72,7 +63,7 @@
                 </p>
             </div>
 
-            <div class="flex flex-col sm:flex-row gap-3 pt-4">
+            <div class="flex flex-col sm:flex-row gap-3 pt-2">
                 <a href="{{ url_for('usuarios.listado_usuarios') }}"
                     class="flex-1 px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
                     Cancelar

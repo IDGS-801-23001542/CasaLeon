@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% block title %}Detalle | Casa León{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      {% if tipo == "INTERNA" %}
+        <h1 class="text-3xl font-bold mb-2">Detalle de Venta {{ venta_db.folio }}</h1>
+        <p class="text-gray-500">Consulta completa de la venta interna registrada</p>
+      {% else %}
+        <h1 class="text-3xl font-bold mb-2">Detalle de Pedido {{ pedido_db.folio }}</h1>
+        <p class="text-gray-500">Consulta completa de la compra realizada desde la tienda</p>
+      {% endif %}
+    </div>
+
+    <a
+      href="{{ url_for('ventas.listado_ventas') }}"
+      class="px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center"
+    >
+      Volver
+    </a>
+  </div>
+
+  {% if tipo == "INTERNA" %}
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+        <p class="text-sm text-gray-500">Folio</p>
+        <p class="text-2xl font-bold mt-3">{{ venta_db.folio }}</p>
+      </div>
+      <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+        <p class="text-sm text-gray-500">Método de pago</p>
+        <p class="text-2xl font-bold mt-3">{{ venta_db.metodo_pago }}</p>
+      </div>
+      <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+        <p class="text-sm text-gray-500">Total</p>
+        <p class="text-2xl font-bold mt-3">${{ venta_db.total|money }}</p>
+      </div>
+      <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+        <p class="text-sm text-gray-500">Fecha</p>
+        <p class="text-lg font-bold mt-3">
+          {{ venta_db.creado_en.strftime('%d/%m/%Y %H:%M') if venta_db.creado_en else 'Sin fecha' }}
+        </p>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Vendedor</p>
+          <p class="font-semibold text-gray-800">
+            {{ venta_db.usuario.nombre if venta_db.usuario else 'No disponible' }}
+          </p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Correo del usuario</p>
+          <p class="font-semibold text-gray-800">
+            {{ venta_db.usuario.email if venta_db.usuario else 'No disponible' }}
+          </p>
+        </div>
+        <div class="md:col-span-2">
+          <p class="text-sm text-gray-500 mb-1">Observaciones</p>
+          <p class="font-semibold text-gray-800">
+            {{ venta_db.observaciones if venta_db.observaciones else 'Sin observaciones' }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
+      <h2 class="text-2xl font-bold text-gray-800 mb-4">Productos vendidos</h2>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 border-y border-gray-200">
+            <tr>
+              <th class="text-left px-4 py-3 font-semibold text-gray-700">Producto</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-700">Cantidad</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-700">Precio unitario</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-700">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for detalle in venta_db.detalles %}
+              <tr class="border-b border-gray-100">
+                <td class="px-4 py-3 font-medium text-gray-800">{{ detalle.producto_nombre }}</td>
+                <td class="px-4 py-3">{{ detalle.cantidad|num(4) }}</td>
+                <td class="px-4 py-3">${{ detalle.precio_unitario|money }}</td>
+                <td class="px-4 py-3 text-blue-700 font-semibold">${{ detalle.subtotal|money }}</td>
+              </tr>
+            {% else %}
+              <tr>
+                <td colspan="4" class="px-4 py-6 text-center text-gray-500">
+                  No hay productos registrados en esta venta.
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  {% else %}
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+        <p class="text-sm text-gray-500">Folio</p>
+        <p class="text-2xl font-bold mt-3">{{ pedido_db.folio }}</p>
+      </div>
+      <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+        <p class="text-sm text-gray-500">Origen</p>
+        <p class="text-2xl font-bold mt-3">TIENDA</p>
+      </div>
+      <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+        <p class="text-sm text-gray-500">Estado</p>
+        <p class="text-2xl font-bold mt-3">{{ pedido_db.estado }}</p>
+      </div>
+      <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+        <p class="text-sm text-gray-500">Total</p>
+        <p class="text-2xl font-bold mt-3">${{ pedido_db.total|money }}</p>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Cliente / envío</p>
+          <p class="font-semibold text-gray-800">{{ pedido_db.nombre_envio }}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Teléfono</p>
+          <p class="font-semibold text-gray-800">{{ pedido_db.telefono_envio or 'Sin teléfono' }}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Fecha</p>
+          <p class="font-semibold text-gray-800">
+            {{ pedido_db.creado_en.strftime('%d/%m/%Y %H:%M') if pedido_db.creado_en else 'Sin fecha' }}
+          </p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Compra</p>
+          <p class="font-semibold text-gray-800">Simulada desde tienda en línea</p>
+        </div>
+        <div class="md:col-span-2">
+          <p class="text-sm text-gray-500 mb-1">Dirección</p>
+          <p class="font-semibold text-gray-800">
+            {{ pedido_db.calle_envio }} {{ pedido_db.numero_envio }}, {{ pedido_db.colonia_envio }},
+            {{ pedido_db.ciudad_envio }}, {{ pedido_db.estado_envio }},
+            {{ pedido_db.pais_envio }}, CP {{ pedido_db.cp_envio }}
+          </p>
+        </div>
+        <div class="md:col-span-2">
+          <p class="text-sm text-gray-500 mb-1">Notas</p>
+          <p class="font-semibold text-gray-800">
+            {{ pedido_db.notas if pedido_db.notas else 'Sin observaciones' }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
+      <h2 class="text-2xl font-bold text-gray-800 mb-4">Productos del pedido</h2>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 border-y border-gray-200">
+            <tr>
+              <th class="text-left px-4 py-3 font-semibold text-gray-700">Producto</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-700">Cantidad</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-700">Precio unitario</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-700">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for detalle in pedido_db.detalles %}
+              <tr class="border-b border-gray-100">
+                <td class="px-4 py-3 font-medium text-gray-800">{{ detalle.producto_nombre }}</td>
+                <td class="px-4 py-3">{{ detalle.cantidad|num(4) }}</td>
+                <td class="px-4 py-3">${{ detalle.precio_unitario|money }}</td>
+                <td class="px-4 py-3 text-blue-700 font-semibold">${{ detalle.subtotal|money }}</td>
+              </tr>
+            {% else %}
+              <tr>
+                <td colspan="4" class="px-4 py-6 text-center text-gray-500">
+                  No hay productos registrados en este pedido.
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

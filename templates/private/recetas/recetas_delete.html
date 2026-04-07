@@ -51,7 +51,7 @@
           <label class="block mb-2 text-sm font-medium text-gray-900">Rendimiento</label>
           <input
             type="text"
-            value="{{ receta_db.rendimiento }}"
+            value="{{ receta_db.rendimiento|num(4) }}"
             disabled
             class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed"
           />
@@ -61,7 +61,7 @@
           <label class="block mb-2 text-sm font-medium text-gray-900">Costo estimado</label>
           <input
             type="text"
-            value="{{ receta_db.costo_estimado }}"
+            value="${{ receta_db.costo_estimado|money }}"
             disabled
             class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed"
           />
@@ -100,7 +100,7 @@
                     {{ detalle.materia_prima.nombre if detalle.materia_prima else 'Materia prima no disponible' }}
                   </p>
                   <p class="text-sm text-blue-600 font-semibold">
-                    {{ detalle.cantidad }}
+                    {{ detalle.cantidad|num(4) }}
                     {% if detalle.materia_prima %}
                       {{ detalle.materia_prima.unidad_medida_rel.nombre }}
                     {% endif %}
@@ -109,7 +109,7 @@
 
                 {% if detalle.materia_prima %}
                   <p class="text-sm text-gray-500 mt-1">
-                    Costo unitario: ${{ detalle.materia_prima.costo_unit_prom }}
+                    Costo unitario: ${{ detalle.materia_prima.costo_unit_prom|money }}
                   </p>
                 {% endif %}
               </div>

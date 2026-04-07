@@ -5,17 +5,56 @@
 {% block content %}
 <div class="space-y-6">
   <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-    <div class="flex items-center justify-between gap-4">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div>
         <h1 class="text-3xl font-bold mb-2">Dashboard Admin</h1>
         <p class="text-gray-500">Bienvenido, {{ g.user.nombre }}</p>
       </div>
-
-      <a href="{{ url_for('auth.logout') }}"
-         class="text-sm font-semibold text-red-600 hover:underline">
+      <a
+        href="{{ url_for('auth.logout') }}"
+        class="text-sm font-semibold text-red-600 hover:underline"
+      >
         Cerrar sesión
       </a>
     </div>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+    <a href="{{ url_for('usuarios.listado_usuarios') }}" class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all">
+      <p class="text-sm text-gray-500">Administración</p>
+      <p class="text-2xl font-bold mt-2">Usuarios</p>
+      <p class="text-sm text-blue-600 mt-3">Gestionar staff →</p>
+    </a>
+
+    <a href="{{ url_for('produccion.produccion_view') }}" class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all">
+      <p class="text-sm text-gray-500">Operación</p>
+      <p class="text-2xl font-bold mt-2">Producción</p>
+      <p class="text-sm text-blue-600 mt-3">Ver órdenes →</p>
+    </a>
+
+    <a href="{{ url_for('ventas.listado_ventas') }}" class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all">
+      <p class="text-sm text-gray-500">Comercial</p>
+      <p class="text-2xl font-bold mt-2">Ventas</p>
+      <p class="text-sm text-blue-600 mt-3">Registrar POS →</p>
+    </a>
+
+    <a href="{{ url_for('reportes.vista_reportes') }}" class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all">
+      <p class="text-sm text-gray-500">Control</p>
+      <p class="text-2xl font-bold mt-2">Reportes</p>
+      <p class="text-sm text-blue-600 mt-3">Ver indicadores →</p>
+    </a>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <a href="{{ url_for('materia_prima.materia_prima_view') }}" class="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all">
+      <h2 class="text-xl font-bold mb-2">Inventario de materia prima</h2>
+      <p class="text-gray-500">Control de entradas, salidas y stock mínimo.</p>
+    </a>
+
+    <a href="{{ url_for('merma.listado_merma') }}" class="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all">
+      <h2 class="text-xl font-bold mb-2">Merma y recuperación</h2>
+      <p class="text-gray-500">Consulta sobrantes útiles, desperdicio y seguimiento.</p>
+    </a>
   </div>
 </div>
 {% endblock %}

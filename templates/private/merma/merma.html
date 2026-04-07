@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+{% block title %}Merma | Casa León{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold mb-2">Merma y Recuperación</h1>
+      <p class="text-gray-500">Consulta, clasifica y da seguimiento a sobrantes, recortes y desperdicios</p>
+    </div>
+
+    {% if g.role == 'ADMIN' %}
+    <a
+      href="{{ url_for('merma.exportar_merma', q=q, tipo=tipo, estado=estado) }}"
+      class="px-4 py-3 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all font-semibold"
+    >
+      Exportar CSV
+    </a>
+    {% endif %}
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="space-y-3">
+        {% for category, message in messages %}
+          <div class="px-4 py-3 rounded-xl border
+            {% if category == 'success' %}
+              bg-green-50 border-green-200 text-green-700
+            {% elif category == 'warning' %}
+              bg-yellow-50 border-yellow-200 text-yellow-700
+            {% elif category == 'danger' %}
+              bg-red-50 border-red-200 text-red-700
+            {% else %}
+              bg-blue-50 border-blue-200 text-blue-700
+            {% endif %}
+          ">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+      <p class="text-sm text-gray-500">Total de registros</p>
+      <p class="text-2xl font-bold mt-3">{{ total_mermas }}</p>
+    </div>
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+      <p class="text-sm text-gray-500">Recuperables</p>
+      <p class="text-2xl font-bold mt-3 text-green-700">{{ total_recuperable }}</p>
+    </div>
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+      <p class="text-sm text-gray-500">No recuperables</p>
+      <p class="text-2xl font-bold mt-3 text-red-700">{{ total_no_recuperable }}</p>
+    </div>
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+      <p class="text-sm text-gray-500">Disponibles</p>
+      <p class="text-2xl font-bold mt-3 text-blue-700">{{ total_disponible }}</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+      <p class="text-sm text-gray-500">Valor total estimado</p>
+      <p class="text-2xl font-bold mt-3">${{ valor_total }}</p>
+    </div>
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+      <p class="text-sm text-gray-500">Valor disponible</p>
+      <p class="text-2xl font-bold mt-3">${{ valor_disponible }}</p>
+    </div>
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+      <p class="text-sm text-gray-500">Detalles registrados</p>
+      <p class="text-2xl font-bold mt-3">{{ detalles_count }}</p>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
+    <form method="GET" class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+      <input
+        type="text"
+        name="q"
+        value="{{ q }}"
+        placeholder="Buscar por materia prima, clasificación u observación..."
+        class="w-full px-4 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+
+      <select
+        name="tipo"
+        class="w-full px-4 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        <option value="">Todos los tipos</option>
+        {% for item in tipos_validos %}
+          <option value="{{ item }}" {% if tipo == item %}selected{% endif %}>{{ item }}</option>
+        {% endfor %}
+      </select>
+
+      <select
+        name="estado"
+        class="w-full px-4 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        <option value="">Todos los estados</option>
+        {% for item in estados_validos %}
+          <option value="{{ item }}" {% if estado == item %}selected{% endif %}>{{ item }}</option>
+        {% endfor %}
+      </select>
+
+      <button
+        class="px-5 py-3 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all"
+      >
+        Filtrar
+      </button>
+    </form>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+    {% for item in mermas_db %}
+      {% set total_detalle = item.detalles|length %}
+      {% set valor_merma = namespace(total=0) %}
+      {% for det in item.detalles %}
+        {% set valor_merma.total = valor_merma.total + (det.valor_estimado_total|float) %}
+      {% endfor %}
+
+      <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all">
+        <div class="flex items-start justify-between gap-3 mb-4">
+          <div>
+            <h3 class="text-lg font-bold">Merma #{{ item.id_merma }}</h3>
+            <p class="text-sm text-gray-500">
+              Orden #{{ item.id_orden_produccion }}
+            </p>
+          </div>
+
+          {% if item.estado == "DISPONIBLE" %}
+            <span class="px-3 py-1 rounded-full text-xs bg-blue-100 text-blue-700">
+              {{ item.estado }}
+            </span>
+          {% elif item.estado == "REUTILIZADA" %}
+            <span class="px-3 py-1 rounded-full text-xs bg-green-100 text-green-700">
+              {{ item.estado }}
+            </span>
+          {% elif item.estado == "VENDIDA" %}
+            <span class="px-3 py-1 rounded-full text-xs bg-emerald-100 text-emerald-700">
+              {{ item.estado }}
+            </span>
+          {% else %}
+            <span class="px-3 py-1 rounded-full text-xs bg-red-100 text-red-700">
+              {{ item.estado }}
+            </span>
+          {% endif %}
+        </div>
+
+        <div class="space-y-3 mb-4">
+          <div class="flex justify-between text-sm gap-3">
+            <span class="text-gray-500">Tipo:</span>
+            <span class="font-medium text-right">{{ item.tipo }}</span>
+          </div>
+
+          <div class="flex justify-between text-sm gap-3">
+            <span class="text-gray-500">Detalles:</span>
+            <span class="font-medium text-right">{{ total_detalle }}</span>
+          </div>
+
+          <div class="flex justify-between text-sm gap-3">
+            <span class="text-gray-500">Valor estimado:</span>
+            <span class="font-medium text-right">${{ "%.2f"|format(valor_merma.total) }}</span>
+          </div>
+
+          <div class="flex justify-between text-sm gap-3">
+            <span class="text-gray-500">Fecha:</span>
+            <span class="font-medium text-right">
+              {{ item.creado_en.strftime('%d/%m/%Y %H:%M') if item.creado_en else 'Sin fecha' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-gray-200 mb-4">
+          <p class="text-sm text-gray-500 mb-2">Materiales:</p>
+          <div class="space-y-2 max-h-40 overflow-y-auto pr-1">
+            {% for det in item.detalles %}
+              <div class="rounded-xl bg-gray-50 border border-gray-200 p-3">
+                <div class="flex justify-between gap-3">
+                  <p class="text-sm font-medium text-gray-800">{{ det.materia_prima_nombre }}</p>
+                  <p class="text-sm font-semibold text-blue-600 text-right">
+                    {{ det.cantidad|num(4) }} {{ det.unidad_medida }}
+                  </p>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">
+                  {{ det.clasificacion }} · ${{ det.valor_estimado_total|money }}
+                </p>
+              </div>
+            {% else %}
+              <div class="rounded-xl bg-yellow-50 border border-yellow-200 p-3">
+                <p class="text-sm text-yellow-700">Sin detalles registrados.</p>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <a
+          href="{{ url_for('merma.detalle_merma', id_merma=item.id_merma) }}"
+          class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all"
+        >
+          Ver detalle
+        </a>
+      </div>
+    {% else %}
+      <div class="md:col-span-2 xl:col-span-3 bg-white rounded-2xl p-10 border border-gray-200 shadow-md text-center">
+        <p class="text-lg font-semibold text-gray-700 mb-2">No hay registros de merma</p>
+        <p class="text-gray-500">Cuando cierres producciones con sobrantes o desperdicio, aparecerán aquí.</p>
+      </div>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}

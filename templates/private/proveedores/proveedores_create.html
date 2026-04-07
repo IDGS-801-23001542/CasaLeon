@@ -9,7 +9,7 @@
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
     <div>
       <h1 class="text-3xl font-bold mb-2">Nuevo Proveedor</h1>
-      <p class="text-gray-500">Registra un nuevo proveedor</p>
+      <p class="text-gray-500">Registra un nuevo proveedor para compras y abastecimiento</p>
     </div>
 
     <a
@@ -43,35 +43,44 @@
   {% endwith %}
 
   <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-    <form method="POST" action="{{ url_for('proveedores.crear_proveedor') }}" class="space-y-4">
+    <form method="POST" action="{{ url_for('proveedores.crear_proveedor') }}" class="space-y-6">
       {{ form.hidden_tag() }}
       {{ ui.form_errors(form) }}
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {{ ui.field(form.nombre, placeholder="Nombre del proveedor") }}
-        {{ ui.field(form.rfc, placeholder="RFC") }}
-        {{ ui.field(form.email, placeholder="correo@empresa.com", type="email") }}
-        {{ ui.field(form.telefono, placeholder="Teléfono") }}
-        {{ ui.field(form.calle, placeholder="Calle") }}
-        {{ ui.field(form.numero, placeholder="Número") }}
-        {{ ui.field(form.colonia, placeholder="Colonia") }}
-        {{ ui.field(form.ciudad, placeholder="Ciudad") }}
-        {{ ui.field(form.estado, placeholder="Estado") }}
-        {{ ui.field(form.pais, placeholder="País") }}
-        {{ ui.field(form.cp, placeholder="Código Postal") }}
+      <div>
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Datos generales</h2>
 
-        <div>
-          <label class="block mb-2 text-sm font-medium text-gray-900">Estado</label>
-          <input
-            type="text"
-            value="Activo"
-            disabled
-            class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed"
-          />
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {{ ui.field(form.nombre, placeholder="Nombre del proveedor") }}
+
+          <div>
+            {{ ui.field(form.rfc, placeholder="Ej. ABC010203AB1 o ABCD010203AB1") }}
+            <p class="mt-2 text-xs text-gray-500">
+              Usa RFC de 12 caracteres para persona moral o 13 para persona física.
+            </p>
+          </div>
+
+          {{ ui.field(form.email, placeholder="correo@empresa.com", type="email") }}
+          {{ ui.field(form.telefono, placeholder="Teléfono") }}
+          {{ ui.select_field(form.activo) }}
         </div>
       </div>
 
-      <div class="flex flex-col sm:flex-row gap-3 pt-4">
+      <div>
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Dirección</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {{ ui.field(form.calle, placeholder="Calle") }}
+          {{ ui.field(form.numero, placeholder="Número") }}
+          {{ ui.field(form.colonia, placeholder="Colonia") }}
+          {{ ui.field(form.ciudad, placeholder="Ciudad") }}
+          {{ ui.field(form.estado, placeholder="Estado") }}
+          {{ ui.field(form.pais, placeholder="País") }}
+          {{ ui.field(form.cp, placeholder="Código Postal") }}
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 pt-2">
         <a
           href="{{ url_for('proveedores.listado_proveedores') }}"
           class="flex-1 px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center"

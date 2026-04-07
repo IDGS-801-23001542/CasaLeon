@@ -5,11 +5,10 @@
 {% block content %}
 <div class="space-y-6">
 
-  <!-- Header -->
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
     <div>
       <h1 class="text-3xl font-bold mb-2">Recetas</h1>
-      <p class="text-gray-500">Gestiona las recetas de producción de cada producto</p>
+      <p class="text-gray-500">Gestiona la estructura de materiales para producción</p>
     </div>
     <a
       href="{{ url_for('recetas.crear_receta') }}"
@@ -20,7 +19,6 @@
     </a>
   </div>
 
-  <!-- Flash messages -->
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       <div class="space-y-3">
@@ -43,7 +41,6 @@
     {% endif %}
   {% endwith %}
 
-  <!-- Stats -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
     <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
       <div class="flex items-center gap-3 mb-2">
@@ -88,7 +85,6 @@
     </div>
   </div>
 
-  <!-- Filters -->
   <div class="flex flex-col md:flex-row gap-4">
     <form method="GET" action="{{ url_for('recetas.recetas_view') }}" class="contents">
       <div class="flex-1 relative">
@@ -111,10 +107,8 @@
     </form>
   </div>
 
-  <!-- Recetas Grid -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
     {% for receta in recetas_db %}
-
       {% set total_insumos = receta.detalles | length %}
 
       <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all">
@@ -127,44 +121,30 @@
           </div>
 
           {% if receta.activo == 1 %}
-            <span class="px-3 py-1 rounded-full text-xs flex items-center gap-1 bg-green-100 text-green-700">
-              ✅ Activa
+            <span class="px-3 py-1 rounded-full text-xs bg-green-100 text-green-700">
+              Activa
             </span>
           {% else %}
-            <span class="px-3 py-1 rounded-full text-xs flex items-center gap-1 bg-red-100 text-red-700">
-              🚫 Inactiva
+            <span class="px-3 py-1 rounded-full text-xs bg-red-100 text-red-700">
+              Inactiva
             </span>
           {% endif %}
         </div>
 
         <div class="space-y-3 mb-4">
           <div class="flex justify-between text-sm gap-3">
-            <span class="text-gray-500">Producto:</span>
-            <span class="font-medium text-right">
-              {{ receta.producto.nombre if receta.producto else 'Sin producto' }}
-            </span>
-          </div>
-
-          <div class="flex justify-between text-sm gap-3">
             <span class="text-gray-500">Rendimiento:</span>
-            <span class="font-medium text-right">{{ receta.rendimiento }}</span>
+            <span class="font-medium text-right">{{ receta.rendimiento|num(4) }}</span>
           </div>
 
           <div class="flex justify-between text-sm gap-3">
-            <span class="text-gray-500">Costo Estimado:</span>
-            <span class="font-medium text-right">${{ receta.costo_estimado }}</span>
+            <span class="text-gray-500">Costo estimado:</span>
+            <span class="font-medium text-right">${{ receta.costo_estimado|money }}</span>
           </div>
 
           <div class="flex justify-between text-sm gap-3">
             <span class="text-gray-500">Insumos:</span>
             <span class="font-medium text-right">{{ total_insumos }}</span>
-          </div>
-
-          <div class="flex justify-between text-sm gap-3">
-            <span class="text-gray-500">Estado:</span>
-            <span class="font-medium text-right">
-              {{ 'Activa' if receta.activo == 1 else 'Inactiva' }}
-            </span>
           </div>
 
           <div class="pt-2 border-t border-gray-200">
@@ -179,7 +159,7 @@
                         {{ detalle.materia_prima.nombre if detalle.materia_prima else 'Materia prima no disponible' }}
                       </p>
                       <p class="text-sm font-semibold text-blue-600 text-right">
-                        {{ detalle.cantidad }}
+                        {{ detalle.cantidad|num(4) }}
                         {% if detalle.materia_prima %}
                           {{ detalle.materia_prima.unidad_medida_rel.nombre }}
                         {% endif %}
@@ -188,7 +168,7 @@
 
                     {% if detalle.materia_prima %}
                       <p class="text-xs text-gray-500 mt-1">
-                        Costo unitario: ${{ detalle.materia_prima.costo_unit_prom }}
+                        Costo unitario: ${{ detalle.materia_prima.costo_unit_prom|money }}
                       </p>
                     {% endif %}
                   </div>

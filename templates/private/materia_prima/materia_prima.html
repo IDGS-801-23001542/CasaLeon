@@ -5,7 +5,6 @@
 {% block content %}
 <div class="space-y-6">
 
-  <!-- Header -->
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
     <div>
       <h1 class="text-3xl font-bold mb-2">Materia Prima</h1>
@@ -20,7 +19,6 @@
     </a>
   </div>
 
-  <!-- Flash messages -->
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       <div class="space-y-3">
@@ -43,7 +41,6 @@
     {% endif %}
   {% endwith %}
 
-  <!-- Stats -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
     <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
       <div class="flex items-center gap-3 mb-2">
@@ -86,7 +83,6 @@
     </div>
   </div>
 
-  <!-- Filters -->
   <div class="flex flex-col md:flex-row gap-4">
     <form method="GET" action="{{ url_for('materia_prima.materia_prima_view') }}" class="contents">
       <div class="flex-1 relative">
@@ -109,7 +105,6 @@
     </form>
   </div>
 
-  <!-- Cards -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
     {% for materia in materias_db %}
 
@@ -161,22 +156,22 @@
 
           <div class="flex justify-between text-sm gap-3">
             <span class="text-gray-500">Stock Actual:</span>
-            <span class="font-medium text-right">{{ materia.stock_actual }}</span>
+            <span class="font-medium text-right">{{ materia.stock_actual|num(4) }}</span>
           </div>
 
           <div class="flex justify-between text-sm gap-3">
             <span class="text-gray-500">Stock Mínimo:</span>
-            <span class="font-medium text-right">{{ materia.stock_minimo }}</span>
+            <span class="font-medium text-right">{{ materia.stock_minimo|num(4) }}</span>
           </div>
 
           <div class="flex justify-between text-sm gap-3">
             <span class="text-gray-500">Costo Unitario:</span>
-            <span class="font-medium text-right">${{ materia.costo_unit_prom }}</span>
+            <span class="font-medium text-right">${{ materia.costo_unit_prom|money }}</span>
           </div>
 
           <div class="flex justify-between text-sm gap-3">
             <span class="text-gray-500">Merma:</span>
-            <span class="font-medium text-right">{{ materia.merma_pct }}%</span>
+            <span class="font-medium text-right">{{ materia.merma_pct|num(2) }}%</span>
           </div>
 
           <div class="flex justify-between text-sm gap-3">

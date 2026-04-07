@@ -21,20 +21,27 @@ from models import (
     UnidadMedida,
     OrdenProduccion,
     OrdenProduccionDetalle,
+    Merma,
+    MermaDetalle,
 )
 
 
 def reset_data():
     print("🧹 Reiniciando datos...")
 
+    MermaDetalle.query.delete()
+    Merma.query.delete()
+
     OrdenProduccionDetalle.query.delete()
     OrdenProduccion.query.delete()
 
     RecetaDetalle.query.delete()
     Receta.query.delete()
+
     MateriaPrima.query.delete()
     CategoriaMateriaPrima.query.delete()
     UnidadMedida.query.delete()
+
     AuditoriaLog.query.delete()
 
     PedidoDetalle.query.delete()
@@ -338,10 +345,16 @@ def seed_materias_primas():
 
 def costo_receta(detalles):
     total = Decimal("0")
+
     for nombre_mp, cantidad in detalles:
         mp = MateriaPrima.query.filter_by(nombre=nombre_mp).first()
-        total += Decimal(str(mp.costo_unit_prom)) * Decimal(str(cantidad))
-    return total
+        costo = Decimal(str(mp.costo_unit_prom or 0))
+        merma_pct = Decimal(str(mp.merma_pct or 0))
+        cantidad_base = Decimal(str(cantidad))
+        cantidad_real = cantidad_base * (Decimal("1") + (merma_pct / Decimal("100")))
+        total += costo * cantidad_real
+
+    return total.quantize(Decimal("0.0001"))
 
 
 def seed_recetas():
@@ -537,7 +550,7 @@ def seed_recetas():
         receta = Receta(
             id_producto=producto.id_producto,
             nombre=nombre_receta,
-            rendimiento=rendimiento,
+            rendimiento=Decimal(str(rendimiento)),
             costo_estimado=costo_receta(detalles),
             activo=1,
         )
@@ -550,7 +563,7 @@ def seed_recetas():
                 RecetaDetalle(
                     id_receta=receta.id_receta,
                     id_materia_prima=mp.id_materia_prima,
-                    cantidad=cantidad,
+                    cantidad=Decimal(str(cantidad)),
                 )
             )
 
@@ -633,8 +646,11 @@ def seed_auditoria():
 def run_seed():
     app = create_app()
     with app.app_context():
-        print("🌱 Ejecutando seed...")
-        reset_data()
+        print("Ejecutando seed...")
+
+        db.drop_all()
+        db.create_all()
+
         seed_roles()
         seed_staff()
         seed_clientes()
@@ -647,6 +663,7 @@ def run_seed():
         seed_recetas()
         seed_pedidos()
         seed_auditoria()
+
         print("✅ Seed completado")
 
 

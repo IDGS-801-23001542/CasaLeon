@@ -11,6 +11,7 @@
       const overlay = document.getElementById("mobile-overlay");
       sidebar.classList.toggle("-translate-x-full");
       overlay.classList.toggle("hidden");
+      document.body.classList.toggle("overflow-hidden");
     }
 
     function closeSidebar() {
@@ -18,98 +19,185 @@
       const overlay = document.getElementById("mobile-overlay");
       sidebar.classList.add("-translate-x-full");
       overlay.classList.add("hidden");
+      document.body.classList.remove("overflow-hidden");
     }
   </script>
 </head>
-<body class="min-h-screen bg-gray-100">
+<body class="min-h-screen bg-gray-100 text-gray-900">
   {% set current_path = request.path %}
 
   {% if g.role == "ADMIN" %}
-    {% set menu_items = [
-      {"label": "Dashboard", "path": url_for('tienda.admin_dashboard'), "icon": "📊"},
-      {"label": "Materia Prima", "path": url_for('materia_prima.materia_prima_view'), "icon": "🛒"},
-      {"label": "Producción", "path": url_for('produccion.produccion_view'), "icon": "🏭"},
-      {"label": "Productos", "path": url_for('productos.listado_productos'), "icon": "📦"},
-      {"label": "Ventas", "path": url_for('operaciones.ventas'), "icon": "📈"},
-      {"label": "Reportes", "path": url_for('operaciones.reportes'), "icon": "📉"},
-      {"label": "Proveedores", "path": url_for('proveedores.listado_proveedores'), "icon": "🚚"},
-      {"label": "Usuarios", "path": url_for('usuarios.listado_usuarios'), "icon": "👥"},
-      {"label": "Auditoría", "path": url_for('auditoria.listado_auditoria'), "icon": "📄"},
-      {"label": "Recetas", "path": url_for('recetas.recetas_view'), "icon": "🧾"}
+    {% set nav_sections = [
+      {
+        "title": "Dashboard",
+        "items": [
+          {"label": "Inicio", "path": url_for('tienda.admin_dashboard'), "icon": "🏠"}
+        ]
+      },
+      {
+        "title": "Producción y catálogo",
+        "items": [
+          {"label": "Proveedores", "path": url_for('proveedores.listado_proveedores'), "icon": "🚚"},
+          {"label": "Recetas", "path": url_for('recetas.recetas_view'), "icon": "🧾"},
+          {"label": "Producción", "path": url_for('produccion.produccion_view'), "icon": "🏭"},
+          {"label": "Productos", "path": url_for('productos.listado_productos'), "icon": "📦"},
+          {"label": "Materia Prima", "path": url_for('materia_prima.materia_prima_view'), "icon": "🧵"},
+          {"label": "Merma", "path": url_for('merma.listado_merma'), "icon": "♻️"}
+        ]
+      },
+      {
+        "title": "Comercial",
+        "items": [
+          {"label": "Ventas", "path": url_for('ventas.listado_ventas'), "icon": "💳"}
+        ]
+      },
+      {
+        "title": "Administración",
+        "items": [
+          {"label": "Usuarios", "path": url_for('usuarios.listado_usuarios'), "icon": "👥"}
+        ]
+      },
+      {
+        "title": "Control y análisis",
+        "items": [
+          {"label": "Reportes", "path": url_for('reportes.vista_reportes'), "icon": "📊"},
+          {"label": "Auditoría", "path": url_for('auditoria.listado_auditoria'), "icon": "🛡️"}
+        ]
+      }
+    ] %}
+  {% elif g.role == "EMPLEADO" %}
+    {% set nav_sections = [
+      {
+        "title": "Dashboard",
+        "items": [
+          {"label": "Inicio", "path": url_for('tienda.vendedor_dashboard'), "icon": "🏠"}
+        ]
+      },
+      {
+        "title": "Producción y catálogo",
+        "items": [
+          {"label": "Recetas", "path": url_for('recetas.recetas_view'), "icon": "🧾"},
+          {"label": "Producción", "path": url_for('produccion.produccion_view'), "icon": "🏭"},
+          {"label": "Productos", "path": url_for('productos.listado_productos'), "icon": "📦"},
+          {"label": "Materia Prima", "path": url_for('materia_prima.materia_prima_view'), "icon": "🧵"},
+          {"label": "Merma", "path": url_for('merma.listado_merma'), "icon": "♻️"}
+        ]
+      },
+      {
+        "title": "Comercial",
+        "items": [
+          {"label": "Ventas", "path": url_for('ventas.listado_ventas'), "icon": "💳"}
+        ]
+      }
     ] %}
   {% else %}
-    {% set menu_items = [
-      {"label": "Dashboard", "path": url_for('tienda.vendedor_dashboard'), "icon": "📊"},
-      {"label": "Materia Prima", "path": url_for('materia_prima.materia_prima_view'), "icon": "🛒"},
-      {"label": "Producción", "path": url_for('produccion.produccion_view'), "icon": "🏭"},
-      {"label": "Productos", "path": url_for('productos.listado_productos'), "icon": "📦"},
-      {"label": "Ventas", "path": url_for('operaciones.ventas'), "icon": "📈"}
-    ] %}
+    {% set nav_sections = [] %}
   {% endif %}
 
-  <header class="lg:hidden fixed top-0 left-0 right-0 z-50 bg-blue-900 border-b border-blue-800 shadow-lg">
+  <header class="lg:hidden sticky top-0 z-30 bg-white border-b border-gray-200 shadow-sm">
     <div class="flex items-center justify-between px-4 py-3">
-      <button
-        onclick="toggleSidebar()"
-        class="text-white p-2 hover:bg-blue-800 rounded-lg transition-colors"
-      >
-        ☰
-      </button>
+      <div class="flex items-center gap-3 min-w-0">
+        <button
+          type="button"
+          onclick="toggleSidebar()"
+          class="inline-flex items-center justify-center w-10 h-10 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-100"
+        >
+          ☰
+        </button>
 
-      <div class="flex items-center gap-2">
-        <div class="w-8 h-8 bg-amber-400 rounded-lg flex items-center justify-center">
-          <span class="text-blue-900 font-bold">CL</span>
+        <div class="min-w-0">
+          <p class="font-bold text-lg truncate">Casa León</p>
+          <p class="text-xs text-gray-500 truncate">
+            {{ "Administrador" if g.role == "ADMIN" else "Empleado" if g.role == "EMPLEADO" else "Panel" }}
+          </p>
         </div>
-        <span class="text-white font-bold text-lg">Casa León</span>
       </div>
 
       <a
         href="{{ url_for('auth.logout') }}"
-        class="text-white p-2 hover:bg-blue-800 rounded-lg transition-colors"
+        class="text-sm px-3 py-2 rounded-xl border border-gray-200 hover:bg-gray-100"
       >
-        ⎋
+        Salir
       </a>
     </div>
   </header>
 
   <aside
     id="sidebar"
-    class="fixed top-0 left-0 h-full bg-slate-900 text-white w-64 z-40 transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0 shadow-2xl"
+    class="fixed top-0 left-0 h-full w-72 bg-slate-950 text-white z-40 transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0 shadow-2xl"
   >
-    <div class="p-6 border-b border-slate-700">
-      <div class="flex items-center gap-3">
-        <div class="w-12 h-12 bg-amber-400 rounded-xl flex items-center justify-center shadow-lg">
-          <span class="text-blue-900 font-bold text-xl">CL</span>
-        </div>
-        <div>
-          <h1 class="font-bold text-xl text-white">Casa León</h1>
-          <p class="text-xs text-slate-400">Marroquinería</p>
+    <div class="flex flex-col h-full">
+      <div class="p-6 border-b border-slate-800">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-amber-400 rounded-2xl flex items-center justify-center shadow-lg">
+            <span class="text-slate-950 font-bold text-xl">CL</span>
+          </div>
+          <div class="min-w-0">
+            <h1 class="font-bold text-xl text-white truncate">Casa León</h1>
+            <p class="text-xs text-slate-400 truncate">Panel interno</p>
+          </div>
         </div>
       </div>
-    </div>
 
-    <nav class="p-4 space-y-2">
-      {% for item in menu_items %}
-        {% set active = current_path == item.path %}
+      <div class="px-4 pt-4 pb-3 border-b border-slate-800">
+        <p class="text-xs uppercase tracking-wide text-slate-500">Sesión</p>
+        <p class="font-semibold text-white truncate mt-1">{{ g.user.nombre if g.user else "Usuario" }}</p>
+        <p class="text-xs text-slate-400 mt-1">{{ g.role if g.role else "SIN ROL" }}</p>
+      </div>
+
+      <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-5">
+        {% for section in nav_sections %}
+          <div>
+            <p class="px-3 mb-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+              {{ section["title"] }}
+            </p>
+
+            <div class="space-y-1">
+              {% for item in section["items"] %}
+                {% set active =
+                  (item["path"] == current_path)
+                  or
+                  (item["path"] != "/" and current_path.startswith(item["path"])
+                    and item["path"] != url_for('tienda.admin_dashboard')
+                    and item["path"] != url_for('tienda.vendedor_dashboard'))
+                %}
+                <a
+                  href="{{ item['path'] }}"
+                  onclick="closeSidebar()"
+                  class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200
+                    {% if active %}
+                      bg-slate-800 text-white shadow-lg border border-slate-700
+                    {% else %}
+                      text-slate-300 hover:bg-slate-900 hover:text-white
+                    {% endif %}
+                  "
+                >
+                  <span class="text-lg">{{ item["icon"] }}</span>
+                  <span class="text-sm font-medium">{{ item["label"] }}</span>
+                </a>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </nav>
+
+      <div class="p-4 border-t border-slate-800 space-y-2">
         <a
-          href="{{ item.path }}"
-          onclick="closeSidebar()"
-          class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {% if active %}bg-slate-700 text-white shadow-lg scale-[1.02]{% else %}text-slate-300 hover:bg-slate-800 hover:text-white{% endif %}"
+          href="{{ url_for('tienda.home') }}"
+          class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-300 hover:bg-slate-900 hover:text-white transition-all duration-200"
         >
-          <span>{{ item.icon }}</span>
-          <span>{{ item.label }}</span>
+          <span>🌐</span>
+          <span class="text-sm font-medium">Ir al sitio público</span>
         </a>
-      {% endfor %}
-    </nav>
 
-    <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700 hidden lg:block">
-      <a
-        href="{{ url_for('auth.logout') }}"
-        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-red-600 hover:text-white transition-all duration-200"
-      >
-        <span>⎋</span>
-        <span>Cerrar Sesión</span>
-      </a>
+        <a
+          href="{{ url_for('auth.logout') }}"
+          class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-300 hover:bg-red-600 hover:text-white transition-all duration-200"
+        >
+          <span>⎋</span>
+          <span class="text-sm font-medium">Cerrar sesión</span>
+        </a>
+      </div>
     </div>
   </aside>
 
@@ -119,8 +207,8 @@
     onclick="closeSidebar()"
   ></div>
 
-  <main class="lg:ml-64 min-h-screen pt-16 lg:pt-0">
-    <div class="p-4 lg:p-8">
+  <main class="lg:ml-72 min-h-screen">
+    <div class="p-4 sm:p-6 lg:p-8">
       {% block content %}{% endblock %}
     </div>
   </main>

@@ -8,7 +8,7 @@
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
     <div>
       <h1 class="text-3xl font-bold mb-2">Editar Producción</h1>
-      <p class="text-gray-500">Actualiza el estado y revisa el consumo proyectado de la orden</p>
+      <p class="text-gray-500">Actualiza el estado operativo y revisa el consumo registrado de la orden</p>
     </div>
     <a href="{{ url_for('produccion.produccion_view') }}"
        class="px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
@@ -16,7 +16,6 @@
     </a>
   </div>
 
-  <!-- Flash messages -->
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       <div class="space-y-3">
@@ -40,7 +39,6 @@
   {% endwith %}
 
   <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-    <!-- Formulario -->
     <div class="xl:col-span-1">
       <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
         <form method="POST" action="{{ url_for('produccion.actualizar_produccion', id=orden_db.id_orden_produccion) }}" class="space-y-4">
@@ -56,7 +54,7 @@
               {{ form.observaciones.label.text }}
             </label>
             {{ form.observaciones(
-              class="bg-white/80 border border-cl-line text-gray-900 text-sm rounded-xl focus:ring-2 focus:ring-emerald-300 focus:border-emerald-300 block w-full p-3 placeholder:text-gray-400",
+              class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-2 focus:ring-emerald-300 focus:border-emerald-300 block w-full p-3 placeholder:text-gray-400",
               placeholder="Observaciones opcionales",
               rows="4"
             ) }}
@@ -73,6 +71,12 @@
                 Esta orden ya está {{ orden_db.estado|lower }}. No se permiten más cambios.
               </p>
             </div>
+          {% else %}
+            <div class="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3">
+              <p class="text-sm text-blue-700">
+                Para terminar inventario, sobrantes y merma, usa el botón <strong>Acabar</strong> desde el listado de producción.
+              </p>
+            </div>
           {% endif %}
 
           <div class="pt-2">
@@ -86,7 +90,6 @@
       </div>
     </div>
 
-    <!-- Resumen -->
     <div class="xl:col-span-2">
       <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -112,7 +115,7 @@
 
           <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
             <p class="text-sm text-gray-500 mb-1">Cantidad</p>
-            <p class="font-semibold text-gray-800">{{ orden_db.cantidad }}</p>
+            <p class="font-semibold text-gray-800">{{ orden_db.cantidad|num(4) }}</p>
           </div>
 
           <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
@@ -126,8 +129,9 @@
             <thead class="bg-gray-50 border-y border-gray-200">
               <tr>
                 <th class="text-left px-4 py-3 font-semibold text-gray-700">Materia prima</th>
-                <th class="text-left px-4 py-3 font-semibold text-gray-700">Cantidad base</th>
-                <th class="text-left px-4 py-3 font-semibold text-gray-700">Cantidad consumida</th>
+                <th class="text-left px-4 py-3 font-semibold text-gray-700">Base receta</th>
+                <th class="text-left px-4 py-3 font-semibold text-gray-700">Teórica</th>
+                <th class="text-left px-4 py-3 font-semibold text-gray-700">Consumida</th>
                 <th class="text-left px-4 py-3 font-semibold text-gray-700">Costo unitario</th>
                 <th class="text-left px-4 py-3 font-semibold text-gray-700">Subtotal</th>
               </tr>
@@ -139,14 +143,15 @@
                     <div class="font-medium text-gray-800">{{ detalle.materia_prima_nombre }}</div>
                     <div class="text-xs text-gray-500">{{ detalle.unidad_medida }}</div>
                   </td>
-                  <td class="px-4 py-3">{{ detalle.cantidad_base }}</td>
-                  <td class="px-4 py-3 font-medium">{{ detalle.cantidad_consumida }}</td>
-                  <td class="px-4 py-3">${{ detalle.costo_unitario }}</td>
-                  <td class="px-4 py-3 text-blue-700 font-semibold">${{ detalle.subtotal }}</td>
+                  <td class="px-4 py-3">{{ detalle.cantidad_base|num(4) }}</td>
+                  <td class="px-4 py-3">{{ detalle.cantidad_teorica|num(4) }}</td>
+                  <td class="px-4 py-3 font-medium">{{ detalle.cantidad_consumida|num(4) }}</td>
+                  <td class="px-4 py-3">${{ detalle.costo_unitario|money }}</td>
+                  <td class="px-4 py-3 text-blue-700 font-semibold">${{ detalle.subtotal|money }}</td>
                 </tr>
               {% else %}
                 <tr>
-                  <td colspan="5" class="px-4 py-6 text-center text-gray-500">
+                  <td colspan="6" class="px-4 py-6 text-center text-gray-500">
                     No hay detalles registrados para esta orden.
                   </td>
                 </tr>

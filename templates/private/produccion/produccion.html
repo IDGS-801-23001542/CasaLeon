@@ -5,11 +5,10 @@
 {% block content %}
 <div class="space-y-6">
 
-  <!-- Header -->
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
     <div>
       <h1 class="text-3xl font-bold mb-2">Producción</h1>
-      <p class="text-gray-500">Gestiona órdenes de producción y trazabilidad de fabricación</p>
+      <p class="text-gray-500">Gestiona órdenes de fabricación y trazabilidad del consumo de materiales</p>
     </div>
     <a
       href="{{ url_for('produccion.crear_produccion') }}"
@@ -20,7 +19,6 @@
     </a>
   </div>
 
-  <!-- Flash messages -->
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       <div class="space-y-3">
@@ -43,7 +41,6 @@
     {% endif %}
   {% endwith %}
 
-  <!-- Stats -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
     <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
       <div class="flex items-center gap-3 mb-2">
@@ -86,7 +83,6 @@
     </div>
   </div>
 
-  <!-- Producciones Grid -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
     {% for orden in producciones_db %}
       <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all">
@@ -99,41 +95,29 @@
           </div>
 
           {% if orden.estado == "COMPLETADA" %}
-            <span class="px-3 py-1 rounded-full text-xs flex items-center gap-1 bg-green-100 text-green-700">
-              ✅ {{ orden.estado }}
+            <span class="px-3 py-1 rounded-full text-xs bg-green-100 text-green-700">
+              {{ orden.estado }}
             </span>
           {% elif orden.estado == "CANCELADA" %}
-            <span class="px-3 py-1 rounded-full text-xs flex items-center gap-1 bg-red-100 text-red-700">
-              🚫 {{ orden.estado }}
+            <span class="px-3 py-1 rounded-full text-xs bg-red-100 text-red-700">
+              {{ orden.estado }}
             </span>
           {% else %}
-            <span class="px-3 py-1 rounded-full text-xs flex items-center gap-1 bg-yellow-100 text-yellow-700">
-              ⏳ {{ orden.estado }}
+            <span class="px-3 py-1 rounded-full text-xs bg-yellow-100 text-yellow-700">
+              {{ orden.estado }}
             </span>
           {% endif %}
         </div>
 
         <div class="space-y-3 mb-4">
           <div class="flex justify-between text-sm gap-3">
-            <span class="text-gray-500">Producto:</span>
-            <span class="font-medium text-right">
-              {{ orden.producto.nombre if orden.producto else 'No disponible' }}
-            </span>
-          </div>
-
-          <div class="flex justify-between text-sm gap-3">
             <span class="text-gray-500">Cantidad producida:</span>
-            <span class="font-medium text-right">{{ orden.cantidad }}</span>
+            <span class="font-medium text-right">{{ orden.cantidad|num(4) }}</span>
           </div>
 
           <div class="flex justify-between text-sm gap-3">
             <span class="text-gray-500">Costo estimado:</span>
-            <span class="font-medium text-right">${{ orden.costo_estimado }}</span>
-          </div>
-
-          <div class="flex justify-between text-sm gap-3">
-            <span class="text-gray-500">Estado:</span>
-            <span class="font-medium text-right">{{ orden.estado }}</span>
+            <span class="font-medium text-right">${{ orden.costo_estimado|money }}</span>
           </div>
 
           <div class="flex justify-between text-sm gap-3">
@@ -168,11 +152,11 @@
                       {{ detalle.materia_prima_nombre }}
                     </p>
                     <p class="text-sm font-semibold text-blue-600 text-right">
-                      {{ detalle.cantidad_consumida }} {{ detalle.unidad_medida }}
+                      {{ detalle.cantidad_consumida|num(4) }} {{ detalle.unidad_medida }}
                     </p>
                   </div>
                   <p class="text-xs text-gray-500 mt-1">
-                    Base: {{ detalle.cantidad_base }} · Costo unitario: ${{ detalle.costo_unitario }} · Subtotal: ${{ detalle.subtotal }}
+                    Base: {{ detalle.cantidad_base|num(4) }} · Teórica: {{ detalle.cantidad_teorica|num(4) }} · Subtotal: ${{ detalle.subtotal|money }}
                   </p>
                 </div>
               {% endfor %}
@@ -191,15 +175,24 @@
             href="{{ url_for('produccion.actualizar_produccion', id=orden.id_orden_produccion) }}"
             class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all"
           >
-            Ver / Editar
+            Editar
           </a>
 
-          {% if g.role == 'ADMIN' %}
+          {% if orden.estado not in ['COMPLETADA', 'CANCELADA'] %}
+          <a
+            href="{{ url_for('produccion.finalizar_produccion', id=orden.id_orden_produccion) }}"
+            class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl hover:shadow-lg transition-all"
+          >
+            Acabar
+          </a>
+          {% endif %}
+
+          {% if g.role == 'ADMIN' and orden.estado != 'COMPLETADA' %}
           <a
             href="{{ url_for('produccion.eliminar_produccion', id=orden.id_orden_produccion) }}"
             class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl hover:shadow-lg transition-all"
           >
-            Cancelar
+            Eliminar
           </a>
           {% endif %}
         </div>

@@ -17,7 +17,7 @@
   </div>
 
   <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-    <form method="POST" action="{{ url_for('materia_prima.actualizar_materia_prima', id=materia_db.id_materia_prima) }}" class="space-y-4">
+    <form method="POST" action="{{ url_for('materia_prima.actualizar_materia_prima', id=materia_db.id_materia_prima) }}" class="space-y-6">
       {{ form.hidden_tag() }}
       {{ ui.form_errors(form) }}
 
@@ -29,19 +29,10 @@
         {{ ui.field(form.stock_minimo, placeholder="Stock mínimo") }}
         {{ ui.field(form.costo_unit_prom, placeholder="Costo unitario promedio") }}
         {{ ui.field(form.merma_pct, placeholder="Merma %") }}
-
-        <div>
-          <label class="block mb-2 text-sm font-medium text-gray-900">Estado</label>
-          <input
-            type="text"
-            value="{{ 'Activa' if materia_db.activo == 1 else 'Inactiva' }}"
-            disabled
-            class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed"
-          />
-        </div>
+        {{ ui.select_field(form.activo) }}
       </div>
 
-      <div class="flex flex-col sm:flex-row gap-3 pt-4">
+      <div class="flex flex-col sm:flex-row gap-3 pt-2">
         <a href="{{ url_for('materia_prima.materia_prima_view') }}"
            class="flex-1 px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
           Cancelar

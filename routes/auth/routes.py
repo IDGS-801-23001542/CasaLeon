@@ -1,5 +1,6 @@
 from flask import render_template, redirect, url_for, flash, make_response, request, g
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy.exc import SQLAlchemyError
 
 import forms
 from models import db, Usuario, Cliente
@@ -15,9 +16,21 @@ def login():
     if g.user:
         return redirect(url_for("auth.post_login"))
 
-    if form.validate_on_submit():
-        email = form.email.data.strip().lower()
-        password = form.password.data
+    if request.method == "POST":
+        print("LOGIN request.form =", dict(request.form))
+        print("LOGIN form.errors =", form.errors)
+
+        if not form.validate_on_submit():
+            print("LOGIN validate_on_submit = False")
+            print("LOGIN form.errors after validate =", form.errors)
+            for field, errors in form.errors.items():
+                for error in errors:
+                    flash(f"{field}: {error}", "danger")
+            return render_template("auth/login.html", form=form)
+
+        email = (form.email.data or "").strip().lower()
+        password = form.password.data or ""
+        remember = bool(getattr(form, "remember", None) and form.remember.data)
 
         u = Usuario.query.filter(
             db.func.lower(Usuario.email) == email,
@@ -26,6 +39,7 @@ def login():
 
         if u and check_password_hash(u.password_hash, password):
             raw = issue_token("USUARIO", u.id_usuario)
+
             log_event(
                 modulo="Autenticación",
                 accion="Inicio de sesión",
@@ -36,9 +50,9 @@ def login():
                 actor_nombre=u.nombre,
                 actor_email=u.email,
             )
-            resp = build_login_response(url_for("auth.post_login"), raw)
+
             flash(f"Bienvenido, {u.nombre}.", "success")
-            return resp
+            return build_login_response(url_for("auth.post_login"), raw, remember=remember)
 
         c = Cliente.query.filter(
             db.func.lower(Cliente.email) == email,
@@ -47,6 +61,7 @@ def login():
 
         if c and c.password_hash and check_password_hash(c.password_hash, password):
             raw = issue_token("CLIENTE", c.id_cliente)
+
             log_event(
                 modulo="Autenticación",
                 accion="Inicio de sesión",
@@ -57,9 +72,9 @@ def login():
                 actor_nombre=c.nombre,
                 actor_email=c.email,
             )
-            resp = build_login_response(url_for("auth.post_login"), raw)
+
             flash(f"Bienvenido, {c.nombre}.", "success")
-            return resp
+            return build_login_response(url_for("auth.post_login"), raw, remember=remember)
 
         log_event(
             modulo="Autenticación",
@@ -80,8 +95,23 @@ def register():
     if g.user:
         return redirect(url_for("auth.post_login"))
 
-    if form.validate_on_submit():
-        email = form.email.data.strip().lower()
+    if request.method == "POST":
+        print("REGISTER request.form =", dict(request.form))
+        print("REGISTER confirm_password raw =", request.form.get("confirm_password"))
+        print("REGISTER form.errors before validate =", form.errors)
+
+        if not form.validate_on_submit():
+            print("REGISTER validate_on_submit = False")
+            print("REGISTER form.errors after validate =", form.errors)
+            for field, errors in form.errors.items():
+                for error in errors:
+                    flash(f"{field}: {error}", "danger")
+            return render_template("auth/register.html", form=form)
+
+        email = (form.email.data or "").strip().lower()
+        nombre = (form.nombre.data or "").strip()
+        telefono = (form.telefono.data or "").strip() or None
+        password = form.password.data or ""
 
         exists_cliente = Cliente.query.filter(db.func.lower(Cliente.email) == email).first()
         exists_usuario = Usuario.query.filter(db.func.lower(Usuario.email) == email).first()
@@ -90,29 +120,41 @@ def register():
             flash("Ese correo ya está registrado.", "warning")
             return render_template("auth/register.html", form=form)
 
-        cliente = Cliente(
-            nombre=form.nombre.data.strip(),
-            email=email,
-            telefono=form.telefono.data or None,
-            activo=1,
-            password_hash=generate_password_hash(form.password.data),
-        )
-        db.session.add(cliente)
-        db.session.commit()
+        try:
+            cliente = Cliente(
+                nombre=nombre,
+                email=email,
+                telefono=telefono,
+                activo=1,
+                password_hash=generate_password_hash(password),
+            )
 
-        log_event(
-            modulo="Usuarios",
-            accion="Cliente registrado",
-            detalle=f"Nuevo cliente '{email}' creado desde registro público",
-            severidad="INFO",
-            actor_tipo="CLIENTE",
-            actor_id=cliente.id_cliente,
-            actor_nombre=cliente.nombre,
-            actor_email=cliente.email,
-        )
+            db.session.add(cliente)
+            db.session.commit()
 
-        flash("Cuenta creada correctamente. Ahora inicia sesión.", "success")
-        return redirect(url_for("auth.login"))
+            log_event(
+                modulo="Usuarios",
+                accion="Cliente registrado",
+                detalle=f"Nuevo cliente '{email}' creado desde registro público",
+                severidad="INFO",
+                actor_tipo="CLIENTE",
+                actor_id=cliente.id_cliente,
+                actor_nombre=cliente.nombre,
+                actor_email=cliente.email,
+            )
+
+            flash("Cuenta creada correctamente. Ahora inicia sesión.", "success")
+            return redirect(url_for("auth.login"))
+
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            print("REGISTER SQL ERROR =", e)
+            flash("Ocurrió un error al crear la cuenta. Intenta nuevamente.", "danger")
+
+        except Exception as e:
+            db.session.rollback()
+            print("REGISTER GENERAL ERROR =", e)
+            flash("Ocurrió un error inesperado al crear la cuenta.", "danger")
 
     return render_template("auth/register.html", form=form)
 
@@ -144,7 +186,8 @@ def logout():
         )
 
     revoke_token(raw)
+
     resp = make_response(redirect(url_for("tienda.home")))
-    resp.delete_cookie(COOKIE_NAME)
+    resp.delete_cookie(COOKIE_NAME, path="/")
     flash("Sesión cerrada.", "info")
     return resp

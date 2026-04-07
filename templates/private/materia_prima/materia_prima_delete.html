@@ -47,25 +47,25 @@
 
         <div>
           <label class="block mb-2 text-sm font-medium text-gray-900">Stock Actual</label>
-          <input type="text" value="{{ materia_db.stock_actual }}" disabled
+          <input type="text" value="{{ materia_db.stock_actual|num(4) }}" disabled
                  class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
         </div>
 
         <div>
           <label class="block mb-2 text-sm font-medium text-gray-900">Stock Mínimo</label>
-          <input type="text" value="{{ materia_db.stock_minimo }}" disabled
+          <input type="text" value="{{ materia_db.stock_minimo|num(4) }}" disabled
                  class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
         </div>
 
         <div>
           <label class="block mb-2 text-sm font-medium text-gray-900">Costo Unitario</label>
-          <input type="text" value="{{ materia_db.costo_unit_prom }}" disabled
+          <input type="text" value="${{ materia_db.costo_unit_prom|money }}" disabled
                  class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
         </div>
 
         <div>
           <label class="block mb-2 text-sm font-medium text-gray-900">Merma %</label>
-          <input type="text" value="{{ materia_db.merma_pct }}" disabled
+          <input type="text" value="{{ materia_db.merma_pct|num(2) }}%" disabled
                  class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
         </div>
 
