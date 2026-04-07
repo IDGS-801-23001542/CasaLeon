@@ -25,7 +25,7 @@
               maxlength="150",
               minlength="2",
               autocomplete="name",
-              pattern="[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+",
+              pattern="[A-Za-zÁÉÍÓÚáéíóúÑñÜü\\s]+",
               title="Solo letras y espacios"
             ) }}
             {% for error in form.nombre.errors %}
@@ -56,7 +56,7 @@
               maxlength="15",
               autocomplete="tel",
               inputmode="tel",
-              pattern="^\+?[0-9\s\-]+$",
+              pattern="^\\+?[0-9\\s\\-]+$",
               title="Solo números, espacios, guiones y un + opcional"
             ) }}
             {% for error in form.telefono.errors %}
@@ -78,6 +78,21 @@
               <p class="mt-2 text-sm text-red-600">{{ error }}</p>
             {% endfor %}
             <p class="mt-2 text-xs text-gray-500">Debe contener al menos una letra y un número.</p>
+          </div>
+
+          <div>
+            <label class="block mb-2 text-sm font-medium text-gray-900">Confirmar contraseña</label>
+            {{ form.confirm_password(
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-700 focus:border-emerald-700 block w-full p-4",
+              placeholder="Repite tu contraseña",
+              required=True,
+              minlength="6",
+              maxlength="100",
+              autocomplete="new-password"
+            ) }}
+            {% for error in form.confirm_password.errors %}
+              <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+            {% endfor %}
           </div>
 
           <button type="submit"

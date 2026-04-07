@@ -1,12 +1,10 @@
 {% extends "base.html" %}
-{% import "_macros.html" as ui %}
 
 {% block title %}Usuarios | Casa León{% endblock %}
 
 {% block content %}
 <div class="space-y-6">
 
-  <!-- Header -->
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
     <div>
       <h1 class="text-3xl font-bold mb-2">Usuarios</h1>
@@ -21,7 +19,6 @@
     </a>
   </div>
 
-  <!-- Flash messages -->
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       <div class="space-y-3">
@@ -44,23 +41,18 @@
     {% endif %}
   {% endwith %}
 
-  <!-- Stats -->
   <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
     <div class="bg-white rounded-xl p-4 border border-gray-200 shadow-md">
       <p class="text-sm text-gray-500 mb-1">Total Usuarios</p>
-      <p class="text-2xl font-bold">{{ usuarios_db|length }}</p>
+      <p class="text-2xl font-bold">{{ total_usuarios }}</p>
     </div>
     <div class="bg-white rounded-xl p-4 border border-gray-200 shadow-md">
       <p class="text-sm text-gray-500 mb-1">Activos</p>
-      <p class="text-2xl font-bold text-green-600">
-        {{ usuarios_db | selectattr('activo', 'equalto', 1) | list | length }}
-      </p>
+      <p class="text-2xl font-bold text-green-600">{{ usuarios_activos }}</p>
     </div>
     <div class="bg-white rounded-xl p-4 border border-gray-200 shadow-md">
       <p class="text-sm text-gray-500 mb-1">Inactivos</p>
-      <p class="text-2xl font-bold text-red-600">
-        {{ usuarios_db | selectattr('activo', 'equalto', 0) | list | length }}
-      </p>
+      <p class="text-2xl font-bold text-red-600">{{ usuarios_inactivos }}</p>
     </div>
     <div class="bg-white rounded-xl p-4 border border-gray-200 shadow-md">
       <p class="text-sm text-gray-500 mb-1">Roles</p>
@@ -68,15 +60,14 @@
     </div>
   </div>
 
-  <!-- Filters -->
   <form method="GET" action="{{ url_for('usuarios.listado_usuarios') }}" class="flex flex-col md:flex-row gap-4">
     <div class="flex-1 relative">
       <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
       <input
         type="text"
         name="search"
-        placeholder="Buscar por nombre o correo..."
-        value="{{ request.args.get('search', '') }}"
+        placeholder="Buscar por nombre, correo o rol..."
+        value="{{ search }}"
         class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
     </div>
@@ -89,7 +80,6 @@
     </button>
   </form>
 
-  <!-- Users Grid -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
     {% for usuario in usuarios_db %}
       <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all">
@@ -109,7 +99,9 @@
             </p>
           </div>
 
-          {{ ui.estado_badge(usuario.activo) }}
+          <span class="px-3 py-1 rounded-full text-xs {% if usuario.activo == 1 %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">
+            {{ 'Activo' if usuario.activo == 1 else 'Inactivo' }}
+          </span>
         </div>
 
         <div class="space-y-3 mb-4">
@@ -133,8 +125,6 @@
           </div>
         </div>
 
-       
-
         <div class="flex gap-2 pt-4">
           <a
             href="{{ url_for('usuarios.actualizar_usuario', id=usuario.id_usuario) }}"
@@ -147,7 +137,7 @@
             href="{{ url_for('usuarios.eliminar_usuario', id=usuario.id_usuario) }}"
             class="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-100 text-red-600 rounded-xl hover:bg-red-200 transition-colors"
           >
-            Eliminar
+            Desactivar
           </a>
         </div>
       </div>

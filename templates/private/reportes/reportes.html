@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block title %}Reportes | Casa León{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+  <div>
+    <h1 class="text-3xl font-bold mb-2">Reportes</h1>
+    <p class="text-gray-500">Resumen operativo del sistema sin gráficas</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+      <p class="text-sm text-gray-500">Ventas POS</p>
+      <p class="text-2xl font-bold mt-3">{{ total_ventas }}</p>
+      <p class="text-sm text-gray-500 mt-2">Ingresos: ${{ ingresos_ventas }}</p>
+    </div>
+
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+      <p class="text-sm text-gray-500">Pedidos tienda</p>
+      <p class="text-2xl font-bold mt-3">{{ total_pedidos }}</p>
+      <p class="text-sm text-gray-500 mt-2">Ingresos: ${{ ingresos_pedidos }}</p>
+    </div>
+
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+      <p class="text-sm text-gray-500">Producción completada</p>
+      <p class="text-2xl font-bold mt-3">{{ producciones_completadas }}</p>
+      <p class="text-sm text-gray-500 mt-2">Pendientes: {{ producciones_pendientes }}</p>
+    </div>
+
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+      <p class="text-sm text-gray-500">Merma</p>
+      <p class="text-2xl font-bold mt-3">{{ total_mermas }}</p>
+      <p class="text-sm text-gray-500 mt-2">Valor estimado: ${{ valor_merma }}</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
+      <h2 class="text-xl font-bold mb-4">Inventario de productos terminados</h2>
+      <div class="grid grid-cols-3 gap-4 mb-4">
+        <div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+          <p class="text-sm text-gray-500">Productos</p>
+          <p class="text-xl font-bold mt-2">{{ total_productos }}</p>
+        </div>
+        <div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+          <p class="text-sm text-gray-500">Valor inventario</p>
+          <p class="text-xl font-bold mt-2">${{ valor_pt }}</p>
+        </div>
+        <div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+          <p class="text-sm text-gray-500">Sin stock</p>
+          <p class="text-xl font-bold mt-2">{{ productos_sin_stock }}</p>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 border-y border-gray-200">
+            <tr>
+              <th class="text-left px-4 py-3 font-semibold text-gray-700">Producto</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-700">Stock</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-700">Costo</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-700">Precio</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in productos_db %}
+              <tr class="border-b border-gray-100">
+                <td class="px-4 py-3">{{ p.nombre }}</td>
+                <td class="px-4 py-3">{{ p.stock_actual }}</td>
+                <td class="px-4 py-3">${{ p.costo_unit_prom }}</td>
+                <td class="px-4 py-3">${{ p.precio_venta }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
+      <h2 class="text-xl font-bold mb-4">Inventario de materia prima</h2>
+      <div class="grid grid-cols-3 gap-4 mb-4">
+        <div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+          <p class="text-sm text-gray-500">Materiales</p>
+          <p class="text-xl font-bold mt-2">{{ total_materias }}</p>
+        </div>
+        <div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+          <p class="text-sm text-gray-500">Valor inventario</p>
+          <p class="text-xl font-bold mt-2">${{ valor_mp }}</p>
+        </div>
+        <div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+          <p class="text-sm text-gray-500">Stock bajo</p>
+          <p class="text-xl font-bold mt-2">{{ materias_stock_bajo }}</p>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 border-y border-gray-200">
+            <tr>
+              <th class="text-left px-4 py-3 font-semibold text-gray-700">Material</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-700">Stock</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-700">Mínimo</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-700">Costo</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in materias_db %}
+              <tr class="border-b border-gray-100">
+                <td class="px-4 py-3">{{ m.nombre }}</td>
+                <td class="px-4 py-3">{{ m.stock_actual }}</td>
+                <td class="px-4 py-3">{{ m.stock_minimo }}</td>
+                <td class="px-4 py-3">${{ m.costo_unit_prom }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
+      <h2 class="text-xl font-bold mb-4">Top productos vendidos (POS)</h2>
+      <div class="space-y-3">
+        {% for item in top_productos_lista %}
+          <div class="rounded-xl bg-gray-50 border border-gray-200 p-4 flex justify-between gap-3">
+            <span class="font-medium text-gray-800">{{ item.nombre }}</span>
+            <span class="font-semibold text-blue-700">{{ item.cantidad }}</span>
+          </div>
+        {% else %}
+          <div class="rounded-xl bg-yellow-50 border border-yellow-200 p-4 text-yellow-700">
+            No hay ventas suficientes para calcular ranking.
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
+      <h2 class="text-xl font-bold mb-4">Resumen de merma</h2>
+      <div class="grid grid-cols-3 gap-4">
+        <div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+          <p class="text-sm text-gray-500">Total</p>
+          <p class="text-xl font-bold mt-2">{{ total_mermas }}</p>
+        </div>
+        <div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+          <p class="text-sm text-gray-500">Recuperable</p>
+          <p class="text-xl font-bold mt-2 text-green-700">{{ merma_recuperable }}</p>
+        </div>
+        <div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+          <p class="text-sm text-gray-500">No recuperable</p>
+          <p class="text-xl font-bold mt-2 text-red-700">{{ merma_no_recuperable }}</p>
+        </div>
+      </div>
+
+      <div class="mt-4 rounded-xl bg-gray-50 border border-gray-200 p-4">
+        <p class="text-sm text-gray-500">Valor estimado acumulado</p>
+        <p class="text-2xl font-bold mt-2">${{ valor_merma }}</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

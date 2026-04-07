@@ -1,8 +1,6 @@
 from decimal import Decimal, InvalidOperation
-
 from flask import render_template, request, redirect, url_for, flash
 from sqlalchemy import or_
-
 import forms
 from models import db, MateriaPrima, Receta, RecetaDetalle, Producto
 from utils.auth import login_required
@@ -12,9 +10,7 @@ from . import recetas
 
 def cargar_productos_receta(form):
     productos = Producto.query.filter_by(activo=1).order_by(Producto.nombre.asc()).all()
-    form.id_producto.choices = [
-        (p.id_producto, p.nombre) for p in productos
-    ]
+    form.id_producto.choices = [(p.id_producto, p.nombre) for p in productos]
 
 
 def obtener_materias_primas_activas():
@@ -23,14 +19,20 @@ def obtener_materias_primas_activas():
 
 def calcular_costo_receta(receta_db):
     total = Decimal("0")
-
     for detalle in receta_db.detalles:
-        if detalle.materia_prima:
-            total += Decimal(str(detalle.cantidad or 0)) * Decimal(
-                str(detalle.materia_prima.costo_unit_prom or 0)
-            )
+        if not detalle.materia_prima:
+            continue
 
-    receta_db.costo_estimado = total
+        cantidad_base = Decimal(str(detalle.cantidad or 0))
+        costo_unit = Decimal(str(detalle.materia_prima.costo_unit_prom or 0))
+        merma_pct = Decimal(str(detalle.materia_prima.merma_pct or 0))
+
+        factor_merma = Decimal("1") + (merma_pct / Decimal("100"))
+        cantidad_real = cantidad_base * factor_merma
+
+        total += cantidad_real * costo_unit
+
+    receta_db.costo_estimado = total.quantize(Decimal("0.0001"))
 
 
 def extraer_detalles_receta_desde_form():
@@ -75,11 +77,7 @@ def extraer_detalles_receta_desde_form():
             errores.append(f"La cantidad de la fila {i} debe ser mayor a 0.")
             continue
 
-        materia = MateriaPrima.query.filter_by(
-            id_materia_prima=id_materia,
-            activo=1
-        ).first()
-
+        materia = MateriaPrima.query.filter_by(id_materia_prima=id_materia, activo=1).first()
         if not materia:
             errores.append(f"La materia prima de la fila {i} no existe o está inactiva.")
             continue
@@ -88,7 +86,7 @@ def extraer_detalles_receta_desde_form():
             "id_materia_prima": id_materia,
             "cantidad": cantidad,
             "materia_nombre": materia.nombre,
-            "unidad_medida": materia.unidad_medida_rel.nombre,
+            "unidad_medida": materia.unidad_medida_rel.nombre if materia.unidad_medida_rel else "",
         })
 
     if not detalles:
@@ -106,11 +104,9 @@ def extraer_detalles_receta_desde_form():
 def recetas_view():
     create_form = forms.RecetaForm()
     cargar_productos_receta(create_form)
-
     search = request.args.get("search", "").strip()
 
     query = Receta.query.join(Producto)
-
     if search:
         like_term = f"%{search}%"
         query = query.filter(
@@ -121,11 +117,9 @@ def recetas_view():
         )
 
     recetas_db = query.order_by(Receta.nombre.asc()).all()
-
     total_recetas = Receta.query.count()
     recetas_activas = Receta.query.filter_by(activo=1).count()
     recetas_inactivas = Receta.query.filter_by(activo=0).count()
-
     costo_total = sum(float(receta.costo_estimado or 0) for receta in Receta.query.all())
 
     return render_template(
@@ -144,9 +138,8 @@ def recetas_view():
 @login_required("ADMIN")
 def crear_receta():
     create_form = forms.RecetaForm()
-    cargar_productos_receta(create_form)
+    cargar_productos_sin_receta(create_form)
     materias_primas = obtener_materias_primas_activas()
-
     detalles_form = []
 
     if request.method == "POST":
@@ -169,11 +162,10 @@ def crear_receta():
             receta_db = Receta(
                 id_producto=id_producto,
                 nombre=nombre,
-                rendimiento=int(create_form.rendimiento.data),
+                rendimiento=Decimal(str(create_form.rendimiento.data)),
                 costo_estimado=0,
-                activo=1,
+                activo=create_form.activo.data,
             )
-
             db.session.add(receta_db)
             db.session.flush()
 
@@ -195,7 +187,6 @@ def crear_receta():
                 detalle=f"Receta '{receta_db.nombre}' creada con {len(detalles_form)} insumo(s)",
                 severidad="INFO",
             )
-
             flash("Receta creada correctamente.", "success")
             return redirect(url_for("recetas.recetas_view"))
 
@@ -216,10 +207,9 @@ def actualizar_receta():
     create_form = forms.RecetaForm()
     cargar_productos_receta(create_form)
     materias_primas = obtener_materias_primas_activas()
-
     id_receta = request.args.get("id")
-    receta_db = db.session.query(Receta).filter(Receta.id_receta == id_receta).first()
 
+    receta_db = Receta.query.filter(Receta.id_receta == id_receta).first()
     if not receta_db:
         flash("Receta no encontrada.", "danger")
         return redirect(url_for("recetas.recetas_view"))
@@ -228,13 +218,15 @@ def actualizar_receta():
         create_form.id_producto.data = receta_db.id_producto
         create_form.nombre.data = receta_db.nombre
         create_form.rendimiento.data = receta_db.rendimiento
+        create_form.activo.data = receta_db.activo
 
         detalles_form = [
             {
                 "id_materia_prima": detalle.id_materia_prima,
                 "cantidad": detalle.cantidad,
                 "materia_nombre": detalle.materia_prima.nombre if detalle.materia_prima else "",
-                "unidad_medida": detalle.materia_prima.unidad_medida_rel.nombre if detalle.materia_prima else "",
+                "unidad_medida": detalle.materia_prima.unidad_medida_rel.nombre
+                if detalle.materia_prima and detalle.materia_prima.unidad_medida_rel else "",
             }
             for detalle in receta_db.detalles
         ]
@@ -267,7 +259,8 @@ def actualizar_receta():
 
         receta_db.id_producto = create_form.id_producto.data
         receta_db.nombre = create_form.nombre.data.strip()
-        receta_db.rendimiento = int(create_form.rendimiento.data)
+        receta_db.rendimiento = Decimal(str(create_form.rendimiento.data))
+        receta_db.activo = create_form.activo.data
 
         RecetaDetalle.query.filter_by(id_receta=receta_db.id_receta).delete()
 
@@ -289,7 +282,6 @@ def actualizar_receta():
             detalle=f"Receta '{receta_db.nombre}' actualizada con {len(detalles_form)} insumo(s)",
             severidad="INFO",
         )
-
         flash("Receta actualizada correctamente.", "success")
         return redirect(url_for("recetas.recetas_view"))
 
@@ -310,10 +302,9 @@ def actualizar_receta():
 def eliminar_receta():
     create_form = forms.RecetaForm()
     cargar_productos_receta(create_form)
-
     id_receta = request.args.get("id")
-    receta_db = db.session.query(Receta).filter(Receta.id_receta == id_receta).first()
 
+    receta_db = Receta.query.filter(Receta.id_receta == id_receta).first()
     if not receta_db:
         flash("Receta no encontrada.", "danger")
         return redirect(url_for("recetas.recetas_view"))
@@ -322,7 +313,7 @@ def eliminar_receta():
         create_form.id_producto.data = receta_db.id_producto
         create_form.nombre.data = receta_db.nombre
         create_form.rendimiento.data = receta_db.rendimiento
-
+        create_form.activo.data = receta_db.activo
         return render_template(
             "private/recetas/recetas_delete.html",
             form=create_form,
@@ -339,6 +330,14 @@ def eliminar_receta():
         detalle=f"Receta '{receta_db.nombre}' marcada como inactiva",
         severidad="WARNING",
     )
-
     flash("Receta desactivada correctamente.", "info")
     return redirect(url_for("recetas.recetas_view"))
+def cargar_productos_sin_receta(form):
+    productos = (
+        Producto.query
+        .filter_by(activo=1)
+        .filter(~Producto.id_producto.in_(db.session.query(Receta.id_producto)))
+        .order_by(Producto.nombre.asc())
+        .all()
+    )
+    form.id_producto.choices = [(p.id_producto, p.nombre) for p in productos]

@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Acabar Producción | Casa León{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold mb-2">Acabar Producción</h1>
+      <p class="text-gray-500">Captura sobrantes por materia prima y decide si regresan a inventario o se van a merma</p>
+    </div>
+    <a href="{{ url_for('produccion.produccion_view') }}"
+       class="px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
+      Volver
+    </a>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="space-y-3">
+        {% for category, message in messages %}
+          <div class="px-4 py-3 rounded-xl border
+            {% if category == 'success' %}
+              bg-green-50 border-green-200 text-green-700
+            {% elif category == 'warning' %}
+              bg-yellow-50 border-yellow-200 text-yellow-700
+            {% elif category == 'danger' %}
+              bg-red-50 border-red-200 text-red-700
+            {% else %}
+              bg-blue-50 border-blue-200 text-blue-700
+            {% endif %}
+          ">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <div class="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
+        <p class="text-sm text-gray-500 mb-1">Folio</p>
+        <p class="font-semibold text-gray-800">{{ orden_db.folio }}</p>
+      </div>
+      <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
+        <p class="text-sm text-gray-500 mb-1">Producto</p>
+        <p class="font-semibold text-gray-800">{{ orden_db.producto.nombre if orden_db.producto else 'Sin producto' }}</p>
+      </div>
+      <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
+        <p class="text-sm text-gray-500 mb-1">Cantidad</p>
+        <p class="font-semibold text-gray-800">{{ orden_db.cantidad|num(4) }}</p>
+      </div>
+    </div>
+  </div>
+
+  <form method="POST" class="space-y-6">
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
+      <h2 class="text-2xl font-bold text-gray-800 mb-4">Distribución de sobrantes</h2>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 border-y border-gray-200">
+            <tr>
+              <th class="text-left px-4 py-3 font-semibold text-gray-700">Materia prima</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-700">Teórica</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-700">Consumida</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-700">Excedente</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-700">Regresa a MP</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-700">Envía a merma</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in resumen_cierre %}
+              {% set detalle = item.detalle %}
+              <tr class="border-b border-gray-100">
+                <td class="px-4 py-3">
+                  <div class="font-medium text-gray-800">{{ detalle.materia_prima_nombre }}</div>
+                  <div class="text-xs text-gray-500">{{ detalle.unidad_medida }}</div>
+                </td>
+                <td class="px-4 py-3">{{ item.cantidad_teorica|num(4) }}</td>
+                <td class="px-4 py-3">{{ item.cantidad_consumida|num(4) }}</td>
+                <td class="px-4 py-3 font-semibold text-blue-700">{{ item.excedente|num(4) }}</td>
+                <td class="px-4 py-3">
+                  <input
+                    type="number"
+                    step="0.0001"
+                    min="0"
+                    name="regresar_mp_{{ detalle.id_orden_produccion_detalle }}"
+                    value="0"
+                    class="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </td>
+                <td class="px-4 py-3">
+                  <input
+                    type="number"
+                    step="0.0001"
+                    min="0"
+                    name="enviar_merma_{{ detalle.id_orden_produccion_detalle }}"
+                    value="{{ item.excedente }}"
+                    class="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-4 rounded-xl border border-yellow-200 bg-yellow-50 px-4 py-3">
+        <p class="text-sm text-yellow-700">
+          La suma de <strong>Regresa a MP</strong> + <strong>Envía a merma</strong> debe ser exactamente igual al excedente de cada materia prima.
+        </p>
+      </div>
+    </div>
+
+    <div class="flex flex-col sm:flex-row gap-3">
+      <a
+        href="{{ url_for('produccion.produccion_view') }}"
+        class="flex-1 px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center"
+      >
+        Cancelar
+      </a>
+
+      <button
+        type="submit"
+        class="flex-1 px-4 py-3 bg-green-600 text-white rounded-xl hover:shadow-lg transition-all"
+      >
+        Confirmar cierre de producción
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

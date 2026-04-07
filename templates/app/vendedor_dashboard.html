@@ -4,9 +4,45 @@
 
 {% block content %}
 <div class="space-y-6">
-  <div class="bg-white rounded-3xl shadow-lg border border-gray-200 p-8">
-    <h1 class="text-4xl font-bold text-[#123f32]">Dashboard Empleado</h1>
-    <p class="text-gray-500 mt-2">Bienvenido, {{ g.user.nombre }}</p>
+  <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-3xl font-bold mb-2">Dashboard Empleado</h1>
+        <p class="text-gray-500">Bienvenido, {{ g.user.nombre }}</p>
+      </div>
+      <a
+        href="{{ url_for('auth.logout') }}"
+        class="text-sm font-semibold text-red-600 hover:underline"
+      >
+        Cerrar sesión
+      </a>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+    <a href="{{ url_for('ventas.listado_ventas') }}" class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all">
+      <p class="text-sm text-gray-500">Comercial</p>
+      <p class="text-2xl font-bold mt-2">Ventas</p>
+      <p class="text-sm text-blue-600 mt-3">Registrar venta →</p>
+    </a>
+
+    <a href="{{ url_for('produccion.produccion_view') }}" class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all">
+      <p class="text-sm text-gray-500">Operación</p>
+      <p class="text-2xl font-bold mt-2">Producción</p>
+      <p class="text-sm text-blue-600 mt-3">Ver órdenes →</p>
+    </a>
+
+    <a href="{{ url_for('materia_prima.materia_prima_view') }}" class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all">
+      <p class="text-sm text-gray-500">Inventario</p>
+      <p class="text-2xl font-bold mt-2">Materia Prima</p>
+      <p class="text-sm text-blue-600 mt-3">Consultar stock →</p>
+    </a>
+
+    <a href="{{ url_for('merma.listado_merma') }}" class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all">
+      <p class="text-sm text-gray-500">Control</p>
+      <p class="text-2xl font-bold mt-2">Merma</p>
+      <p class="text-sm text-blue-600 mt-3">Ver registros →</p>
+    </a>
   </div>
 </div>
 {% endblock %}

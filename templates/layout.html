@@ -11,82 +11,141 @@
 </head>
 <body class="bg-stone-50 text-gray-900 min-h-screen flex flex-col">
 
-  <nav class="bg-white border-b border-gray-200 shadow-sm">
-    <div class="max-w-screen-2xl flex flex-wrap items-center justify-between mx-auto px-6 py-4">
-      <a href="{{ url_for('tienda.home') }}" class="flex items-center space-x-3">
-        <img src="{{ url_for('static', filename='img/casaLeon.png') }}" alt="Casa León" class="h-14 w-auto">
-        <div>
-          <span class="block text-2xl font-bold text-emerald-900">Casa León</span>
-          <p class="text-sm text-gray-500 -mt-1">Marroquinería de Calidad</p>
-        </div>
-      </a>
+  <nav class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
+    <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 py-3">
+      <div class="flex items-center justify-between gap-4">
 
-      <button data-collapse-toggle="navbar-default" type="button"
-        class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
-        aria-controls="navbar-default" aria-expanded="false">
-        <span class="sr-only">Abrir menú</span>
-        <svg class="w-5 h-5" viewBox="0 0 17 14" fill="none">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M1 1h15M1 7h15M1 13h15"/>
-        </svg>
-      </button>
-
-      <div class="hidden w-full md:block md:w-auto" id="navbar-default">
-        <ul class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-white md:flex-row md:space-x-8 md:mt-0 md:border-0">
-          <li><a href="{{ url_for('tienda.home') }}" class="block py-2 px-3 text-emerald-900 font-semibold hover:text-emerald-700">Inicio</a></li>
-          <li><a href="{{ url_for('tienda.productos_publico') }}" class="block py-2 px-3 text-gray-700 hover:text-emerald-700">Productos</a></li>
-          <li><a href="{{ url_for('tienda.nosotros') }}" class="block py-2 px-3 text-gray-700 hover:text-emerald-700">Nosotros</a></li>
-          <li><a href="{{ url_for('tienda.contacto') }}" class="block py-2 px-3 text-gray-700 hover:text-emerald-700">Contacto</a></li>
-        </ul>
-      </div>
-
-      <div class="hidden md:flex items-center gap-4">
-        <a href="{{ url_for('tienda.carrito') }}" class="relative text-gray-700 hover:text-emerald-700">
-          <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none">
-            <path d="M3 4h2l2.2 10.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.7L21 7H7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="10" cy="19" r="1.5" fill="currentColor"/>
-            <circle cx="18" cy="19" r="1.5" fill="currentColor"/>
-          </svg>
-          {% if g.cart_count and g.cart_count > 0 %}
-            <span class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full min-w-[20px] h-5 px-1 flex items-center justify-center">
-              {{ g.cart_count }}
-            </span>
-          {% endif %}
+        <a href="{{ url_for('tienda.home') }}" class="flex items-center gap-3 min-w-0">
+          <img src="{{ url_for('static', filename='img/casaLeon.png') }}" alt="Casa León" class="h-11 sm:h-14 w-auto shrink-0">
+          <div class="min-w-0">
+            <span class="block text-lg sm:text-2xl font-bold text-emerald-900 leading-tight truncate">Casa León</span>
+            <p class="text-xs sm:text-sm text-gray-500 leading-tight">Marroquinería de Calidad</p>
+          </div>
         </a>
 
-        {% if g.user %}
-          {% if g.role == "CLIENTE" %}
-            <a href="{{ url_for('tienda.cliente_dashboard') }}"
-               class="text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-full text-sm px-6 py-3 text-center">
-              Mi cuenta
-            </a>
-            <a href="{{ url_for('auth.logout') }}"
-               class="text-emerald-900 bg-white border border-emerald-800 hover:bg-emerald-50 focus:ring-4 focus:outline-none focus:ring-emerald-200 font-medium rounded-full text-sm px-6 py-3 text-center">
-              Cerrar sesión
-            </a>
+        <div class="flex items-center gap-2 md:hidden">
+          <a href="{{ url_for('tienda.carrito') }}" class="relative inline-flex items-center justify-center p-2 rounded-lg text-gray-700 hover:text-emerald-700 hover:bg-gray-100">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none">
+              <path d="M3 4h2l2.2 10.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.7L21 7H7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="10" cy="19" r="1.5" fill="currentColor"/>
+              <circle cx="18" cy="19" r="1.5" fill="currentColor"/>
+            </svg>
+            {% if g.cart_count and g.cart_count > 0 %}
+              <span class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center">
+                {{ g.cart_count }}
+              </span>
+            {% endif %}
+          </a>
+
+          <button data-collapse-toggle="navbar-default" type="button"
+            class="inline-flex items-center justify-center p-2 w-10 h-10 text-sm text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
+            aria-controls="navbar-default" aria-expanded="false">
+            <span class="sr-only">Abrir menú</span>
+            <svg class="w-5 h-5" viewBox="0 0 17 14" fill="none">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M1 1h15M1 7h15M1 13h15"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="hidden md:flex items-center gap-3">
+          <a href="{{ url_for('tienda.home') }}" class="text-emerald-900 font-semibold hover:text-emerald-700">Inicio</a>
+          <a href="{{ url_for('tienda.productos_publico') }}" class="text-gray-700 hover:text-emerald-700">Productos</a>
+          <a href="{{ url_for('tienda.nosotros') }}" class="text-gray-700 hover:text-emerald-700">Nosotros</a>
+          <a href="{{ url_for('tienda.contacto') }}" class="text-gray-700 hover:text-emerald-700">Contacto</a>
+
+          <a href="{{ url_for('tienda.carrito') }}" class="relative text-gray-700 hover:text-emerald-700 ml-2">
+            <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none">
+              <path d="M3 4h2l2.2 10.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.7L21 7H7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="10" cy="19" r="1.5" fill="currentColor"/>
+              <circle cx="18" cy="19" r="1.5" fill="currentColor"/>
+            </svg>
+            {% if g.cart_count and g.cart_count > 0 %}
+              <span class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full min-w-[20px] h-5 px-1 flex items-center justify-center">
+                {{ g.cart_count }}
+              </span>
+            {% endif %}
+          </a>
+
+          {% if g.user %}
+            {% if g.role == "CLIENTE" %}
+              <a href="{{ url_for('tienda.cliente_dashboard') }}"
+                 class="text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-full text-sm px-5 py-2.5 text-center">
+                Mi cuenta
+              </a>
+              <a href="{{ url_for('auth.logout') }}"
+                 class="text-emerald-900 bg-white border border-emerald-800 hover:bg-emerald-50 focus:ring-4 focus:outline-none focus:ring-emerald-200 font-medium rounded-full text-sm px-5 py-2.5 text-center">
+                Cerrar sesión
+              </a>
+            {% else %}
+              <a href="{{ url_for('auth.post_login') }}"
+                 class="text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-full text-sm px-5 py-2.5 text-center">
+                Ir al panel
+              </a>
+            {% endif %}
           {% else %}
-            <a href="{{ url_for('auth.post_login') }}"
-               class="text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-full text-sm px-6 py-3 text-center">
-              Ir al panel
+            <a href="{{ url_for('auth.login') }}"
+               class="text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-full text-sm px-5 py-2.5 text-center">
+              Iniciar sesión
+            </a>
+            <a href="{{ url_for('auth.register') }}"
+               class="text-emerald-900 bg-white border border-emerald-800 hover:bg-emerald-50 focus:ring-4 focus:outline-none focus:ring-emerald-200 font-medium rounded-full text-sm px-5 py-2.5 text-center">
+              Registrarme
             </a>
           {% endif %}
-        {% else %}
-          <a href="{{ url_for('auth.login') }}"
-             class="text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-full text-sm px-6 py-3 text-center">
-            Iniciar Sesión
-          </a>
-          <a href="{{ url_for('auth.register') }}"
-             class="text-emerald-900 bg-white border border-emerald-800 hover:bg-emerald-50 focus:ring-4 focus:outline-none focus:ring-emerald-200 font-medium rounded-full text-sm px-6 py-3 text-center">
-            Registrarme
-          </a>
-        {% endif %}
+        </div>
+      </div>
+
+      <div class="hidden w-full pt-3 md:hidden" id="navbar-default">
+        <div class="border border-gray-200 rounded-2xl bg-white shadow-sm p-4 space-y-4">
+          <ul class="space-y-2">
+            <li><a href="{{ url_for('tienda.home') }}" class="block rounded-xl px-3 py-2 text-emerald-900 font-semibold hover:bg-emerald-50">Inicio</a></li>
+            <li><a href="{{ url_for('tienda.productos_publico') }}" class="block rounded-xl px-3 py-2 text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">Productos</a></li>
+            <li><a href="{{ url_for('tienda.nosotros') }}" class="block rounded-xl px-3 py-2 text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">Nosotros</a></li>
+            <li><a href="{{ url_for('tienda.contacto') }}" class="block rounded-xl px-3 py-2 text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">Contacto</a></li>
+            <li>
+              <a href="{{ url_for('tienda.carrito') }}" class="block rounded-xl px-3 py-2 text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">
+                Carrito {% if g.cart_count and g.cart_count > 0 %}({{ g.cart_count }}){% endif %}
+              </a>
+            </li>
+          </ul>
+
+          <div class="grid grid-cols-1 gap-3">
+            {% if g.user %}
+              {% if g.role == "CLIENTE" %}
+                <a href="{{ url_for('tienda.cliente_dashboard') }}"
+                   class="w-full text-center text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-xl text-sm px-5 py-3">
+                  Mi cuenta
+                </a>
+                <a href="{{ url_for('auth.logout') }}"
+                   class="w-full text-center text-emerald-900 bg-white border border-emerald-800 hover:bg-emerald-50 focus:ring-4 focus:outline-none focus:ring-emerald-200 font-medium rounded-xl text-sm px-5 py-3">
+                  Cerrar sesión
+                </a>
+              {% else %}
+                <a href="{{ url_for('auth.post_login') }}"
+                   class="w-full text-center text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-xl text-sm px-5 py-3">
+                  Ir al panel
+                </a>
+              {% endif %}
+            {% else %}
+              <a href="{{ url_for('auth.login') }}"
+                 class="w-full text-center text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-xl text-sm px-5 py-3">
+                Iniciar sesión
+              </a>
+              <a href="{{ url_for('auth.register') }}"
+                 class="w-full text-center text-emerald-900 bg-white border border-emerald-800 hover:bg-emerald-50 focus:ring-4 focus:outline-none focus:ring-emerald-200 font-medium rounded-xl text-sm px-5 py-3">
+                Registrarme
+              </a>
+            {% endif %}
+          </div>
+        </div>
       </div>
     </div>
   </nav>
 
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-      <div class="max-w-screen-xl mx-auto px-6 pt-5 w-full">
+      <div class="max-w-screen-xl mx-auto px-4 sm:px-6 pt-4 w-full">
         {% for category, message in messages %}
           {% set cls = "bg-emerald-50 text-emerald-800 border-emerald-200" if category=="success"
                     else "bg-red-50 text-red-800 border-red-200" if category=="danger"
@@ -100,10 +159,12 @@
     {% endif %}
   {% endwith %}
 
-  {% block body %}{% endblock %}
+  <main class="flex-1">
+    {% block body %}{% endblock %}
+  </main>
 
   <footer class="mt-auto bg-emerald-900 text-white">
-    <div class="mx-auto w-full max-w-screen-2xl p-8 lg:py-10">
+    <div class="mx-auto w-full max-w-screen-2xl px-4 sm:px-6 py-10">
       <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
         <div>
           <div class="flex items-center gap-3 mb-4">
@@ -113,14 +174,14 @@
               <p class="text-sm text-emerald-100">Marroquinería</p>
             </div>
           </div>
-          <p class="text-emerald-50 leading-7">
-            Productos de cuero de la más alta calidad, hechos a mano con dedicación y pasión.
+          <p class="text-emerald-50 leading-7 text-sm sm:text-base">
+            Productos de cuero de alta calidad, elaborados con dedicación, estilo y tradición.
           </p>
         </div>
 
         <div>
           <h2 class="mb-4 text-lg font-semibold">Cliente</h2>
-          <ul class="space-y-3 text-emerald-50">
+          <ul class="space-y-3 text-emerald-50 text-sm sm:text-base">
             <li><a href="{{ url_for('tienda.productos_publico') }}" class="hover:underline">Catálogo</a></li>
             <li><a href="{{ url_for('tienda.carrito') }}" class="hover:underline">Carrito</a></li>
             <li><a href="{{ url_for('tienda.checkout') }}" class="hover:underline">Checkout</a></li>
@@ -130,7 +191,7 @@
 
         <div>
           <h2 class="mb-4 text-lg font-semibold">Cuenta</h2>
-          <ul class="space-y-3 text-emerald-50">
+          <ul class="space-y-3 text-emerald-50 text-sm sm:text-base">
             <li><a href="{{ url_for('tienda.cliente_dashboard') }}" class="hover:underline">Dashboard</a></li>
             <li><a href="{{ url_for('tienda.mi_cuenta') }}" class="hover:underline">Mi cuenta</a></li>
             <li><a href="{{ url_for('auth.login') }}" class="hover:underline">Iniciar sesión</a></li>
@@ -140,7 +201,7 @@
 
         <div>
           <h2 class="mb-4 text-lg font-semibold">Contacto</h2>
-          <ul class="space-y-3 text-emerald-50">
+          <ul class="space-y-3 text-emerald-50 text-sm sm:text-base">
             <li>📧 info@casaleon.com</li>
             <li>📞 +52 123-456-7890</li>
             <li>📍 León, Guanajuato, México</li>
@@ -150,7 +211,7 @@
 
       <hr class="my-8 border-emerald-800" />
 
-      <div class="text-center text-emerald-100">
+      <div class="text-center text-emerald-100 text-sm sm:text-base">
         © 2026 Casa León. Todos los derechos reservados.
       </div>
     </div>

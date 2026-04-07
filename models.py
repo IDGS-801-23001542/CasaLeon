@@ -11,6 +11,10 @@ class Rol(db.Model):
     codigo = db.Column(db.String(30), unique=True, nullable=False)
     descripcion = db.Column(db.String(120), nullable=False)
 
+    def __repr__(self):
+        return f"<Rol {self.codigo}>"
+
+
 
 class Usuario(db.Model):
     __tablename__ = "Usuario"
@@ -24,6 +28,9 @@ class Usuario(db.Model):
     creado_en = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
 
     rol = db.relationship("Rol")
+
+    def __repr__(self):
+        return f"<Usuario {self.id_usuario} - {self.email}>"
 
 
 class Cliente(db.Model):
@@ -47,6 +54,9 @@ class Cliente(db.Model):
 
     pedidos = db.relationship("Pedido", backref="cliente", lazy=True)
 
+    def __repr__(self):
+        return f"<Cliente {self.id_cliente} - {self.email}>"
+
 
 class AuthToken(db.Model):
     __tablename__ = "AuthToken"
@@ -60,6 +70,9 @@ class AuthToken(db.Model):
     revoked = db.Column(db.Integer, nullable=False, default=0)
     user_agent = db.Column(db.String(255))
     ip_addr = db.Column(db.String(45))
+
+    def __repr__(self):
+        return f"<AuthToken {self.id_token} - {self.subject_type}:{self.subject_id}>"
 
 
 class Proveedor(db.Model):
@@ -114,6 +127,11 @@ class Producto(db.Model):
     activo = db.Column(db.Integer, nullable=False, default=1)
     imagen = db.Column(db.String(255))
 
+    recetas = db.relationship("Receta", backref="producto_ref", lazy=True)
+    pedidos_detalle = db.relationship("PedidoDetalle", backref="producto_ref_pedido", lazy=True)
+    ventas_detalle = db.relationship("VentaDetalle", backref="producto_ref_venta", lazy=True)
+    ordenes_produccion = db.relationship("OrdenProduccion", backref="producto_ref_orden", lazy=True)
+
     def __repr__(self):
         return f"<Producto {self.id_producto} - {self.nombre}>"
 
@@ -148,6 +166,9 @@ class Pedido(db.Model):
         cascade="all, delete-orphan",
     )
 
+    def __repr__(self):
+        return f"<Pedido {self.id_pedido} - {self.folio}>"
+
 
 class PedidoDetalle(db.Model):
     __tablename__ = "pedido_detalles"
@@ -163,10 +184,49 @@ class PedidoDetalle(db.Model):
 
     producto = db.relationship("Producto")
 
+    def __repr__(self):
+        return f"<PedidoDetalle {self.id_pedido_detalle} - {self.producto_nombre}>"
 
-# =========================
-# Nuevos modelos para cerrar proyecto
-# =========================
+
+class Venta(db.Model):
+    __tablename__ = "ventas"
+
+    id_venta = db.Column(db.Integer, primary_key=True)
+    folio = db.Column(db.String(30), unique=True, nullable=False)
+    id_usuario = db.Column(db.Integer, db.ForeignKey("Usuario.id_usuario"), nullable=False)
+    total = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    metodo_pago = db.Column(db.String(30), nullable=False, default="EFECTIVO")
+    observaciones = db.Column(db.String(255))
+    creado_en = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
+
+    usuario = db.relationship("Usuario")
+    detalles = db.relationship(
+        "VentaDetalle",
+        backref="venta",
+        lazy=True,
+        cascade="all, delete-orphan",
+    )
+
+    def __repr__(self):
+        return f"<Venta {self.id_venta} - {self.folio}>"
+
+
+class VentaDetalle(db.Model):
+    __tablename__ = "ventas_detalle"
+
+    id_venta_detalle = db.Column(db.Integer, primary_key=True)
+    id_venta = db.Column(db.Integer, db.ForeignKey("ventas.id_venta"), nullable=False)
+    id_producto = db.Column(db.Integer, db.ForeignKey("productos.id_producto"), nullable=False)
+    producto_nombre = db.Column(db.String(120), nullable=False)
+    precio_unitario = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    cantidad = db.Column(db.Numeric(14, 4), nullable=False, default=1)
+    subtotal = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+
+    producto = db.relationship("Producto")
+
+    def __repr__(self):
+        return f"<VentaDetalle {self.id_venta_detalle} - {self.producto_nombre}>"
+
 
 class CategoriaMateriaPrima(db.Model):
     __tablename__ = "categorias_materia_prima"
@@ -193,6 +253,7 @@ class UnidadMedida(db.Model):
     def __repr__(self):
         return f"<UnidadMedida {self.id_unidad_medida} - {self.nombre}>"
 
+
 class MateriaPrima(db.Model):
     __tablename__ = "materias_primas"
 
@@ -217,6 +278,10 @@ class MateriaPrima(db.Model):
     merma_pct = db.Column(db.Numeric(5, 2), nullable=False, default=0)
     activo = db.Column(db.Integer, nullable=False, default=1)
 
+    receta_detalles = db.relationship("RecetaDetalle", backref="materia_prima_ref_receta", lazy=True)
+    ordenes_detalle = db.relationship("OrdenProduccionDetalle", backref="materia_prima_ref_orden", lazy=True)
+    mermas_detalle = db.relationship("MermaDetalle", backref="materia_prima_ref_merma", lazy=True)
+
     def __repr__(self):
         return f"<MateriaPrima {self.id_materia_prima} - {self.nombre}>"
 
@@ -227,7 +292,7 @@ class Receta(db.Model):
     id_receta = db.Column(db.Integer, primary_key=True)
     id_producto = db.Column(db.Integer, db.ForeignKey("productos.id_producto"), nullable=False, unique=True)
     nombre = db.Column(db.String(150), nullable=False)
-    rendimiento = db.Column(db.Integer, nullable=False, default=1)
+    rendimiento = db.Column(db.Numeric(14, 4), nullable=False, default=1)
     costo_estimado = db.Column(db.Numeric(12, 4), nullable=False, default=0)
     activo = db.Column(db.Integer, nullable=False, default=1)
     creado_en = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
@@ -254,6 +319,9 @@ class RecetaDetalle(db.Model):
 
     materia_prima = db.relationship("MateriaPrima")
 
+    def __repr__(self):
+        return f"<RecetaDetalle {self.id_receta_detalle}>"
+
 
 class OrdenProduccion(db.Model):
     __tablename__ = "ordenes_produccion"
@@ -276,6 +344,12 @@ class OrdenProduccion(db.Model):
     detalles = db.relationship(
         "OrdenProduccionDetalle",
         backref="orden_produccion",
+        lazy=True,
+        cascade="all, delete-orphan",
+    )
+    mermas = db.relationship(
+        "Merma",
+        backref="orden",
         lazy=True,
         cascade="all, delete-orphan",
     )
@@ -302,6 +376,7 @@ class OrdenProduccionDetalle(db.Model):
     materia_prima_nombre = db.Column(db.String(120), nullable=False)
     unidad_medida = db.Column(db.String(20), nullable=False)
     cantidad_base = db.Column(db.Numeric(14, 4), nullable=False, default=0)
+    cantidad_teorica = db.Column(db.Numeric(14, 4), nullable=False, default=0)
     cantidad_consumida = db.Column(db.Numeric(14, 4), nullable=False, default=0)
     costo_unitario = db.Column(db.Numeric(12, 4), nullable=False, default=0)
     subtotal = db.Column(db.Numeric(12, 4), nullable=False, default=0)
@@ -310,6 +385,59 @@ class OrdenProduccionDetalle(db.Model):
 
     def __repr__(self):
         return f"<OrdenProduccionDetalle {self.id_orden_produccion_detalle}>"
+
+
+class Merma(db.Model):
+    __tablename__ = "mermas"
+
+    id_merma = db.Column(db.Integer, primary_key=True)
+    id_orden_produccion = db.Column(
+        db.Integer,
+        db.ForeignKey("ordenes_produccion.id_orden_produccion"),
+        nullable=False,
+    )
+    tipo = db.Column(db.String(30), nullable=False, default="RECUPERABLE")
+    estado = db.Column(db.String(30), nullable=False, default="DISPONIBLE")
+    observaciones = db.Column(db.String(255))
+    creado_en = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
+
+    detalles = db.relationship(
+        "MermaDetalle",
+        backref="merma",
+        lazy=True,
+        cascade="all, delete-orphan",
+    )
+
+    def __repr__(self):
+        return f"<Merma {self.id_merma} - {self.tipo}>"
+
+
+class MermaDetalle(db.Model):
+    __tablename__ = "mermas_detalle"
+
+    id_merma_detalle = db.Column(db.Integer, primary_key=True)
+    id_merma = db.Column(
+        db.Integer,
+        db.ForeignKey("mermas.id_merma"),
+        nullable=False,
+    )
+    id_materia_prima = db.Column(
+        db.Integer,
+        db.ForeignKey("materias_primas.id_materia_prima"),
+        nullable=False,
+    )
+
+    materia_prima_nombre = db.Column(db.String(120), nullable=False)
+    unidad_medida = db.Column(db.String(20), nullable=False)
+    cantidad = db.Column(db.Numeric(14, 4), nullable=False, default=0)
+    clasificacion = db.Column(db.String(50), nullable=False, default="RECORTE_UTIL")
+    valor_estimado_unit = db.Column(db.Numeric(12, 4), nullable=False, default=0)
+    valor_estimado_total = db.Column(db.Numeric(12, 4), nullable=False, default=0)
+
+    materia_prima = db.relationship("MateriaPrima")
+
+    def __repr__(self):
+        return f"<MermaDetalle {self.id_merma_detalle} - {self.materia_prima_nombre}>"
 
 
 class AuditoriaLog(db.Model):

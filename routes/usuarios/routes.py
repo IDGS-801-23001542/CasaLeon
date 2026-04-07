@@ -1,6 +1,5 @@
-from flask import render_template, request, redirect, url_for, flash, g
+from flask import render_template, request, redirect, url_for, flash
 from werkzeug.security import generate_password_hash
-
 import forms
 from models import db, Usuario, Rol
 from utils.auth import login_required
@@ -18,10 +17,9 @@ def cargar_roles(form):
 def listado_usuarios():
     create_form = forms.UsuarioForm()
     cargar_roles(create_form)
-
     search = request.args.get("search", "").strip()
-    query = Usuario.query.join(Rol)
 
+    query = Usuario.query.join(Rol)
     if search:
         like_term = f"%{search}%"
         query = query.filter(
@@ -34,12 +32,18 @@ def listado_usuarios():
         )
 
     usuarios_db = query.order_by(Usuario.nombre.asc()).all()
+    total_usuarios = Usuario.query.count()
+    usuarios_activos = Usuario.query.filter_by(activo=1).count()
+    usuarios_inactivos = Usuario.query.filter_by(activo=0).count()
 
     return render_template(
         "private/usuarios/usuarios.html",
         form=create_form,
         usuarios_db=usuarios_db,
-        roles=Rol.query.order_by(Rol.descripcion.asc()).all()
+        total_usuarios=total_usuarios,
+        usuarios_activos=usuarios_activos,
+        usuarios_inactivos=usuarios_inactivos,
+        search=search,
     )
 
 
@@ -49,42 +53,36 @@ def crear_usuario():
     create_form = forms.UsuarioForm()
     cargar_roles(create_form)
 
-    if request.method == "POST":
-        if create_form.validate():
-            email = create_form.email.data.strip().lower()
+    if request.method == "POST" and create_form.validate():
+        email = create_form.email.data.strip().lower()
+        existe = Usuario.query.filter(db.func.lower(Usuario.email) == email).first()
 
-            existe = Usuario.query.filter(
-                db.func.lower(Usuario.email) == email
-            ).first()
+        if existe:
+            flash("Ese correo ya está registrado.", "warning")
+            return render_template("private/usuarios/usuarios_create.html", form=create_form)
 
-            if existe:
-                flash("Ese correo ya está registrado.", "warning")
-                return render_template("private/usuarios/usuarios_create.html", form=create_form)
+        if not create_form.password.data or not create_form.password.data.strip():
+            flash("La contraseña es obligatoria.", "warning")
+            return render_template("private/usuarios/usuarios_create.html", form=create_form)
 
-            if not create_form.password.data or not create_form.password.data.strip():
-                flash("La contraseña es obligatoria.", "warning")
-                return render_template("private/usuarios/usuarios_create.html", form=create_form)
+        usuario = Usuario(
+            id_rol=create_form.rol.data,
+            nombre=create_form.nombre.data.strip(),
+            email=email,
+            password_hash=generate_password_hash(create_form.password.data.strip()),
+            activo=create_form.activo.data,
+        )
+        db.session.add(usuario)
+        db.session.commit()
 
-            usuario = Usuario(
-                id_rol=create_form.rol.data,
-                nombre=create_form.nombre.data.strip(),
-                email=email,
-                password_hash=generate_password_hash(create_form.password.data),
-                activo=1,
-            )
-
-            db.session.add(usuario)
-            db.session.commit()
-
-            log_event(
-                modulo="Usuarios",
-                accion="Usuario creado",
-                detalle=f"Usuario '{usuario.email}' creado",
-                severidad="INFO",
-            )
-
-            flash("Usuario creado correctamente.", "success")
-            return redirect(url_for("usuarios.listado_usuarios"))
+        log_event(
+            modulo="Usuarios",
+            accion="Usuario creado",
+            detalle=f"Usuario '{usuario.email}' creado con estado {'Activo' if usuario.activo == 1 else 'Inactivo'}",
+            severidad="INFO",
+        )
+        flash("Usuario creado correctamente.", "success")
+        return redirect(url_for("usuarios.listado_usuarios"))
 
     return render_template("private/usuarios/usuarios_create.html", form=create_form)
 
@@ -94,10 +92,9 @@ def crear_usuario():
 def actualizar_usuario():
     create_form = forms.UsuarioForm()
     cargar_roles(create_form)
-
     id_usuario = request.args.get("id")
-    usuario_db = db.session.query(Usuario).filter(Usuario.id_usuario == id_usuario).first()
 
+    usuario_db = Usuario.query.filter(Usuario.id_usuario == id_usuario).first()
     if not usuario_db:
         flash("Usuario no encontrado.", "danger")
         return redirect(url_for("usuarios.listado_usuarios"))
@@ -107,19 +104,17 @@ def actualizar_usuario():
         create_form.email.data = usuario_db.email
         create_form.rol.data = usuario_db.id_rol
         create_form.activo.data = usuario_db.activo
-
         return render_template(
             "private/usuarios/usuarios_update.html",
             form=create_form,
-            usuario_db=usuario_db
+            usuario_db=usuario_db,
         )
 
     if create_form.validate():
         email = create_form.email.data.strip().lower()
-
         existe = Usuario.query.filter(
             db.func.lower(Usuario.email) == email,
-            Usuario.id_usuario != usuario_db.id_usuario
+            Usuario.id_usuario != usuario_db.id_usuario,
         ).first()
 
         if existe:
@@ -127,7 +122,7 @@ def actualizar_usuario():
             return render_template(
                 "private/usuarios/usuarios_update.html",
                 form=create_form,
-                usuario_db=usuario_db
+                usuario_db=usuario_db,
             )
 
         usuario_db.nombre = create_form.nombre.data.strip()
@@ -136,15 +131,7 @@ def actualizar_usuario():
         usuario_db.activo = create_form.activo.data
 
         if create_form.password.data and create_form.password.data.strip():
-            if not g.user or g.user.id_usuario != usuario_db.id_usuario:
-                flash("Solo puedes cambiar tu propia contraseña.", "warning")
-                return render_template(
-                    "private/usuarios/usuarios_update.html",
-                    form=create_form,
-                    usuario_db=usuario_db
-                )
-
-            usuario_db.password_hash = generate_password_hash(create_form.password.data)
+            usuario_db.password_hash = generate_password_hash(create_form.password.data.strip())
 
         db.session.add(usuario_db)
         db.session.commit()
@@ -152,17 +139,16 @@ def actualizar_usuario():
         log_event(
             modulo="Usuarios",
             accion="Usuario actualizado",
-            detalle=f"Usuario '{usuario_db.email}' actualizado",
+            detalle=f"Usuario '{usuario_db.email}' actualizado. Estado: {'Activo' if usuario_db.activo == 1 else 'Inactivo'}",
             severidad="INFO",
         )
-
         flash("Usuario actualizado correctamente.", "success")
         return redirect(url_for("usuarios.listado_usuarios"))
 
     return render_template(
         "private/usuarios/usuarios_update.html",
         form=create_form,
-        usuario_db=usuario_db
+        usuario_db=usuario_db,
     )
 
 
@@ -171,10 +157,9 @@ def actualizar_usuario():
 def eliminar_usuario():
     create_form = forms.UsuarioForm()
     cargar_roles(create_form)
-
     id_usuario = request.args.get("id")
-    usuario_db = db.session.query(Usuario).filter(Usuario.id_usuario == id_usuario).first()
 
+    usuario_db = Usuario.query.filter(Usuario.id_usuario == id_usuario).first()
     if not usuario_db:
         flash("Usuario no encontrado.", "danger")
         return redirect(url_for("usuarios.listado_usuarios"))
@@ -184,11 +169,10 @@ def eliminar_usuario():
         create_form.email.data = usuario_db.email
         create_form.rol.data = usuario_db.id_rol
         create_form.activo.data = usuario_db.activo
-
         return render_template(
             "private/usuarios/usuarios_delete.html",
             form=create_form,
-            usuario_db=usuario_db
+            usuario_db=usuario_db,
         )
 
     usuario_db.activo = 0
@@ -201,6 +185,5 @@ def eliminar_usuario():
         detalle=f"Usuario '{usuario_db.email}' marcado como inactivo",
         severidad="WARNING",
     )
-
     flash("Usuario desactivado correctamente.", "info")
     return redirect(url_for("usuarios.listado_usuarios"))

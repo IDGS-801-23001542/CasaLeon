@@ -13,16 +13,29 @@ def cargar_categorias(form):
     ]
 
 
+def normalizar_ruta_imagen(imagen_raw):
+    imagen = (imagen_raw or "").strip().replace("\\", "/")
+    if not imagen:
+        return None
+
+    if imagen.startswith("/"):
+        imagen = imagen[1:]
+
+    # Si solo escriben el nombre del archivo, se guarda en static/productos/
+    if "/" not in imagen:
+        imagen = f"productos/{imagen}"
+
+    return imagen
+
+
 @productos.route("/private/productos")
 @login_required(["ADMIN", "EMPLEADO"])
 def listado_productos():
     create_form = forms.ProductoForm()
     cargar_categorias(create_form)
-
     search = request.args.get("search", "").strip()
 
     query = Producto.query.join(CategoriaProducto)
-
     if search:
         like_term = f"%{search}%"
         query = query.filter(
@@ -30,16 +43,15 @@ def listado_productos():
                 Producto.nombre.ilike(like_term),
                 Producto.sku.ilike(like_term),
                 Producto.descripcion.ilike(like_term),
+                Producto.imagen.ilike(like_term),
                 CategoriaProducto.nombre.ilike(like_term),
             )
         )
 
     productos_db = query.order_by(Producto.nombre.asc()).all()
-
     total_productos = Producto.query.count()
     productos_activos = Producto.query.filter_by(activo=1).count()
     productos_inactivos = Producto.query.filter_by(activo=0).count()
-
     valor_inventario = sum(
         float(producto.stock_actual or 0) * float(producto.costo_unit_prom or 0)
         for producto in Producto.query.all()
@@ -67,35 +79,40 @@ def crear_producto():
         if create_form.validate():
             sku = create_form.sku.data.strip().upper() if create_form.sku.data else None
             nombre = create_form.nombre.data.strip()
+            imagen = normalizar_ruta_imagen(create_form.imagen.data)
 
             existe_nombre = Producto.query.filter(
                 db.func.lower(Producto.nombre) == nombre.lower()
             ).first()
-
             if existe_nombre:
                 flash("Ya existe un producto con ese nombre.", "warning")
-                return render_template("private/productos/productos_create.html", form=create_form)
+                return render_template(
+                    "private/productos/productos_create.html",
+                    form=create_form
+                )
 
             if sku:
                 existe_sku = Producto.query.filter(
                     db.func.upper(Producto.sku) == sku
                 ).first()
-
                 if existe_sku:
                     flash("Ya existe un producto con ese SKU.", "warning")
-                    return render_template("private/productos/productos_create.html", form=create_form)
+                    return render_template(
+                        "private/productos/productos_create.html",
+                        form=create_form
+                    )
 
             producto = Producto(
                 id_categoria_producto=create_form.id_categoria_producto.data,
                 sku=sku,
                 nombre=nombre,
                 descripcion=create_form.descripcion.data.strip() if create_form.descripcion.data else None,
+                imagen=imagen,
                 precio_venta=create_form.precio_venta.data,
                 stock_actual=create_form.stock_actual.data,
                 costo_unit_prom=create_form.costo_unit_prom.data,
-                activo=1,
+                activo=create_form.activo.data,
             )
-
             db.session.add(producto)
             db.session.commit()
 
@@ -105,11 +122,13 @@ def crear_producto():
                 detalle=f"Producto '{producto.nombre}' creado con stock {producto.stock_actual}",
                 severidad="INFO",
             )
-
             flash("Producto creado correctamente.", "success")
             return redirect(url_for("productos.listado_productos"))
 
-    return render_template("private/productos/productos_create.html", form=create_form)
+    return render_template(
+        "private/productos/productos_create.html",
+        form=create_form
+    )
 
 
 @productos.route("/private/productos/update", methods=["GET", "POST"])
@@ -117,9 +136,11 @@ def crear_producto():
 def actualizar_producto():
     create_form = forms.ProductoForm()
     cargar_categorias(create_form)
-
     id_producto = request.args.get("id")
-    producto_db = db.session.query(Producto).filter(Producto.id_producto == id_producto).first()
+
+    producto_db = db.session.query(Producto).filter(
+        Producto.id_producto == id_producto
+    ).first()
 
     if not producto_db:
         flash("Producto no encontrado.", "danger")
@@ -130,9 +151,11 @@ def actualizar_producto():
         create_form.sku.data = producto_db.sku
         create_form.nombre.data = producto_db.nombre
         create_form.descripcion.data = producto_db.descripcion
+        create_form.imagen.data = producto_db.imagen
         create_form.precio_venta.data = producto_db.precio_venta
         create_form.stock_actual.data = producto_db.stock_actual
         create_form.costo_unit_prom.data = producto_db.costo_unit_prom
+        create_form.activo.data = producto_db.activo
 
         return render_template(
             "private/productos/productos_update.html",
@@ -143,12 +166,12 @@ def actualizar_producto():
     if create_form.validate():
         sku = create_form.sku.data.strip().upper() if create_form.sku.data else None
         nombre = create_form.nombre.data.strip()
+        imagen = normalizar_ruta_imagen(create_form.imagen.data)
 
         existe_nombre = Producto.query.filter(
             db.func.lower(Producto.nombre) == nombre.lower(),
             Producto.id_producto != producto_db.id_producto,
         ).first()
-
         if existe_nombre:
             flash("Ya existe otro producto con ese nombre.", "warning")
             return render_template(
@@ -162,7 +185,6 @@ def actualizar_producto():
                 db.func.upper(Producto.sku) == sku,
                 Producto.id_producto != producto_db.id_producto,
             ).first()
-
             if existe_sku:
                 flash("Ya existe otro producto con ese SKU.", "warning")
                 return render_template(
@@ -175,9 +197,11 @@ def actualizar_producto():
         producto_db.sku = sku
         producto_db.nombre = nombre
         producto_db.descripcion = create_form.descripcion.data.strip() if create_form.descripcion.data else None
+        producto_db.imagen = imagen
         producto_db.precio_venta = create_form.precio_venta.data
         producto_db.stock_actual = create_form.stock_actual.data
         producto_db.costo_unit_prom = create_form.costo_unit_prom.data
+        producto_db.activo = create_form.activo.data
 
         db.session.add(producto_db)
         db.session.commit()
@@ -188,7 +212,6 @@ def actualizar_producto():
             detalle=f"Producto '{producto_db.nombre}' actualizado",
             severidad="INFO",
         )
-
         flash("Producto actualizado correctamente.", "success")
         return redirect(url_for("productos.listado_productos"))
 
@@ -204,9 +227,11 @@ def actualizar_producto():
 def eliminar_producto():
     create_form = forms.ProductoForm()
     cargar_categorias(create_form)
-
     id_producto = request.args.get("id")
-    producto_db = db.session.query(Producto).filter(Producto.id_producto == id_producto).first()
+
+    producto_db = db.session.query(Producto).filter(
+        Producto.id_producto == id_producto
+    ).first()
 
     if not producto_db:
         flash("Producto no encontrado.", "danger")
@@ -217,9 +242,11 @@ def eliminar_producto():
         create_form.sku.data = producto_db.sku
         create_form.nombre.data = producto_db.nombre
         create_form.descripcion.data = producto_db.descripcion
+        create_form.imagen.data = producto_db.imagen
         create_form.precio_venta.data = producto_db.precio_venta
         create_form.stock_actual.data = producto_db.stock_actual
         create_form.costo_unit_prom.data = producto_db.costo_unit_prom
+        create_form.activo.data = producto_db.activo
 
         return render_template(
             "private/productos/productos_delete.html",
@@ -237,6 +264,5 @@ def eliminar_producto():
         detalle=f"Producto '{producto_db.nombre}' marcado como inactivo",
         severidad="WARNING",
     )
-
     flash("Producto desactivado correctamente.", "info")
     return redirect(url_for("productos.listado_productos"))

@@ -8,7 +8,7 @@
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
     <div>
       <h1 class="text-3xl font-bold mb-2">Editar Producto</h1>
-      <p class="text-gray-500">Actualiza la información del producto</p>
+      <p class="text-gray-500">Actualiza la información del producto terminado</p>
     </div>
     <a href="{{ url_for('productos.listado_productos') }}"
        class="px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
@@ -17,7 +17,7 @@
   </div>
 
   <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-    <form method="POST" action="{{ url_for('productos.actualizar_producto', id=producto_db.id_producto) }}" class="space-y-4">
+    <form method="POST" action="{{ url_for('productos.actualizar_producto', id=producto_db.id_producto) }}" class="space-y-6">
       {{ form.hidden_tag() }}
       {{ ui.form_errors(form) }}
 
@@ -30,22 +30,34 @@
           {{ ui.field(form.descripcion, placeholder="Descripción") }}
         </div>
 
+        <div class="md:col-span-2">
+          {{ ui.field(form.imagen, placeholder="productos/cartera-clasica.png") }}
+          <p class="mt-2 text-xs text-gray-500">
+            Guarda las imágenes dentro de <strong>static/productos/</strong>.  
+            Aquí captura la ruta como: <strong>productos/cartera-clasica.png</strong>
+          </p>
+        </div>
+
+        {% if producto_db.imagen %}
+        <div class="md:col-span-2">
+          <p class="text-sm font-medium text-gray-700 mb-2">Vista previa actual</p>
+          <div class="w-full md:w-72 h-48 rounded-2xl overflow-hidden border border-gray-200 bg-stone-100">
+            <img
+              src="{{ url_for('static', filename=producto_db.imagen) }}"
+              alt="{{ producto_db.nombre }}"
+              class="w-full h-full object-cover"
+            >
+          </div>
+        </div>
+        {% endif %}
+
         {{ ui.field(form.precio_venta, placeholder="Precio de venta") }}
         {{ ui.field(form.stock_actual, placeholder="Stock actual") }}
         {{ ui.field(form.costo_unit_prom, placeholder="Costo unitario promedio") }}
-
-        <div>
-          <label class="block mb-2 text-sm font-medium text-gray-900">Estado</label>
-          <input
-            type="text"
-            value="Activo"
-            disabled
-            class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed"
-          />
-        </div>
+        {{ ui.select_field(form.activo) }}
       </div>
 
-      <div class="flex flex-col sm:flex-row gap-3 pt-4">
+      <div class="flex flex-col sm:flex-row gap-3 pt-2">
         <a href="{{ url_for('productos.listado_productos') }}"
            class="flex-1 px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
           Cancelar
