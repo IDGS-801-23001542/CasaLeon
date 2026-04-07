@@ -1,6 +1,7 @@
 from decimal import Decimal
 from flask import Flask, render_template, g
 from flask_migrate import Migrate
+from dotenv import load_dotenv
 
 from config import DevelopmentConfig
 from models import db, Usuario, Cliente
@@ -27,6 +28,8 @@ migrate = Migrate()
 def create_app():
     app = Flask(__name__)
     app.config.from_object(DevelopmentConfig)
+
+    load_dotenv(".env.local")
 
     db.init_app(app)
     migrate.init_app(app, db)

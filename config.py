@@ -1,5 +1,5 @@
 import os
-
+import cloudinary
 
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "CasaLeon_ClaveSecreta_Cambiala")
@@ -20,3 +20,10 @@ class DevelopmentConfig(Config):
         "mysql+pymysql://root:root@127.0.0.1/fabrica_pieles2"
     )
     TOKEN_EXPIRES_MINUTES = 10
+
+cloudinary.config(
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+    secure=True,
+)

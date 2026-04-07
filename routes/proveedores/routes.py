@@ -11,8 +11,11 @@ from utils.audit import log_event
 def listado_proveedores():
     create_form = forms.ProveedorForm()
     search = request.args.get("search", "").strip()
+    page = request.args.get("page", 1, type=int)
+    per_page = 10
 
     query = Proveedor.query
+
     if search:
         like_term = f"%{search}%"
         query = query.filter(
@@ -27,7 +30,15 @@ def listado_proveedores():
             )
         )
 
-    proveedores_db = query.order_by(Proveedor.nombre.asc()).all()
+    query = query.order_by(Proveedor.nombre.asc())
+
+    pagination = query.paginate(
+        page=page,
+        per_page=per_page,
+        error_out=False,
+    )
+
+    proveedores_db = pagination.items
     total_proveedores = Proveedor.query.count()
     proveedores_activos = Proveedor.query.filter_by(activo=1).count()
     proveedores_inactivos = Proveedor.query.filter_by(activo=0).count()
@@ -36,6 +47,7 @@ def listado_proveedores():
         "private/proveedores/proveedores.html",
         form=create_form,
         proveedores_db=proveedores_db,
+        pagination=pagination,
         total_proveedores=total_proveedores,
         proveedores_activos=proveedores_activos,
         proveedores_inactivos=proveedores_inactivos,
