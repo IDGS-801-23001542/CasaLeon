@@ -25,7 +25,6 @@
         <h2 class="text-lg font-semibold text-gray-800 mb-4">Datos de la receta</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {{ ui.select_field(form.id_producto) }}
           {{ ui.field(form.nombre, placeholder="Nombre de la receta") }}
           {{ ui.field(form.rendimiento, placeholder="Ej. 1, 10, 25") }}
           {{ ui.select_field(form.activo) }}

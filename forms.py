@@ -11,6 +11,7 @@ from wtforms import (
 )
 from wtforms.validators import (
     DataRequired,
+    InputRequired,
     Email,
     Length,
     Optional,
@@ -784,31 +785,35 @@ class MateriaPrimaForm(FlaskForm):
         validators=[DataRequired(message="La unidad de medida es requerida")],
         choices=[],
     )
+    
     stock_actual = DecimalField(
         "Stock Actual",
         validators=[
-            DataRequired(message="El stock actual es requerido"),
+            InputRequired(message="El stock actual es requerido"),
             NumberRange(min=0, message="El stock debe ser mayor o igual a 0"),
         ],
     )
+
     stock_minimo = DecimalField(
         "Stock Mínimo",
         validators=[
-            DataRequired(message="El stock mínimo es requerido"),
+            InputRequired(message="El stock mínimo es requerido"),
             NumberRange(min=0, message="El stock mínimo debe ser mayor o igual a 0"),
         ],
     )
+
     costo_unit_prom = DecimalField(
         "Costo Unitario Promedio",
         validators=[
-            DataRequired(message="El costo unitario es requerido"),
+            InputRequired(message="El costo unitario es requerido"),
             NumberRange(min=0, message="El costo debe ser mayor o igual a 0"),
         ],
     )
+
     merma_pct = DecimalField(
         "Merma %",
         validators=[
-            DataRequired(message="La merma es requerida"),
+            InputRequired(message="La merma es requerida"),
             NumberRange(min=0, message="La merma debe ser mayor o igual a 0"),
         ],
     )
@@ -826,13 +831,6 @@ class MateriaPrimaForm(FlaskForm):
 
 # RECETAS
 class RecetaForm(FlaskForm):
-    id_producto = SelectField(
-        "Producto (opcional)",
-        coerce=int,
-        validators=[Optional()],
-        choices=[],
-        default=0,
-    )
     nombre = StringField(
         "Nombre de la Receta",
         validators=[
@@ -859,6 +857,7 @@ class RecetaForm(FlaskForm):
         field.data = _normalize_spaces(field.data)
 
 
+#PRODUCCIÓN
 class ProduccionForm(FlaskForm):
     id_producto = SelectField(
         "Producto",

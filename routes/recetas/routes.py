@@ -2,17 +2,10 @@ from decimal import Decimal, InvalidOperation
 from flask import render_template, request, redirect, url_for, flash
 from sqlalchemy import or_
 import forms
-from models import db, MateriaPrima, Receta, RecetaDetalle, Producto
+from models import db, MateriaPrima, Receta, RecetaDetalle
 from utils.auth import login_required
 from utils.audit import log_event
 from . import recetas
-
-
-def cargar_productos_receta(form):
-    productos = Producto.query.filter_by(activo=1).order_by(Producto.nombre.asc()).all()
-    form.id_producto.choices = [(0, "Sin asignar")] + [
-        (p.id_producto, p.nombre) for p in productos
-    ]
 
 
 def obtener_materias_primas_activas():
@@ -105,18 +98,14 @@ def extraer_detalles_receta_desde_form():
 @login_required("ADMIN")
 def recetas_view():
     create_form = forms.RecetaForm()
-    cargar_productos_receta(create_form)
     search = request.args.get("search", "").strip()
 
-    query = Receta.query.outerjoin(Producto)
+    query = Receta.query
 
     if search:
         like_term = f"%{search}%"
         query = query.filter(
-            or_(
-                Receta.nombre.ilike(like_term),
-                Producto.nombre.ilike(like_term),
-            )
+            Receta.nombre.ilike(like_term)
         )
 
     recetas_db = query.order_by(Receta.nombre.asc()).all()
@@ -141,7 +130,6 @@ def recetas_view():
 @login_required("ADMIN")
 def crear_receta():
     create_form = forms.RecetaForm()
-    cargar_productos_sin_receta(create_form)
     materias_primas = obtener_materias_primas_activas()
     detalles_form = []
 
@@ -149,24 +137,9 @@ def crear_receta():
         detalles_form, errores_detalle = extraer_detalles_receta_desde_form()
 
         if create_form.validate() and not errores_detalle:
-            id_producto = create_form.id_producto.data
-            if id_producto == 0:
-                id_producto = None
             nombre = create_form.nombre.data.strip()
 
-            if id_producto is not None:
-                existe_producto = Receta.query.filter_by(id_producto=id_producto).first()
-                if existe_producto:
-                    flash("Ese producto ya tiene una receta registrada.", "warning")
-                    return render_template(
-                        "private/recetas/recetas_create.html",
-                        form=create_form,
-                        materias_primas=materias_primas,
-                        detalles_form=detalles_form,
-                    )
-
             receta_db = Receta(
-                id_producto=id_producto,
                 nombre=nombre,
                 rendimiento=Decimal(str(create_form.rendimiento.data)),
                 costo_estimado=0,
@@ -211,7 +184,6 @@ def crear_receta():
 @login_required("ADMIN")
 def actualizar_receta():
     create_form = forms.RecetaForm()
-    cargar_productos_receta(create_form)
     materias_primas = obtener_materias_primas_activas()
     id_receta = request.args.get("id")
 
@@ -221,7 +193,6 @@ def actualizar_receta():
         return redirect(url_for("recetas.recetas_view"))
 
     if request.method == "GET":
-        create_form.id_producto.data = receta_db.id_producto if receta_db.id_producto else 0
         create_form.nombre.data = receta_db.nombre
         create_form.rendimiento.data = receta_db.rendimiento
         create_form.activo.data = receta_db.activo
@@ -248,27 +219,6 @@ def actualizar_receta():
     detalles_form, errores_detalle = extraer_detalles_receta_desde_form()
 
     if create_form.validate() and not errores_detalle:
-        id_producto = create_form.id_producto.data
-        if id_producto == 0:
-            id_producto = None
-
-        if id_producto is not None:
-            existe_producto = Receta.query.filter(
-                Receta.id_producto == id_producto,
-                Receta.id_receta != receta_db.id_receta,
-            ).first()
-
-            if existe_producto:
-                flash("Ese producto ya tiene otra receta registrada.", "warning")
-                return render_template(
-                    "private/recetas/recetas_update.html",
-                    form=create_form,
-                    receta_db=receta_db,
-                    materias_primas=materias_primas,
-                    detalles_form=detalles_form,
-                )
-
-        receta_db.id_producto = id_producto
         receta_db.nombre = create_form.nombre.data.strip()
         receta_db.rendimiento = Decimal(str(create_form.rendimiento.data))
         receta_db.activo = create_form.activo.data
@@ -312,7 +262,6 @@ def actualizar_receta():
 @login_required("ADMIN")
 def eliminar_receta():
     create_form = forms.RecetaForm()
-    cargar_productos_receta(create_form)
     id_receta = request.args.get("id")
 
     receta_db = Receta.query.filter(Receta.id_receta == id_receta).first()
@@ -321,7 +270,6 @@ def eliminar_receta():
         return redirect(url_for("recetas.recetas_view"))
 
     if request.method == "GET":
-        create_form.id_producto.data = receta_db.id_producto if receta_db.id_producto else 0
         create_form.nombre.data = receta_db.nombre
         create_form.rendimiento.data = receta_db.rendimiento
         create_form.activo.data = receta_db.activo
@@ -343,12 +291,3 @@ def eliminar_receta():
     )
     flash("Receta desactivada correctamente.", "info")
     return redirect(url_for("recetas.recetas_view"))
-def cargar_productos_sin_receta(form):
-    productos = (
-        Producto.query
-        .filter_by(activo=1)
-        .filter(~Producto.id_producto.in_(db.session.query(Receta.id_producto)))
-        .order_by(Producto.nombre.asc())
-        .all()
-    )
-    form.id_producto.choices = [(p.id_producto, p.nombre) for p in productos]

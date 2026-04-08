@@ -28,6 +28,11 @@ def parse_decimal(value, default="0"):
     except (InvalidOperation, TypeError, ValueError, AttributeError):
         return Decimal(default)
 
+def truncar_detalle_auditoria(texto, limite=255):
+    texto = (texto or "").strip()
+    if len(texto) <= limite:
+        return texto
+    return texto[:limite - 3].rstrip() + "..."
 
 def cargar_productos_produccion(form):
     productos = Producto.query.filter_by(activo=1).order_by(Producto.nombre.asc()).all()
@@ -187,10 +192,16 @@ def crear_produccion():
                 f"{item['nombre']} (requiere {item['cantidad_requerida']}, hay {item['stock_actual']})"
                 for item in insuficientes
             )
+
+            detalle_log = truncar_detalle_auditoria(
+                f"No fue posible registrar producción de '{producto_db.nombre}'. "
+                f"Insumos insuficientes: {detalle_error}"
+            )
+
             log_event(
                 modulo="Producción",
                 accion="Producción rechazada por stock insuficiente",
-                detalle=f"No fue posible registrar producción de '{producto_db.nombre}'. Insumos insuficientes: {detalle_error}",
+                detalle=detalle_log,
                 severidad="ERROR",
             )
             flash("No hay suficiente materia prima para registrar la orden.", "danger")
@@ -254,20 +265,43 @@ def crear_produccion():
 @produccion.route("/private/produccion/update", methods=["GET", "POST"])
 @login_required(["ADMIN", "EMPLEADO"])
 def actualizar_produccion():
-    create_form = forms.ProduccionForm()
-    cargar_productos_produccion(create_form)
     id_orden = request.args.get("id")
 
-    orden_db = OrdenProduccion.query.filter(OrdenProduccion.id_orden_produccion == id_orden).first()
+    orden_db = OrdenProduccion.query.filter(
+        OrdenProduccion.id_orden_produccion == id_orden
+    ).first()
+
     if not orden_db:
         flash("Orden de producción no encontrada.", "danger")
         return redirect(url_for("produccion.produccion_view"))
 
+    if orden_db.estado in ["COMPLETADA", "CANCELADA"]:
+        flash("No se puede modificar una orden completada o cancelada.", "danger")
+        return redirect(url_for("produccion.produccion_view"))
+
+    create_form = forms.ProduccionForm()
+    
+    create_form.id_producto.choices = [
+        (
+            orden_db.id_producto,
+            orden_db.producto.nombre if orden_db.producto else "Producto actual"
+        )
+    ]
+    create_form.id_producto.data = orden_db.id_producto
+    create_form.id_producto.validators = []
+
+    create_form.cantidad.data = orden_db.cantidad
+    create_form.cantidad.validators = []
+
+    create_form.estado.choices = [
+        ("PENDIENTE", "Pendiente"),
+        ("EN_PROCESO", "En proceso"),
+    ]
+
     if request.method == "GET":
-        create_form.id_producto.data = orden_db.id_producto
-        create_form.cantidad.data = orden_db.cantidad
         create_form.estado.data = orden_db.estado
         create_form.observaciones.data = orden_db.observaciones
+
         return render_template(
             "private/produccion/produccion_update.html",
             form=create_form,
@@ -278,16 +312,22 @@ def actualizar_produccion():
         estado_anterior = orden_db.estado
         estado_nuevo = create_form.estado.data
 
-        if estado_anterior in ["COMPLETADA", "CANCELADA"]:
-            flash("No se puede modificar una orden completada o cancelada.", "danger")
-            return redirect(url_for("produccion.produccion_view"))
+        if estado_nuevo not in ["PENDIENTE", "EN_PROCESO"]:
+            flash(
+                "Solo puedes cambiar la orden a Pendiente o En proceso desde esta vista.",
+                "danger",
+            )
+            return render_template(
+                "private/produccion/produccion_update.html",
+                form=create_form,
+                orden_db=orden_db,
+            )
 
-        if estado_nuevo == "COMPLETADA":
-            flash("La orden no se completa desde editar. Usa el botón 'Acabar'.", "warning")
-            return redirect(url_for("produccion.finalizar_produccion", id=orden_db.id_orden_produccion))
-
-        orden_db.observaciones = create_form.observaciones.data.strip() if create_form.observaciones.data else None
         orden_db.estado = estado_nuevo
+        orden_db.observaciones = (
+            create_form.observaciones.data.strip()
+            if create_form.observaciones.data else None
+        )
 
         db.session.add(orden_db)
         db.session.commit()
@@ -296,8 +336,9 @@ def actualizar_produccion():
             modulo="Producción",
             accion="Orden de producción actualizada",
             detalle=f"Orden {orden_db.folio} cambió de {estado_anterior} a {estado_nuevo}",
-            severidad="INFO" if estado_nuevo != "CANCELADA" else "WARNING",
+            severidad="INFO",
         )
+
         flash("Orden de producción actualizada correctamente.", "success")
         return redirect(url_for("produccion.produccion_view"))
 
@@ -360,10 +401,14 @@ def finalizar_produccion():
 
         if insuficientes:
             flash("No hay suficiente materia prima para finalizar la orden.", "danger")
+            detalle_log = truncar_detalle_auditoria(
+                f"Orden {orden_db.folio}. Insumos insuficientes: {', '.join(insuficientes)}"
+            )
+
             log_event(
                 modulo="Producción",
                 accion="Finalización rechazada por stock insuficiente",
-                detalle=f"Orden {orden_db.folio}. Insumos insuficientes: {', '.join(insuficientes)}",
+                detalle=detalle_log,
                 severidad="ERROR",
             )
             return render_template(

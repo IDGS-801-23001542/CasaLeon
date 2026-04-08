@@ -8,7 +8,7 @@
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
     <div>
       <h1 class="text-3xl font-bold mb-2">Editar Producción</h1>
-      <p class="text-gray-500">Actualiza el estado operativo y revisa el consumo registrado de la orden</p>
+      <p class="text-gray-500">Actualiza el estado operativo de la orden y revisa su consumo registrado</p>
     </div>
     <a href="{{ url_for('produccion.produccion_view') }}"
        class="px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
@@ -45,9 +45,32 @@
           {{ form.hidden_tag() }}
           {{ ui.form_errors(form) }}
 
-          {{ ui.select_field(form.id_producto) }}
-          {{ ui.field(form.cantidad, placeholder="Cantidad a producir") }}
-          {{ ui.select_field(form.estado) }}
+          <div>
+            <label class="block mb-2 text-sm font-medium text-gray-900">Producto</label>
+            <input
+              type="text"
+              value="{{ orden_db.producto.nombre if orden_db.producto else 'Sin producto' }}"
+              disabled
+              class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed"
+            />
+          </div>
+
+          <div>
+            <label class="block mb-2 text-sm font-medium text-gray-900">Cantidad a producir</label>
+            <input
+              type="text"
+              value="{{ orden_db.cantidad|num(4) }}"
+              disabled
+              class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed"
+            />
+          </div>
+
+          <div>
+            {{ ui.select_field(form.estado) }}
+            <p class="text-xs text-gray-500 -mt-2">
+              Desde esta vista solo se permite cambiar entre Pendiente y En proceso.
+            </p>
+          </div>
 
           <div>
             <label class="block mb-2 text-sm font-medium text-gray-900">
@@ -65,19 +88,11 @@
             {% endif %}
           </div>
 
-          {% if orden_db.estado in ['COMPLETADA', 'CANCELADA'] %}
-            <div class="rounded-xl border border-yellow-200 bg-yellow-50 px-4 py-3">
-              <p class="text-sm text-yellow-700">
-                Esta orden ya está {{ orden_db.estado|lower }}. No se permiten más cambios.
-              </p>
-            </div>
-          {% else %}
-            <div class="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3">
-              <p class="text-sm text-blue-700">
-                Para terminar inventario, sobrantes y merma, usa el botón <strong>Acabar</strong> desde el listado de producción.
-              </p>
-            </div>
-          {% endif %}
+          <div class="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
+            <p class="text-sm text-gray-700">
+              Desde esta vista solo puedes actualizar el estado operativo y las observaciones de la orden.
+            </p>
+          </div>
 
           <div class="pt-2">
             <button type="submit"

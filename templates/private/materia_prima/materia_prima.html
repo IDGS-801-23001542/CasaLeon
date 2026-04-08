@@ -20,28 +20,28 @@
   </div>
 
   {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <div class="space-y-3">
-        {% for category, message in messages %}
-          <div class="px-4 py-3 rounded-xl border
-            {% if category == 'success' %}
-              bg-green-50 border-green-200 text-green-700
-            {% elif category == 'warning' %}
-              bg-yellow-50 border-yellow-200 text-yellow-700
-            {% elif category == 'danger' %}
-              bg-red-50 border-red-200 text-red-700
-            {% else %}
-              bg-blue-50 border-blue-200 text-blue-700
-            {% endif %}
-          ">
-            {{ message }}
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
+  {% if messages %}
+  <div class="space-y-3">
+    {% for category, message in messages %}
+    <div class="px-4 py-3 rounded-xl border
+      {% if category == 'success' %}
+        bg-green-50 border-green-200 text-green-700
+      {% elif category == 'warning' %}
+        bg-yellow-50 border-yellow-200 text-yellow-700
+      {% elif category == 'danger' %}
+        bg-red-50 border-red-200 text-red-700
+      {% else %}
+        bg-blue-50 border-blue-200 text-blue-700
+      {% endif %}
+    ">
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
   {% endwith %}
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
     <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
       <div class="flex items-center gap-3 mb-2">
         <div class="p-2 bg-blue-100 rounded-lg">
@@ -81,6 +81,16 @@
       </div>
       <p class="text-2xl font-bold">{{ stock_bajo }}</p>
     </div>
+
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="p-2 bg-gray-100 rounded-lg">
+          <span class="text-gray-600 text-xl">🚫</span>
+        </div>
+        <p class="text-sm text-gray-500">Sin stock</p>
+      </div>
+      <p class="text-2xl font-bold">{{ sin_stock }}</p>
+    </div>
   </div>
 
   <div class="flex flex-col md:flex-row gap-4">
@@ -105,170 +115,236 @@
     </form>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-    {% for materia in materias_db %}
+  <div class="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[1100px]">
+        <thead class="bg-gray-50 border-b border-gray-200">
+          <tr class="text-left text-sm text-gray-600">
+            <th class="px-4 py-4 font-semibold">Materia Prima</th>
+            <th class="px-4 py-4 font-semibold">Categoría</th>
+            <th class="px-4 py-4 font-semibold">Stock Actual</th>
+            <th class="px-4 py-4 font-semibold">Stock Mínimo</th>
+            <th class="px-4 py-4 font-semibold">Precio Unitario</th>
+            <th class="px-4 py-4 font-semibold">Estado</th>
+            <th class="px-4 py-4 font-semibold text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for materia in materias_db %}
+            {% set stock_num = materia.stock_actual|float %}
+            {% set stock_min = materia.stock_minimo|float %}
 
-      {% set stock_num = materia.stock_actual|float %}
-      {% set stock_min = materia.stock_minimo|float %}
-      {% set valor_total = stock_num * (materia.costo_unit_prom|float) %}
-
-      {% if stock_num == 0 %}
-        {% set stock_label = 'Sin stock' %}
-        {% set stock_bg = 'bg-red-100 text-red-700' %}
-        {% set stock_icon = '🚫' %}
-        {% set barra_bg = 'bg-red-500' %}
-        {% set barra_width = 4 %}
-      {% elif stock_num <= stock_min %}
-        {% set stock_label = 'Stock bajo' %}
-        {% set stock_bg = 'bg-yellow-100 text-yellow-700' %}
-        {% set stock_icon = '⚠️' %}
-        {% set barra_bg = 'bg-yellow-500' %}
-        {% set barra_width = 35 %}
-      {% else %}
-        {% set stock_label = 'Disponible' %}
-        {% set stock_bg = 'bg-green-100 text-green-700' %}
-        {% set stock_icon = '✅' %}
-        {% set barra_bg = 'bg-green-500' %}
-        {% set barra_width = 100 %}
-      {% endif %}
-
-      <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all">
-        <div class="flex items-start justify-between mb-4 gap-3">
-          <div class="flex-1">
-            <h3 class="font-bold text-lg mb-1">{{ materia.nombre }}</h3>
-            <p class="text-sm text-gray-500">
-              {{ materia.categoria_mp.nombre if materia.categoria_mp else 'Sin categoría' }}
-            </p>
-          </div>
-          <span class="px-3 py-1 rounded-full text-xs flex items-center gap-1 {{ stock_bg }}">
-            <span>{{ stock_icon }}</span>
-            {{ stock_label }}
-          </span>
-        </div>
-
-        <div class="space-y-3 mb-4">
-          <div class="flex justify-between text-sm gap-3">
-            <span class="text-gray-500">Unidad:</span>
-            <span class="font-medium text-right">
-              {{ materia.unidad_medida_rel.nombre if materia.unidad_medida_rel else 'Sin unidad' }}
-            </span>
-          </div>
-
-          <div class="flex justify-between text-sm gap-3">
-            <span class="text-gray-500">Stock Actual:</span>
-            <span class="font-medium text-right">{{ materia.stock_actual|num(4) }}</span>
-          </div>
-
-          <div class="flex justify-between text-sm gap-3">
-            <span class="text-gray-500">Stock Mínimo:</span>
-            <span class="font-medium text-right">{{ materia.stock_minimo|num(4) }}</span>
-          </div>
-
-          <div class="flex justify-between text-sm gap-3">
-            <span class="text-gray-500">Costo Unitario:</span>
-            <span class="font-medium text-right">${{ materia.costo_unit_prom|money }}</span>
-          </div>
-
-          <div class="flex justify-between text-sm gap-3">
-            <span class="text-gray-500">Merma:</span>
-            <span class="font-medium text-right">{{ materia.merma_pct|num(2) }}%</span>
-          </div>
-
-          <div class="flex justify-between text-sm gap-3">
-            <span class="text-gray-500">Estatus:</span>
-            <span class="font-medium text-right">
-              {{ 'Activa' if materia.activo == 1 else 'Inactiva' }}
-            </span>
-          </div>
-
-          <div class="flex justify-between text-sm pt-2 border-t border-gray-200 gap-3">
-            <span class="text-gray-500">Valor Total:</span>
-            <span class="font-bold text-blue-600">
-              ${{ "%.2f"|format(valor_total) }}
-            </span>
-          </div>
-        </div>
-
-        <div class="mb-4">
-          <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
-            <div
-              class="h-full {{ barra_bg }}"
-              style="width: {{ barra_width }}%;"
-            ></div>
-          </div>
-        </div>
-
-        <div class="flex flex-col gap-2">
-          <form
-            method="POST"
-            action="{{ url_for('materia_prima.movimiento_materia_prima') }}"
-            class="grid grid-cols-1 sm:grid-cols-3 gap-2"
-          >
-            <input type="hidden" name="id" value="{{ materia.id_materia_prima }}">
-
-            <select
-              name="tipo"
-              class="px-3 py-2 border border-gray-200 rounded-xl text-sm"
-              required
-            >
-              <option value="ENTRADA">Entrada</option>
-              <option value="SALIDA">Salida</option>
-            </select>
-
-            <input
-              type="number"
-              step="0.0001"
-              min="0.0001"
-              name="cantidad"
-              placeholder="Cantidad"
-              class="px-3 py-2 border border-gray-200 rounded-xl text-sm"
-              required
-            >
-
-            <button
-              type="submit"
-              class="px-4 py-2 bg-emerald-600 text-white rounded-xl hover:shadow-lg transition-all text-sm"
-            >
-              Mover
-            </button>
-
-            <div class="sm:col-span-3">
-              <input
-                type="text"
-                name="motivo"
-                placeholder="Motivo del movimiento"
-                class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"
-              >
-            </div>
-          </form>
-
-          <div class="flex gap-2">
-            <a
-              href="{{ url_for('materia_prima.actualizar_materia_prima', id=materia.id_materia_prima) }}"
-              class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all"
-            >
-              Editar
-            </a>
-
-            {% if g.role == 'ADMIN' %}
-            <a
-              href="{{ url_for('materia_prima.eliminar_materia_prima', id=materia.id_materia_prima) }}"
-              class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl hover:shadow-lg transition-all"
-            >
-              Desactivar
-            </a>
+            {% if stock_num == 0 %}
+              {% set stock_label = 'Sin stock' %}
+              {% set stock_bg = 'bg-red-100 text-red-700' %}
+            {% elif stock_num <= stock_min %}
+              {% set stock_label = 'Stock bajo' %}
+              {% set stock_bg = 'bg-yellow-100 text-yellow-700' %}
+            {% else %}
+              {% set stock_label = 'Disponible' %}
+              {% set stock_bg = 'bg-green-100 text-green-700' %}
             {% endif %}
-          </div>
-        </div>
-      </div>
 
-    {% else %}
-      <div class="md:col-span-2 lg:col-span-3 bg-white rounded-2xl p-8 border border-gray-200 shadow-md text-center">
-        <p class="text-lg font-semibold text-gray-700 mb-2">No hay materias primas registradas</p>
-        <p class="text-gray-500">Cuando agregues materiales, aparecerán aquí.</p>
-      </div>
-    {% endfor %}
+          <tr class="border-b border-gray-100 hover:bg-gray-50">
+            <td class="px-4 py-4">
+              <div class="font-semibold text-gray-900">{{ materia.nombre }}</div>
+              <div class="mt-2">
+                <span class="px-3 py-1 rounded-full text-xs font-medium {{ stock_bg }}">
+                  {{ stock_label }}
+                </span>
+              </div>
+            </td>
+
+            <td class="px-4 py-4 text-gray-700">
+              {{ materia.categoria_mp.nombre if materia.categoria_mp else 'Sin categoría' }}
+            </td>
+
+            <td class="px-4 py-4 text-gray-700">
+              {{ materia.stock_actual|num(4) }}
+              {% if materia.unidad_medida_rel %}{{ materia.unidad_medida_rel.nombre }}{% endif %}
+            </td>
+
+            <td class="px-4 py-4 text-gray-700">
+              {{ materia.stock_minimo|num(4) }}
+              {% if materia.unidad_medida_rel %}{{ materia.unidad_medida_rel.nombre }}{% endif %}
+            </td>
+
+            <td class="px-4 py-4 text-gray-700">
+              ${{ materia.costo_unit_prom|money }}
+            </td>
+
+            <td class="px-4 py-4">
+              <span class="px-3 py-1 rounded-full text-xs font-medium {% if materia.activo == 1 %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">
+                {{ 'Activo' if materia.activo == 1 else 'Inactivo' }}
+              </span>
+            </td>
+
+            <td class="px-4 py-4">
+              <div class="flex items-center justify-center gap-2 flex-wrap">
+                <button
+                  type="button"
+                  class="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-xl hover:bg-emerald-200 transition-colors"
+                  onclick="abrirModalMovimiento(
+                    '{{ materia.id_materia_prima }}',
+                    '{{ materia.nombre|e }}'
+                  )"
+                >
+                  Mover
+                </button>
+
+                <a
+                  href="{{ url_for('materia_prima.actualizar_materia_prima', id=materia.id_materia_prima) }}"
+                  class="px-4 py-2 bg-blue-100 text-blue-700 rounded-xl hover:bg-blue-200 transition-colors"
+                >
+                  Editar
+                </a>
+
+                {% if g.role == 'ADMIN' %}
+                <a
+                  href="{{ url_for('materia_prima.eliminar_materia_prima', id=materia.id_materia_prima) }}"
+                  class="px-4 py-2 bg-red-100 text-red-700 rounded-xl hover:bg-red-200 transition-colors"
+                >
+                  Desactivar
+                </a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="7" class="px-6 py-10 text-center text-gray-500">
+              No hay materias primas registradas.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 
 </div>
+
+<div id="modal-movimiento" class="fixed inset-0 z-50 hidden">
+  <div class="absolute inset-0 bg-black/50" onclick="cerrarModalMovimiento()"></div>
+
+  <div class="relative min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-gray-200">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+        <div>
+          <h2 class="text-xl font-bold text-gray-900">Registrar movimiento</h2>
+          <p id="modal-materia-nombre" class="text-sm text-gray-500"></p>
+        </div>
+        <button
+          type="button"
+          onclick="cerrarModalMovimiento()"
+          class="text-gray-400 hover:text-gray-700 text-xl"
+        >
+          ✕
+        </button>
+      </div>
+
+      <form method="POST" action="{{ url_for('materia_prima.movimiento_materia_prima') }}" class="p-6 space-y-4">
+        <input type="hidden" name="id" id="modal-id-materia">
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Tipo de movimiento</label>
+          <select
+            name="tipo"
+            id="modal-tipo-movimiento"
+            class="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm"
+            required
+            onchange="toggleProveedorField()"
+          >
+            <option value="ENTRADA">Entrada</option>
+            <option value="SALIDA">Salida</option>
+          </select>
+        </div>
+
+        <div id="contenedor-proveedor">
+          <label class="block mb-2 text-sm font-medium text-gray-900">Proveedor</label>
+          <select
+            name="id_proveedor"
+            id="modal-id-proveedor"
+            class="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm"
+          >
+            <option value="">Selecciona un proveedor</option>
+            {% for proveedor in proveedores_db %}
+            <option value="{{ proveedor.id_proveedor }}">{{ proveedor.nombre }}</option>
+            {% endfor %}
+          </select>
+          <p class="mt-1 text-xs text-gray-500">Obligatorio solo para entradas.</p>
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Cantidad</label>
+          <input
+            type="number"
+            step="0.0001"
+            min="0.0001"
+            name="cantidad"
+            class="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm"
+            placeholder="Cantidad"
+            required
+          >
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Motivo</label>
+          <input
+            type="text"
+            name="motivo"
+            class="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm"
+            placeholder="Motivo del movimiento"
+          >
+        </div>
+
+        <div class="flex gap-3 pt-2">
+          <button
+            type="button"
+            onclick="cerrarModalMovimiento()"
+            class="flex-1 px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="flex-1 px-4 py-3 bg-emerald-600 text-white rounded-xl hover:shadow-lg transition-all"
+          >
+            Guardar movimiento
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function abrirModalMovimiento(id, nombre) {
+    document.getElementById("modal-id-materia").value = id;
+    document.getElementById("modal-materia-nombre").textContent = nombre;
+    document.getElementById("modal-tipo-movimiento").value = "ENTRADA";
+    document.getElementById("modal-id-proveedor").value = "";
+    document.getElementById("modal-movimiento").classList.remove("hidden");
+    toggleProveedorField();
+  }
+
+  function cerrarModalMovimiento() {
+    document.getElementById("modal-movimiento").classList.add("hidden");
+  }
+
+  function toggleProveedorField() {
+    const tipo = document.getElementById("modal-tipo-movimiento").value;
+    const contenedor = document.getElementById("contenedor-proveedor");
+    const selectProveedor = document.getElementById("modal-id-proveedor");
+
+    if (tipo === "ENTRADA") {
+      contenedor.classList.remove("hidden");
+      selectProveedor.setAttribute("required", "required");
+    } else {
+      contenedor.classList.add("hidden");
+      selectProveedor.removeAttribute("required");
+      selectProveedor.value = "";
+    }
+  }
+</script>
 {% endblock %}

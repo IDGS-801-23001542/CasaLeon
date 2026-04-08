@@ -17,7 +17,7 @@ class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.getenv(
         "DATABASE_URL",
-        "mysql+pymysql://root:root@127.0.0.1/fabrica_pieles2"
+        "mysql+pymysql://root:1234@127.0.0.1/fabrica_pieles2"
     )
     TOKEN_EXPIRES_MINUTES = 10
 
