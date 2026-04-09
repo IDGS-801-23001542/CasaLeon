@@ -35,6 +35,10 @@ def upload_product_image(file_storage):
     return result.get("secure_url")
 
 
+def generar_sku_producto(id_producto):
+    return f"PROD{id_producto:04d}"
+
+
 def cargar_categorias(form):
     categorias = CategoriaProducto.query.order_by(CategoriaProducto.nombre.asc()).all()
     form.id_categoria_producto.choices = [
@@ -43,7 +47,9 @@ def cargar_categorias(form):
 
 
 def cargar_recetas_disponibles(form, producto_id_actual=None):
-    query = Receta.query.filter_by(activo=1)
+    total_recetas_activas = Receta.query.filter(Receta.activo == 1).count()
+
+    query = Receta.query.filter(Receta.activo == 1)
 
     if producto_id_actual:
         query = query.filter(
@@ -56,6 +62,15 @@ def cargar_recetas_disponibles(form, producto_id_actual=None):
 
     recetas = query.order_by(Receta.nombre.asc()).all()
     form.id_receta.choices = [(r.id_receta, r.nombre) for r in recetas]
+
+    if total_recetas_activas == 0:
+        mensaje = "No hay recetas activas. Debes crear y activar una receta antes de registrar productos."
+    elif len(recetas) == 0:
+        mensaje = "Todas las recetas activas ya están asignadas a productos. Debes liberar una receta o crear una nueva."
+    else:
+        mensaje = None
+
+    return len(recetas) == 0, mensaje
 
 
 @productos.route("/private/productos", methods=["GET"])
@@ -85,7 +100,6 @@ def listado_productos():
     query = query.order_by(Producto.nombre.asc())
 
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
-
     productos_db = pagination.items
 
     total_productos = Producto.query.count()
@@ -115,11 +129,19 @@ def listado_productos():
 def crear_producto():
     create_form = forms.ProductoForm()
     cargar_categorias(create_form)
-    cargar_recetas_disponibles(create_form)
+    sin_recetas, mensaje_recetas = cargar_recetas_disponibles(create_form)
 
     if request.method == "POST":
+        if sin_recetas:
+            flash(mensaje_recetas, "warning")
+            return render_template(
+                "private/productos/productos_create.html",
+                form=create_form,
+                sin_recetas=sin_recetas,
+                mensaje_recetas=mensaje_recetas,
+            )
+
         if create_form.validate():
-            sku = create_form.sku.data.strip().upper() if create_form.sku.data else None
             nombre = create_form.nombre.data.strip()
 
             existe_nombre = Producto.query.filter(
@@ -128,18 +150,11 @@ def crear_producto():
             if existe_nombre:
                 flash("Ya existe un producto con ese nombre.", "warning")
                 return render_template(
-                    "private/productos/productos_create.html", form=create_form
+                    "private/productos/productos_create.html",
+                    form=create_form,
+                    sin_recetas=sin_recetas,
+                    mensaje_recetas=mensaje_recetas,
                 )
-
-            if sku:
-                existe_sku = Producto.query.filter(
-                    db.func.upper(Producto.sku) == sku
-                ).first()
-                if existe_sku:
-                    flash("Ya existe un producto con ese SKU.", "warning")
-                    return render_template(
-                        "private/productos/productos_create.html", form=create_form
-                    )
 
             receta_db = Receta.query.filter(
                 Receta.id_receta == create_form.id_receta.data, Receta.activo == 1
@@ -148,7 +163,10 @@ def crear_producto():
             if not receta_db:
                 flash("La receta seleccionada no es válida.", "warning")
                 return render_template(
-                    "private/productos/productos_create.html", form=create_form
+                    "private/productos/productos_create.html",
+                    form=create_form,
+                    sin_recetas=sin_recetas,
+                    mensaje_recetas=mensaje_recetas,
                 )
 
             if receta_db.id_producto is not None:
@@ -157,7 +175,10 @@ def crear_producto():
                     "warning",
                 )
                 return render_template(
-                    "private/productos/productos_create.html", form=create_form
+                    "private/productos/productos_create.html",
+                    form=create_form,
+                    sin_recetas=sin_recetas,
+                    mensaje_recetas=mensaje_recetas,
                 )
 
             image_file = request.files.get("imagen")
@@ -166,19 +187,22 @@ def crear_producto():
             if image_url == "INVALID_EXTENSION":
                 flash("La imagen debe ser png, jpg, jpeg o webp.", "warning")
                 return render_template(
-                    "private/productos/productos_create.html", form=create_form
+                    "private/productos/productos_create.html",
+                    form=create_form,
+                    sin_recetas=sin_recetas,
+                    mensaje_recetas=mensaje_recetas,
                 )
 
             producto = Producto(
                 id_categoria_producto=create_form.id_categoria_producto.data,
-                sku=sku,
+                sku=None,
                 nombre=nombre,
                 descripcion=create_form.descripcion.data.strip()
                 if create_form.descripcion.data
                 else None,
                 imagen=image_url,
                 precio_venta=create_form.precio_venta.data,
-                stock_actual=create_form.stock_actual.data,
+                stock_actual=0,
                 costo_unit_prom=receta_db.costo_estimado or 0,
                 activo=1,
             )
@@ -186,21 +210,28 @@ def crear_producto():
             db.session.add(producto)
             db.session.flush()
 
+            producto.sku = generar_sku_producto(producto.id_producto)
             receta_db.id_producto = producto.id_producto
 
+            db.session.add(producto)
             db.session.add(receta_db)
             db.session.commit()
 
             log_event(
                 modulo="Inventario",
                 accion="Producto creado",
-                detalle=f"Producto '{producto.nombre}' creado y vinculado a receta '{receta_db.nombre}'",
+                detalle=f"Producto '{producto.nombre}' creado con SKU '{producto.sku}', stock inicial 0 y vinculado a receta '{receta_db.nombre}'",
                 severidad="INFO",
             )
             flash("Producto creado correctamente.", "success")
             return redirect(url_for("productos.listado_productos"))
 
-    return render_template("private/productos/productos_create.html", form=create_form)
+    return render_template(
+        "private/productos/productos_create.html",
+        form=create_form,
+        sin_recetas=sin_recetas,
+        mensaje_recetas=mensaje_recetas,
+    )
 
 
 @productos.route("/private/productos/update", methods=["GET", "POST"])
@@ -224,11 +255,9 @@ def actualizar_producto():
 
     if request.method == "GET":
         create_form.id_categoria_producto.data = producto_db.id_categoria_producto
-        create_form.sku.data = producto_db.sku
         create_form.nombre.data = producto_db.nombre
         create_form.descripcion.data = producto_db.descripcion
         create_form.precio_venta.data = producto_db.precio_venta
-        create_form.stock_actual.data = producto_db.stock_actual
         create_form.id_receta.data = receta_actual.id_receta if receta_actual else None
 
         return render_template(
@@ -239,7 +268,6 @@ def actualizar_producto():
         )
 
     if create_form.validate():
-        sku = create_form.sku.data.strip().upper() if create_form.sku.data else None
         nombre = create_form.nombre.data.strip()
 
         existe_nombre = Producto.query.filter(
@@ -254,20 +282,6 @@ def actualizar_producto():
                 producto_db=producto_db,
                 receta_actual=receta_actual,
             )
-
-        if sku:
-            existe_sku = Producto.query.filter(
-                db.func.upper(Producto.sku) == sku,
-                Producto.id_producto != producto_db.id_producto,
-            ).first()
-            if existe_sku:
-                flash("Ya existe otro producto con ese SKU.", "warning")
-                return render_template(
-                    "private/productos/productos_update.html",
-                    form=create_form,
-                    producto_db=producto_db,
-                    receta_actual=receta_actual,
-                )
 
         receta_nueva = Receta.query.filter(
             Receta.id_receta == create_form.id_receta.data, Receta.activo == 1
@@ -316,7 +330,6 @@ def actualizar_producto():
             producto_db.imagen = new_image_url
 
         producto_db.id_categoria_producto = create_form.id_categoria_producto.data
-        producto_db.sku = sku
         producto_db.nombre = nombre
         producto_db.descripcion = (
             create_form.descripcion.data.strip()
@@ -324,10 +337,11 @@ def actualizar_producto():
             else None
         )
         producto_db.precio_venta = create_form.precio_venta.data
-        producto_db.stock_actual = create_form.stock_actual.data
         producto_db.costo_unit_prom = (
             receta_nueva.costo_estimado or producto_db.costo_unit_prom
         )
+        # stock_actual NO se modifica aquí
+        # sku NO se modifica aquí
 
         db.session.add(receta_nueva)
         db.session.add(producto_db)
@@ -336,7 +350,7 @@ def actualizar_producto():
         log_event(
             modulo="Inventario",
             accion="Producto actualizado",
-            detalle=f"Producto '{producto_db.nombre}' actualizado",
+            detalle=f"Producto '{producto_db.nombre}' actualizado sin alterar stock ni SKU",
             severidad="INFO",
         )
         flash("Producto actualizado correctamente.", "success")
@@ -371,11 +385,9 @@ def eliminar_producto():
 
     if request.method == "GET":
         create_form.id_categoria_producto.data = producto_db.id_categoria_producto
-        create_form.sku.data = producto_db.sku
         create_form.nombre.data = producto_db.nombre
         create_form.descripcion.data = producto_db.descripcion
         create_form.precio_venta.data = producto_db.precio_venta
-        create_form.stock_actual.data = producto_db.stock_actual
         create_form.id_receta.data = receta_actual.id_receta if receta_actual else None
 
         return render_template(

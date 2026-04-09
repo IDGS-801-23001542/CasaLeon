@@ -29,11 +29,30 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {{ ui.select_field(form.id_categoria_producto) }}
         {{ ui.select_field(form.id_receta) }}
-        {{ ui.field(form.sku, placeholder="SKU") }}
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">SKU</label>
+          <input
+            type="text"
+            value="{{ producto_db.sku }}"
+            disabled
+            class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed"
+          />
+        </div>
+
         {{ ui.field(form.nombre, placeholder="Nombre del producto") }}
         {{ ui.field(form.descripcion, placeholder="Descripción") }}
         {{ ui.field(form.precio_venta, placeholder="Precio de venta") }}
-        {{ ui.field(form.stock_actual, placeholder="Stock actual") }}
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Stock actual</label>
+          <input
+            type="text"
+            value="{{ '%.2f'|format(producto_db.stock_actual or 0) }}"
+            disabled
+            class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed"
+          />
+        </div>
 
         <div>
           <label class="block mb-2 text-sm font-medium text-gray-900">Costo unitario promedio</label>
@@ -85,7 +104,7 @@
 
       <div class="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3">
         <p class="text-sm text-blue-700">
-          Puedes reemplazar la imagen del producto seleccionando un nuevo archivo. Si no eliges uno, se conservará la imagen actual.
+          Puedes reemplazar la imagen del producto seleccionando un nuevo archivo. Si no eliges uno, se conservará la imagen actual. El SKU y el stock no se modifican aquí; el stock solo cambia desde producción.
         </p>
       </div>
 
