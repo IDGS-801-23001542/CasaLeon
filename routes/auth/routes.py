@@ -170,7 +170,8 @@ def post_login():
     if g.role == "EMPLEADO":
         return redirect(url_for("tienda.vendedor_dashboard"))
 
-    return redirect(url_for("tienda.cliente_dashboard"))
+    # CLIENTE -> abrir catálogo, no mi cuenta
+    return redirect(url_for("tienda.productos_publico"))
 
 
 @auth.route("/logout")

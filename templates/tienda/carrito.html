@@ -3,99 +3,137 @@
 {% block title %}Carrito | Casa León{% endblock %}
 
 {% block body %}
-<section class="bg-stone-50 min-h-[calc(100vh-120px)]">
-  <div class="max-w-screen-2xl mx-auto px-6 py-16">
-    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
+<section class="bg-white min-h-[calc(100vh-120px)]">
+  <div class="mx-auto max-w-screen-2xl px-4 py-14 sm:px-6 lg:py-16">
+    <div class="flex flex-col gap-4 border-b border-stone-200 pb-8 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h1 class="text-4xl font-extrabold text-emerald-900">Mi carrito</h1>
-        <p class="text-gray-600 mt-2">Revisa tus productos antes de continuar al checkout.</p>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">Compra</p>
+        <h1 class="mt-2 text-4xl font-semibold text-stone-900 sm:text-5xl">Mi carrito</h1>
+        <p class="mt-4 max-w-2xl text-base leading-8 text-stone-600">
+          Revisa tus productos antes de continuar con tu compra simulada.
+        </p>
       </div>
 
-      <a href="{{ url_for('tienda.productos_publico') }}"
-         class="text-emerald-900 bg-white border border-emerald-800 hover:bg-emerald-50 focus:ring-4 focus:outline-none focus:ring-emerald-200 font-medium rounded-xl text-sm px-5 py-3 text-center">
+      <a
+        href="{{ url_for('tienda.productos_publico') }}"
+        class="inline-flex items-center justify-center rounded-full border border-stone-200 px-6 py-3 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
+      >
         Seguir comprando
       </a>
     </div>
 
     {% if items %}
-      <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        <div class="xl:col-span-2 space-y-5">
+      <div class="mt-10 grid gap-8 xl:grid-cols-[1.3fr_.7fr]">
+        <div class="space-y-5">
           {% for item in items %}
-            <div class="bg-white border border-gray-200 rounded-3xl shadow-sm p-6">
-              <div class="flex flex-col md:flex-row md:items-center gap-5">
-                <div class="w-full md:w-36 h-36 rounded-2xl bg-stone-100 overflow-hidden flex-shrink-0">
+            <article class="overflow-hidden rounded-[32px] border border-stone-200 bg-white shadow-sm">
+              <div class="flex flex-col gap-6 p-6 md:flex-row md:items-center">
+                <div class="flex h-32 w-full items-center justify-center overflow-hidden rounded-[28px] bg-stone-50 p-4 md:w-36 md:h-36">
                   {% if item.imagen %}
-                    <img src="{{ url_for('static', filename=item.imagen) }}"
-                         alt="{{ item.nombre }}"
-                         class="w-full h-full object-cover">
+                    <img
+                      src="{{ url_for('static', filename=item.imagen) }}"
+                      alt="{{ item.nombre }}"
+                      class="max-h-full w-auto object-contain"
+                    >
                   {% else %}
-                    <div class="w-full h-full flex items-center justify-center text-gray-400 font-semibold">
+                    <div class="flex h-full w-full items-center justify-center rounded-2xl border border-dashed border-stone-300 text-sm text-stone-400">
                       Sin imagen
                     </div>
                   {% endif %}
                 </div>
 
                 <div class="flex-1">
-                  <h2 class="text-2xl font-bold text-emerald-900">{{ item.nombre }}</h2>
-                  <p class="text-gray-500 mt-2">Precio unitario: ${{ "{:,.2f}".format(item.precio) }}</p>
-                  <p class="text-gray-500">Cantidad en carrito: {{ item.cantidad }}</p>
+                  <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <h2 class="text-2xl font-medium text-stone-900">{{ item.nombre }}</h2>
+                      <p class="mt-2 text-sm text-stone-500">Precio unitario: ${{ "{:,.2f}".format(item.precio) }}</p>
+                      <p class="mt-1 text-sm text-stone-500">Stock disponible: {{ item.stock }}</p>
+                    </div>
 
-                  <div class="mt-4 flex flex-col sm:flex-row sm:items-center gap-3">
-                    <form method="POST" action="{{ url_for('tienda.actualizar_carrito', id_producto=item.id_producto) }}" class="flex items-center gap-3">
-                      <input type="number"
-                             name="cantidad"
-                             min="1"
-                             max="{{ item.stock }}"
-                             value="{{ item.cantidad }}"
-                             class="w-24 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-700 focus:border-emerald-700 p-3">
-                      <button type="submit"
-                              class="text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-xl text-sm px-5 py-3 text-center">
+                    <div class="sm:text-right">
+                      <p class="text-xs uppercase tracking-[0.16em] text-stone-400">Subtotal</p>
+                      <p class="mt-2 text-2xl font-semibold text-stone-900">
+                        ${{ "{:,.2f}".format(item.precio * item.cantidad) }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="mt-6 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                    <form
+                      method="POST"
+                      action="{{ url_for('tienda.actualizar_carrito', id_producto=item.id_producto) }}"
+                      class="flex flex-col gap-3 sm:flex-row sm:items-center"
+                    >
+                      <label class="text-sm font-medium text-stone-700">Cantidad</label>
+                      <input
+                        type="number"
+                        name="cantidad"
+                        min="1"
+                        max="{{ item.stock }}"
+                        value="{{ item.cantidad }}"
+                        class="w-28 rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-900 focus:border-stone-400 focus:ring-stone-300"
+                      >
+                      <button
+                        type="submit"
+                        class="inline-flex items-center justify-center rounded-full bg-stone-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-stone-800"
+                      >
                         Actualizar
                       </button>
                     </form>
 
                     <form method="POST" action="{{ url_for('tienda.eliminar_carrito', id_producto=item.id_producto) }}">
-                      <button type="submit"
-                              class="text-red-700 bg-red-50 border border-red-200 hover:bg-red-100 focus:ring-4 focus:outline-none focus:ring-red-200 font-medium rounded-xl text-sm px-5 py-3 text-center">
+                      <button
+                        type="submit"
+                        class="inline-flex items-center justify-center rounded-full border border-red-200 bg-red-50 px-5 py-3 text-sm font-medium text-red-700 transition hover:bg-red-100"
+                      >
                         Eliminar
                       </button>
                     </form>
                   </div>
                 </div>
-
-                <div class="md:text-right">
-                  <p class="text-sm text-gray-500">Subtotal</p>
-                  <p class="text-3xl font-extrabold text-emerald-900">
-                    ${{ "{:,.2f}".format(item.precio * item.cantidad) }}
-                  </p>
-                </div>
               </div>
-            </div>
+            </article>
           {% endfor %}
         </div>
 
-        <div>
-          <div class="bg-white border border-gray-200 rounded-3xl shadow-sm p-6 sticky top-6">
-            <h2 class="text-2xl font-bold text-emerald-900">Resumen</h2>
+        <aside>
+          <div class="sticky top-28 overflow-hidden rounded-[32px] border border-stone-200 bg-stone-950 p-6 text-white shadow-xl">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">Resumen</p>
+            <h2 class="mt-3 text-3xl font-semibold">Tu compra</h2>
 
-            <div class="border-t mt-6 pt-4 flex items-center justify-between text-xl font-bold text-emerald-900">
-              <span>Total</span>
-              <span>${{ "{:,.2f}".format(total) }}</span>
+            <div class="mt-8 space-y-4 border-t border-white/10 pt-6">
+              <div class="flex items-center justify-between text-sm text-white/80">
+                <span>Productos</span>
+                <span>{{ items|length }}</span>
+              </div>
+
+              <div class="flex items-center justify-between text-lg font-medium text-white">
+                <span>Total</span>
+                <span>${{ "{:,.2f}".format(total) }}</span>
+              </div>
             </div>
 
-            <a href="{{ url_for('tienda.checkout') }}"
-               class="mt-6 w-full inline-block text-center text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-bold rounded-xl text-lg px-5 py-4">
+            <a
+              href="{{ url_for('tienda.checkout') }}"
+              class="mt-8 inline-flex w-full items-center justify-center rounded-full bg-white px-6 py-4 text-sm font-medium text-stone-900 transition hover:bg-stone-100"
+            >
               Ir al checkout
             </a>
+
+            <p class="mt-4 text-sm leading-7 text-white/60">
+              Tu pedido se registrará como una compra simulada dentro del sistema.
+            </p>
           </div>
-        </div>
+        </aside>
       </div>
     {% else %}
-      <div class="bg-white border border-gray-200 rounded-3xl shadow-sm p-12 text-center">
-        <h2 class="text-3xl font-bold text-emerald-900">Tu carrito está vacío</h2>
-        <p class="text-gray-600 mt-3">Agrega productos para continuar con tu compra.</p>
-        <a href="{{ url_for('tienda.productos_publico') }}"
-           class="inline-block mt-6 text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-xl text-sm px-5 py-3 text-center">
+      <div class="mt-10 rounded-[32px] border border-stone-200 bg-stone-50 p-12 text-center">
+        <h2 class="text-3xl font-medium text-stone-900">Tu carrito está vacío</h2>
+        <p class="mt-3 text-stone-600">Agrega productos para continuar con tu compra.</p>
+        <a
+          href="{{ url_for('tienda.productos_publico') }}"
+          class="mt-6 inline-flex items-center justify-center rounded-full bg-stone-900 px-6 py-3 text-sm font-medium text-white hover:bg-stone-800"
+        >
           Ver catálogo
         </a>
       </div>
