@@ -4,7 +4,14 @@ from flask import render_template, request, redirect, url_for, flash
 from sqlalchemy import or_
 
 import forms
-from models import db, MateriaPrima, CategoriaMateriaPrima, UnidadMedida
+from models import (
+    db,
+    MateriaPrima,
+    CategoriaMateriaPrima,
+    UnidadMedida,
+    Proveedor,
+    MovimientoMateriaPrima,
+)
 from utils.auth import login_required
 from utils.audit import log_event
 from . import materia_prima
@@ -32,12 +39,22 @@ def cargar_catalogos_materia_prima(form):
     ]
 
 
+def obtener_proveedores_activos():
+    return (
+        Proveedor.query
+        .filter_by(activo=1)
+        .order_by(Proveedor.nombre.asc())
+        .all()
+    )
+
+
 @materia_prima.route("/private/materia-prima")
 @login_required(["ADMIN", "EMPLEADO"])
 def materia_prima_view():
     create_form = forms.MateriaPrimaForm()
     cargar_catalogos_materia_prima(create_form)
 
+    proveedores_db = obtener_proveedores_activos()
     search = request.args.get("search", "").strip()
 
     query = MateriaPrima.query.join(CategoriaMateriaPrima).join(UnidadMedida)
@@ -54,29 +71,38 @@ def materia_prima_view():
 
     materias_db = query.order_by(MateriaPrima.nombre.asc()).all()
 
-    total_materias = MateriaPrima.query.count()
-    materias_activas = MateriaPrima.query.filter_by(activo=1).count()
-    materias_inactivas = MateriaPrima.query.filter_by(activo=0).count()
+    todas_materias = MateriaPrima.query.all()
+
+    total_materias = len(todas_materias)
+    materias_activas = sum(1 for materia in todas_materias if materia.activo == 1)
 
     stock_bajo = sum(
         1
-        for materia in MateriaPrima.query.all()
-        if float(materia.stock_actual or 0) <= float(materia.stock_minimo or 0)
+        for materia in todas_materias
+        if float(materia.stock_actual or 0) > 0
+        and float(materia.stock_actual or 0) <= float(materia.stock_minimo or 0)
+    )
+
+    sin_stock = sum(
+        1
+        for materia in todas_materias
+        if float(materia.stock_actual or 0) == 0
     )
 
     valor_inventario = sum(
         float(materia.stock_actual or 0) * float(materia.costo_unit_prom or 0)
-        for materia in MateriaPrima.query.all()
+        for materia in todas_materias
     )
 
     return render_template(
         "private/materia_prima/materia_prima.html",
         form=create_form,
         materias_db=materias_db,
+        proveedores_db=proveedores_db,
         total_materias=total_materias,
         materias_activas=materias_activas,
-        materias_inactivas=materias_inactivas,
         stock_bajo=stock_bajo,
+        sin_stock=sin_stock,
         valor_inventario=f"{valor_inventario:,.2f}",
         search=search,
     )
@@ -266,6 +292,7 @@ def movimiento_materia_prima():
     id_materia = request.form.get("id")
     tipo = (request.form.get("tipo") or "").strip().upper()
     motivo = (request.form.get("motivo") or "").strip()
+    id_proveedor = request.form.get("id_proveedor")
 
     materia_db = (
         db.session.query(MateriaPrima)
@@ -293,15 +320,41 @@ def movimiento_materia_prima():
         if materia_db.unidad_medida_rel else ""
     )
 
+    proveedor_db = None
+
     if tipo == "ENTRADA":
+        if not id_proveedor:
+            flash("Debes seleccionar un proveedor para registrar una entrada.", "warning")
+            return redirect(url_for("materia_prima.materia_prima_view"))
+
+        proveedor_db = (
+            Proveedor.query
+            .filter_by(id_proveedor=id_proveedor, activo=1)
+            .first()
+        )
+
+        if not proveedor_db:
+            flash("El proveedor seleccionado no es válido.", "danger")
+            return redirect(url_for("materia_prima.materia_prima_view"))
+
         materia_db.stock_actual = stock_actual + cantidad
+
+        movimiento = MovimientoMateriaPrima(
+            id_materia_prima=materia_db.id_materia_prima,
+            id_proveedor=proveedor_db.id_proveedor,
+            tipo="ENTRADA",
+            cantidad=cantidad,
+            motivo=motivo,
+        )
+        db.session.add(movimiento)
 
         log_event(
             modulo="Inventario",
             accion="Entrada de materia prima",
             detalle=(
-                f"Entrada de {cantidad} {unidad_nombre} a "
-                f"'{materia_db.nombre}'. Motivo: {motivo or 'Sin motivo'}"
+                f"Entrada de {cantidad} {unidad_nombre} a '{materia_db.nombre}' "
+                f"desde proveedor '{proveedor_db.nombre}'. "
+                f"Motivo: {motivo or 'Sin motivo'}"
             ),
             severidad="INFO",
         )
@@ -313,12 +366,21 @@ def movimiento_materia_prima():
 
         materia_db.stock_actual = stock_actual - cantidad
 
+        movimiento = MovimientoMateriaPrima(
+            id_materia_prima=materia_db.id_materia_prima,
+            id_proveedor=None,
+            tipo="SALIDA",
+            cantidad=cantidad,
+            motivo=motivo,
+        )
+        db.session.add(movimiento)
+
         log_event(
             modulo="Inventario",
             accion="Salida de materia prima",
             detalle=(
-                f"Salida de {cantidad} {unidad_nombre} de "
-                f"'{materia_db.nombre}'. Motivo: {motivo or 'Sin motivo'}"
+                f"Salida de {cantidad} {unidad_nombre} de '{materia_db.nombre}'. "
+                f"Motivo: {motivo or 'Sin motivo'}"
             ),
             severidad="WARNING",
         )

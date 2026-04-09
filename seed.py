@@ -14,6 +14,7 @@ from models import (
     PedidoDetalle,
     Proveedor,
     MateriaPrima,
+    MovimientoMateriaPrima,
     Receta,
     RecetaDetalle,
     AuditoriaLog,
@@ -37,6 +38,8 @@ def reset_data():
 
     RecetaDetalle.query.delete()
     Receta.query.delete()
+
+    MovimientoMateriaPrima.query.delete()
 
     MateriaPrima.query.delete()
     CategoriaMateriaPrima.query.delete()
@@ -80,11 +83,10 @@ def seed_categorias_materia_prima():
 
 def seed_unidades_medida():
     unidades = [
-        "m2",
+        "dm2",
         "m",
         "pieza",
         "litro",
-        "cono",
     ]
 
     for nombre in unidades:
@@ -307,19 +309,24 @@ def seed_productos():
 
 def seed_materias_primas():
     materias = [
-        ("Cuero vacuno premium café", "Cuero", "m2", 85, 10, 280, 5),
-        ("Cuero vacuno negro", "Cuero", "m2", 70, 10, 265, 5),
-        ("Forro textil beige", "Forro", "m", 150, 20, 45, 2),
-        ("Forro textil negro", "Forro", "m", 120, 20, 45, 2),
-        ("Cierre metálico 20cm", "Herrajes", "pieza", 320, 50, 18, 1),
-        ("Cierre metálico 35cm", "Herrajes", "pieza", 240, 40, 22, 1),
-        ("Hebilla cinturón clásica", "Herrajes", "pieza", 110, 20, 35, 0),
-        ("Broche magnético", "Herrajes", "pieza", 180, 30, 12, 0),
-        ("Remache decorativo", "Herrajes", "pieza", 500, 100, 2.5, 0),
-        ("Pegamento industrial", "Químicos", "litro", 40, 5, 90, 3),
-        ("Hilo encerado café", "Costura", "cono", 60, 10, 55, 0),
-        ("Hilo encerado negro", "Costura", "cono", 60, 10, 55, 0),
-        ("Espuma de protección", "Relleno", "m", 80, 10, 30, 1),
+        ("Cuero vacuno premium café", "Cuero", "dm2", Decimal("850.00"), Decimal("100.00"), Decimal("28.00"), Decimal("5.00")),
+        ("Cuero vacuno negro", "Cuero", "dm2", Decimal("700.00"), Decimal("100.00"), Decimal("26.50"), Decimal("5.00")),
+
+        ("Forro textil beige", "Forro", "m", Decimal("150.00"), Decimal("20.00"), Decimal("45.00"), Decimal("2.00")),
+        ("Forro textil negro", "Forro", "m", Decimal("120.00"), Decimal("20.00"), Decimal("45.00"), Decimal("2.00")),
+
+        ("Cierre metálico 20cm", "Herrajes", "pieza", Decimal("320.00"), Decimal("50.00"), Decimal("18.00"), Decimal("0.00")),
+        ("Cierre metálico 35cm", "Herrajes", "pieza", Decimal("240.00"), Decimal("40.00"), Decimal("22.00"), Decimal("0.00")),
+        ("Hebilla cinturón clásica", "Herrajes", "pieza", Decimal("110.00"), Decimal("20.00"), Decimal("35.00"), Decimal("0.00")),
+        ("Broche magnético", "Herrajes", "pieza", Decimal("180.00"), Decimal("30.00"), Decimal("12.00"), Decimal("0.00")),
+        ("Remache decorativo", "Herrajes", "pieza", Decimal("500.00"), Decimal("100.00"), Decimal("2.50"), Decimal("0.00")),
+
+        ("Pegamento industrial", "Químicos", "litro", Decimal("40.00"), Decimal("5.00"), Decimal("90.00"), Decimal("3.00")),
+
+        ("Hilo encerado café", "Costura", "m", Decimal("6000.00"), Decimal("1000.00"), Decimal("0.06"), Decimal("0.00")),
+        ("Hilo encerado negro", "Costura", "m", Decimal("6000.00"), Decimal("1000.00"), Decimal("0.06"), Decimal("0.00")),
+
+        ("Espuma de protección", "Relleno", "m", Decimal("80.00"), Decimal("10.00"), Decimal("30.00"), Decimal("1.00")),
     ]
 
     for nombre, categoria_nombre, unidad_nombre, stock, minimo, costo, merma in materias:
@@ -354,7 +361,7 @@ def costo_receta(detalles):
         cantidad_real = cantidad_base * (Decimal("1") + (merma_pct / Decimal("100")))
         total += costo * cantidad_real
 
-    return total.quantize(Decimal("0.0001"))
+    return total.quantize(Decimal("0.01"))
 
 
 def seed_recetas():
@@ -362,184 +369,184 @@ def seed_recetas():
         (
             "Cartera Clásica León",
             "Receta Cartera Clásica León",
-            1,
+            Decimal("1.00"),
             [
-                ("Cuero vacuno premium café", 0.35),
-                ("Forro textil beige", 0.20),
-                ("Cierre metálico 20cm", 1),
-                ("Pegamento industrial", 0.05),
-                ("Hilo encerado café", 0.10),
+                ("Cuero vacuno premium café", Decimal("35.00")),
+                ("Forro textil beige", Decimal("0.20")),
+                ("Cierre metálico 20cm", Decimal("1.00")),
+                ("Pegamento industrial", Decimal("0.05")),
+                ("Hilo encerado café", Decimal("10.00")),
             ],
         ),
         (
             "Monedero Compacto",
             "Receta Monedero Compacto",
-            1,
+            Decimal("1.00"),
             [
-                ("Cuero vacuno negro", 0.12),
-                ("Forro textil negro", 0.08),
-                ("Cierre metálico 20cm", 1),
-                ("Pegamento industrial", 0.02),
-                ("Hilo encerado negro", 0.05),
+                ("Cuero vacuno negro", Decimal("12.00")),
+                ("Forro textil negro", Decimal("0.08")),
+                ("Cierre metálico 20cm", Decimal("1.00")),
+                ("Pegamento industrial", Decimal("0.02")),
+                ("Hilo encerado negro", Decimal("5.00")),
             ],
         ),
         (
             "Tarjetero Ejecutivo",
             "Receta Tarjetero Ejecutivo",
-            1,
+            Decimal("1.00"),
             [
-                ("Cuero vacuno negro", 0.10),
-                ("Forro textil negro", 0.04),
-                ("Pegamento industrial", 0.01),
-                ("Hilo encerado negro", 0.03),
+                ("Cuero vacuno negro", Decimal("10.00")),
+                ("Forro textil negro", Decimal("0.04")),
+                ("Pegamento industrial", Decimal("0.01")),
+                ("Hilo encerado negro", Decimal("3.00")),
             ],
         ),
         (
             "Cinturón Heritage",
             "Receta Cinturón Heritage",
-            1,
+            Decimal("1.00"),
             [
-                ("Cuero vacuno premium café", 0.45),
-                ("Hebilla cinturón clásica", 1),
-                ("Hilo encerado café", 0.06),
+                ("Cuero vacuno premium café", Decimal("45.00")),
+                ("Hebilla cinturón clásica", Decimal("1.00")),
+                ("Hilo encerado café", Decimal("6.00")),
             ],
         ),
         (
             "Bolsa Tote Siena",
             "Receta Bolsa Tote Siena",
-            1,
+            Decimal("1.00"),
             [
-                ("Cuero vacuno premium café", 0.90),
-                ("Forro textil beige", 0.45),
-                ("Cierre metálico 35cm", 1),
-                ("Pegamento industrial", 0.08),
-                ("Hilo encerado café", 0.16),
-                ("Espuma de protección", 0.25),
+                ("Cuero vacuno premium café", Decimal("90.00")),
+                ("Forro textil beige", Decimal("0.45")),
+                ("Cierre metálico 35cm", Decimal("1.00")),
+                ("Pegamento industrial", Decimal("0.08")),
+                ("Hilo encerado café", Decimal("16.00")),
+                ("Espuma de protección", Decimal("0.25")),
             ],
         ),
         (
             "Bolso de Mano Verona",
             "Receta Bolso de Mano Verona",
-            1,
+            Decimal("1.00"),
             [
-                ("Cuero vacuno premium café", 0.75),
-                ("Forro textil beige", 0.40),
-                ("Cierre metálico 35cm", 1),
-                ("Broche magnético", 1),
-                ("Pegamento industrial", 0.08),
-                ("Hilo encerado café", 0.15),
-                ("Espuma de protección", 0.20),
+                ("Cuero vacuno premium café", Decimal("75.00")),
+                ("Forro textil beige", Decimal("0.40")),
+                ("Cierre metálico 35cm", Decimal("1.00")),
+                ("Broche magnético", Decimal("1.00")),
+                ("Pegamento industrial", Decimal("0.08")),
+                ("Hilo encerado café", Decimal("15.00")),
+                ("Espuma de protección", Decimal("0.20")),
             ],
         ),
         (
             "Mochila Andanza",
             "Receta Mochila Andanza",
-            1,
+            Decimal("1.00"),
             [
-                ("Cuero vacuno negro", 1.20),
-                ("Forro textil negro", 0.80),
-                ("Cierre metálico 35cm", 3),
-                ("Broche magnético", 2),
-                ("Pegamento industrial", 0.12),
-                ("Hilo encerado negro", 0.25),
-                ("Espuma de protección", 0.35),
+                ("Cuero vacuno negro", Decimal("120.00")),
+                ("Forro textil negro", Decimal("0.80")),
+                ("Cierre metálico 35cm", Decimal("3.00")),
+                ("Broche magnético", Decimal("2.00")),
+                ("Pegamento industrial", Decimal("0.12")),
+                ("Hilo encerado negro", Decimal("25.00")),
+                ("Espuma de protección", Decimal("0.35")),
             ],
         ),
         (
             "Mariconera Urbana",
             "Receta Mariconera Urbana",
-            1,
+            Decimal("1.00"),
             [
-                ("Cuero vacuno negro", 0.50),
-                ("Forro textil negro", 0.25),
-                ("Cierre metálico 20cm", 2),
-                ("Pegamento industrial", 0.05),
-                ("Hilo encerado negro", 0.10),
-                ("Broche magnético", 1),
+                ("Cuero vacuno negro", Decimal("50.00")),
+                ("Forro textil negro", Decimal("0.25")),
+                ("Cierre metálico 20cm", Decimal("2.00")),
+                ("Pegamento industrial", Decimal("0.05")),
+                ("Hilo encerado negro", Decimal("10.00")),
+                ("Broche magnético", Decimal("1.00")),
             ],
         ),
         (
             "Portafolio Ejecutivo",
             "Receta Portafolio Ejecutivo",
-            1,
+            Decimal("1.00"),
             [
-                ("Cuero vacuno premium café", 1.40),
-                ("Forro textil beige", 0.90),
-                ("Cierre metálico 35cm", 2),
-                ("Broche magnético", 2),
-                ("Pegamento industrial", 0.15),
-                ("Hilo encerado café", 0.30),
-                ("Espuma de protección", 0.40),
-                ("Remache decorativo", 6),
+                ("Cuero vacuno premium café", Decimal("140.00")),
+                ("Forro textil beige", Decimal("0.90")),
+                ("Cierre metálico 35cm", Decimal("2.00")),
+                ("Broche magnético", Decimal("2.00")),
+                ("Pegamento industrial", Decimal("0.15")),
+                ("Hilo encerado café", Decimal("30.00")),
+                ("Espuma de protección", Decimal("0.40")),
+                ("Remache decorativo", Decimal("6.00")),
             ],
         ),
         (
             "Neceser Voyage",
             "Receta Neceser Voyage",
-            1,
+            Decimal("1.00"),
             [
-                ("Cuero vacuno negro", 0.30),
-                ("Forro textil negro", 0.20),
-                ("Cierre metálico 20cm", 1),
-                ("Pegamento industrial", 0.03),
-                ("Hilo encerado negro", 0.06),
+                ("Cuero vacuno negro", Decimal("30.00")),
+                ("Forro textil negro", Decimal("0.20")),
+                ("Cierre metálico 20cm", Decimal("1.00")),
+                ("Pegamento industrial", Decimal("0.03")),
+                ("Hilo encerado negro", Decimal("6.00")),
             ],
         ),
         (
             "Funda Laptop 15",
             "Receta Funda Laptop 15",
-            1,
+            Decimal("1.00"),
             [
-                ("Cuero vacuno negro", 0.80),
-                ("Forro textil negro", 0.50),
-                ("Cierre metálico 35cm", 2),
-                ("Pegamento industrial", 0.08),
-                ("Hilo encerado negro", 0.12),
-                ("Espuma de protección", 0.50),
+                ("Cuero vacuno negro", Decimal("80.00")),
+                ("Forro textil negro", Decimal("0.50")),
+                ("Cierre metálico 35cm", Decimal("2.00")),
+                ("Pegamento industrial", Decimal("0.08")),
+                ("Hilo encerado negro", Decimal("12.00")),
+                ("Espuma de protección", Decimal("0.50")),
             ],
         ),
         (
             "Porta Pasaporte Atlas",
             "Receta Porta Pasaporte Atlas",
-            1,
+            Decimal("1.00"),
             [
-                ("Cuero vacuno premium café", 0.18),
-                ("Forro textil beige", 0.08),
-                ("Pegamento industrial", 0.02),
-                ("Hilo encerado café", 0.04),
+                ("Cuero vacuno premium café", Decimal("18.00")),
+                ("Forro textil beige", Decimal("0.08")),
+                ("Pegamento industrial", Decimal("0.02")),
+                ("Hilo encerado café", Decimal("4.00")),
             ],
         ),
         (
             "Estuche Óptico Classic",
             "Receta Estuche Óptico Classic",
-            1,
+            Decimal("1.00"),
             [
-                ("Cuero vacuno negro", 0.20),
-                ("Forro textil negro", 0.10),
-                ("Broche magnético", 1),
-                ("Pegamento industrial", 0.02),
-                ("Hilo encerado negro", 0.04),
-                ("Espuma de protección", 0.05),
+                ("Cuero vacuno negro", Decimal("20.00")),
+                ("Forro textil negro", Decimal("0.10")),
+                ("Broche magnético", Decimal("1.00")),
+                ("Pegamento industrial", Decimal("0.02")),
+                ("Hilo encerado negro", Decimal("4.00")),
+                ("Espuma de protección", Decimal("0.05")),
             ],
         ),
         (
             "Llavero Artesanal",
             "Receta Llavero Artesanal",
-            1,
+            Decimal("1.00"),
             [
-                ("Cuero vacuno premium café", 0.03),
-                ("Remache decorativo", 1),
-                ("Hilo encerado café", 0.01),
+                ("Cuero vacuno premium café", Decimal("3.00")),
+                ("Remache decorativo", Decimal("1.00")),
+                ("Hilo encerado café", Decimal("1.00")),
             ],
         ),
         (
             "Pulsera Trenzada León",
             "Receta Pulsera Trenzada León",
-            1,
+            Decimal("1.00"),
             [
-                ("Cuero vacuno negro", 0.05),
-                ("Broche magnético", 1),
-                ("Hilo encerado negro", 0.01),
+                ("Cuero vacuno negro", Decimal("5.00")),
+                ("Broche magnético", Decimal("1.00")),
+                ("Hilo encerado negro", Decimal("1.00")),
             ],
         ),
     ]
@@ -550,7 +557,7 @@ def seed_recetas():
         receta = Receta(
             id_producto=producto.id_producto,
             nombre=nombre_receta,
-            rendimiento=Decimal(str(rendimiento)),
+            rendimiento=rendimiento,
             costo_estimado=costo_receta(detalles),
             activo=1,
         )
@@ -563,7 +570,7 @@ def seed_recetas():
                 RecetaDetalle(
                     id_receta=receta.id_receta,
                     id_materia_prima=mp.id_materia_prima,
-                    cantidad=Decimal(str(cantidad)),
+                    cantidad=cantidad,
                 )
             )
 

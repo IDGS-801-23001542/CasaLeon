@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, g
 from werkzeug.security import generate_password_hash
 import forms
 from models import db, Usuario, Rol
@@ -17,9 +17,13 @@ def cargar_roles(form):
 def listado_usuarios():
     create_form = forms.UsuarioForm()
     cargar_roles(create_form)
+
     search = request.args.get("search", "").strip()
+    page = request.args.get("page", 1, type=int)
+    per_page = 10
 
     query = Usuario.query.join(Rol)
+
     if search:
         like_term = f"%{search}%"
         query = query.filter(
@@ -31,18 +35,30 @@ def listado_usuarios():
             )
         )
 
-    usuarios_db = query.order_by(Usuario.nombre.asc()).all()
+    query = query.order_by(Usuario.nombre.asc())
+
+    pagination = query.paginate(
+        page=page,
+        per_page=per_page,
+        error_out=False,
+    )
+
+    usuarios_db = pagination.items
+
     total_usuarios = Usuario.query.count()
     usuarios_activos = Usuario.query.filter_by(activo=1).count()
     usuarios_inactivos = Usuario.query.filter_by(activo=0).count()
+    roles = Rol.query.order_by(Rol.descripcion.asc()).all()
 
     return render_template(
         "private/usuarios/usuarios.html",
         form=create_form,
         usuarios_db=usuarios_db,
+        pagination=pagination,
         total_usuarios=total_usuarios,
         usuarios_activos=usuarios_activos,
         usuarios_inactivos=usuarios_inactivos,
+        roles=roles,
         search=search,
     )
 
@@ -162,6 +178,10 @@ def eliminar_usuario():
     usuario_db = Usuario.query.filter(Usuario.id_usuario == id_usuario).first()
     if not usuario_db:
         flash("Usuario no encontrado.", "danger")
+        return redirect(url_for("usuarios.listado_usuarios"))
+
+    if not g.user or g.user.id_usuario == usuario_db.id_usuario:
+        flash("No puedes desactivar tu propio usuario.", "warning")
         return redirect(url_for("usuarios.listado_usuarios"))
 
     if request.method == "GET":

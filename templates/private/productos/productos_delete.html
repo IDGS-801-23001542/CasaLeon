@@ -31,7 +31,7 @@
         <label class="block mb-2 text-sm font-medium text-gray-900">Imagen actual</label>
         <div class="w-full md:w-72 h-48 rounded-2xl overflow-hidden border border-gray-200 bg-stone-100">
           <img
-            src="{{ url_for('static', filename=producto_db.imagen) }}"
+            src="{{ producto_db.imagen }}"
             alt="{{ producto_db.nombre }}"
             class="w-full h-full object-cover"
           />
@@ -59,14 +59,26 @@
         </div>
 
         <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Receta asociada</label>
+          <input type="text" value="{{ receta_actual.nombre if receta_actual else 'Sin receta' }}" disabled
+                 class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
+        </div>
+
+        <div>
           <label class="block mb-2 text-sm font-medium text-gray-900">Precio</label>
-          <input type="text" value="${{ producto_db.precio_venta|money }}" disabled
+          <input type="text" value="${{ '%.2f'|format(producto_db.precio_venta or 0) }}" disabled
                  class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
         </div>
 
         <div>
           <label class="block mb-2 text-sm font-medium text-gray-900">Stock Actual</label>
-          <input type="text" value="{{ producto_db.stock_actual|num(4) }}" disabled
+          <input type="text" value="{{ '%.2f'|format(producto_db.stock_actual or 0) }}" disabled
+                 class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Costo unitario promedio</label>
+          <input type="text" value="${{ '%.2f'|format(producto_db.costo_unit_prom or 0) }}" disabled
                  class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
         </div>
 

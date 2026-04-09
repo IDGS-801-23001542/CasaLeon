@@ -7,9 +7,11 @@ from wtforms import (
     SelectField,
     TextAreaField,
     DecimalField,
+    FileField,
 )
 from wtforms.validators import (
     DataRequired,
+    InputRequired,
     Email,
     Length,
     Optional,
@@ -18,6 +20,8 @@ from wtforms.validators import (
     Regexp,
     EqualTo,
 )
+
+from flask_wtf.file import FileAllowed
 
 
 def validar_rfc(form, field):
@@ -158,6 +162,7 @@ class RegisterClienteForm(FlaskForm):
             digitos = "".join(char for char in field.data if char.isdigit())
             if len(digitos) < 10 or len(digitos) > 15:
                 raise ValidationError("Ingresa un teléfono válido de 10 a 15 dígitos.")
+                raise ValidationError("Ingresa un teléfono válido de 10 a 15 dígitos.")
 
     def validate_password(self, field):
         field.data = (field.data or "").strip()
@@ -173,7 +178,9 @@ class CheckoutForm(FlaskForm):
         "Nombre completo",
         validators=[
             DataRequired(message="El nombre es obligatorio."),
-            Length(min=2, max=150, message="El nombre debe tener entre 2 y 150 caracteres."),
+            Length(
+                min=2, max=150, message="El nombre debe tener entre 2 y 150 caracteres."
+            ),
             Regexp(
                 r"^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+$",
                 message="El nombre solo puede contener letras y espacios.",
@@ -184,7 +191,11 @@ class CheckoutForm(FlaskForm):
         "Teléfono",
         validators=[
             Optional(),
-            Length(min=10, max=15, message="El teléfono debe tener entre 10 y 15 caracteres."),
+            Length(
+                min=10,
+                max=15,
+                message="El teléfono debe tener entre 10 y 15 caracteres.",
+            ),
             Regexp(
                 r"^\+?[0-9\s\-]+$",
                 message="El teléfono solo puede contener números, espacios, guiones y un + opcional.",
@@ -195,7 +206,9 @@ class CheckoutForm(FlaskForm):
         "Calle",
         validators=[
             DataRequired(message="La calle es obligatoria."),
-            Length(min=3, max=120, message="La calle debe tener entre 3 y 120 caracteres."),
+            Length(
+                min=3, max=120, message="La calle debe tener entre 3 y 120 caracteres."
+            ),
             Regexp(
                 r"^[A-Za-zÁÉÍÓÚáéíóúÑñÜü0-9\s\.\-#]+$",
                 message="La calle contiene caracteres no permitidos.",
@@ -206,7 +219,9 @@ class CheckoutForm(FlaskForm):
         "Número",
         validators=[
             DataRequired(message="El número es obligatorio."),
-            Length(min=1, max=20, message="El número debe tener entre 1 y 20 caracteres."),
+            Length(
+                min=1, max=20, message="El número debe tener entre 1 y 20 caracteres."
+            ),
             Regexp(
                 r"^[A-Za-z0-9\s\-#]+$",
                 message="El número contiene caracteres no permitidos.",
@@ -217,7 +232,11 @@ class CheckoutForm(FlaskForm):
         "Colonia",
         validators=[
             DataRequired(message="La colonia es obligatoria."),
-            Length(min=2, max=120, message="La colonia debe tener entre 2 y 120 caracteres."),
+            Length(
+                min=2,
+                max=120,
+                message="La colonia debe tener entre 2 y 120 caracteres.",
+            ),
             Regexp(
                 r"^[A-Za-zÁÉÍÓÚáéíóúÑñÜü0-9\s\.\-#]+$",
                 message="La colonia contiene caracteres no permitidos.",
@@ -228,7 +247,9 @@ class CheckoutForm(FlaskForm):
         "Ciudad",
         validators=[
             DataRequired(message="La ciudad es obligatoria."),
-            Length(min=2, max=80, message="La ciudad debe tener entre 2 y 80 caracteres."),
+            Length(
+                min=2, max=80, message="La ciudad debe tener entre 2 y 80 caracteres."
+            ),
             Regexp(
                 r"^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+$",
                 message="La ciudad solo puede contener letras y espacios.",
@@ -239,7 +260,9 @@ class CheckoutForm(FlaskForm):
         "Estado",
         validators=[
             DataRequired(message="El estado es obligatorio."),
-            Length(min=2, max=80, message="El estado debe tener entre 2 y 80 caracteres."),
+            Length(
+                min=2, max=80, message="El estado debe tener entre 2 y 80 caracteres."
+            ),
             Regexp(
                 r"^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+$",
                 message="El estado solo puede contener letras y espacios.",
@@ -250,7 +273,9 @@ class CheckoutForm(FlaskForm):
         "País",
         validators=[
             DataRequired(message="El país es obligatorio."),
-            Length(min=2, max=80, message="El país debe tener entre 2 y 80 caracteres."),
+            Length(
+                min=2, max=80, message="El país debe tener entre 2 y 80 caracteres."
+            ),
             Regexp(
                 r"^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+$",
                 message="El país solo puede contener letras y espacios.",
@@ -261,7 +286,11 @@ class CheckoutForm(FlaskForm):
         "Código postal",
         validators=[
             DataRequired(message="El código postal es obligatorio."),
-            Length(min=5, max=10, message="El código postal debe tener entre 5 y 10 caracteres."),
+            Length(
+                min=5,
+                max=10,
+                message="El código postal debe tener entre 5 y 10 caracteres.",
+            ),
             Regexp(
                 r"^[0-9\-]+$",
                 message="El código postal solo puede contener números y guiones.",
@@ -290,6 +319,7 @@ class CheckoutForm(FlaskForm):
             field.data = _normalize_spaces(field.data)
             digitos = "".join(char for char in field.data if char.isdigit())
             if len(digitos) < 10 or len(digitos) > 15:
+                raise ValidationError("Ingresa un teléfono válido de 10 a 15 dígitos.")
                 raise ValidationError("Ingresa un teléfono válido de 10 a 15 dígitos.")
 
     def validate_calle(self, field):
@@ -323,7 +353,9 @@ class UpdateClienteForm(FlaskForm):
         "Nombre completo",
         validators=[
             DataRequired(message="El nombre es obligatorio."),
-            Length(min=2, max=150, message="El nombre debe tener entre 2 y 150 caracteres."),
+            Length(
+                min=2, max=150, message="El nombre debe tener entre 2 y 150 caracteres."
+            ),
             Regexp(
                 r"^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+$",
                 message="El nombre solo puede contener letras y espacios.",
@@ -334,7 +366,11 @@ class UpdateClienteForm(FlaskForm):
         "Teléfono",
         validators=[
             Optional(),
-            Length(min=10, max=15, message="El teléfono debe tener entre 10 y 15 caracteres."),
+            Length(
+                min=10,
+                max=15,
+                message="El teléfono debe tener entre 10 y 15 caracteres.",
+            ),
             Regexp(
                 r"^\+?[0-9\s\-]+$",
                 message="El teléfono solo puede contener números, espacios, guiones y un + opcional.",
@@ -345,7 +381,9 @@ class UpdateClienteForm(FlaskForm):
         "Calle",
         validators=[
             Optional(),
-            Length(min=3, max=120, message="La calle debe tener entre 3 y 120 caracteres."),
+            Length(
+                min=3, max=120, message="La calle debe tener entre 3 y 120 caracteres."
+            ),
             Regexp(
                 r"^[A-Za-zÁÉÍÓÚáéíóúÑñÜü0-9\s\.\-#]*$",
                 message="La calle contiene caracteres no permitidos.",
@@ -356,7 +394,9 @@ class UpdateClienteForm(FlaskForm):
         "Número",
         validators=[
             Optional(),
-            Length(min=1, max=20, message="El número debe tener entre 1 y 20 caracteres."),
+            Length(
+                min=1, max=20, message="El número debe tener entre 1 y 20 caracteres."
+            ),
             Regexp(
                 r"^[A-Za-z0-9\s\-#]*$",
                 message="El número contiene caracteres no permitidos.",
@@ -367,7 +407,11 @@ class UpdateClienteForm(FlaskForm):
         "Colonia",
         validators=[
             Optional(),
-            Length(min=2, max=120, message="La colonia debe tener entre 2 y 120 caracteres."),
+            Length(
+                min=2,
+                max=120,
+                message="La colonia debe tener entre 2 y 120 caracteres.",
+            ),
             Regexp(
                 r"^[A-Za-zÁÉÍÓÚáéíóúÑñÜü0-9\s\.\-#]*$",
                 message="La colonia contiene caracteres no permitidos.",
@@ -378,7 +422,9 @@ class UpdateClienteForm(FlaskForm):
         "Ciudad",
         validators=[
             Optional(),
-            Length(min=2, max=80, message="La ciudad debe tener entre 2 y 80 caracteres."),
+            Length(
+                min=2, max=80, message="La ciudad debe tener entre 2 y 80 caracteres."
+            ),
             Regexp(
                 r"^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]*$",
                 message="La ciudad solo puede contener letras y espacios.",
@@ -389,7 +435,9 @@ class UpdateClienteForm(FlaskForm):
         "Estado",
         validators=[
             Optional(),
-            Length(min=2, max=80, message="El estado debe tener entre 2 y 80 caracteres."),
+            Length(
+                min=2, max=80, message="El estado debe tener entre 2 y 80 caracteres."
+            ),
             Regexp(
                 r"^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]*$",
                 message="El estado solo puede contener letras y espacios.",
@@ -400,7 +448,9 @@ class UpdateClienteForm(FlaskForm):
         "País",
         validators=[
             Optional(),
-            Length(min=2, max=80, message="El país debe tener entre 2 y 80 caracteres."),
+            Length(
+                min=2, max=80, message="El país debe tener entre 2 y 80 caracteres."
+            ),
             Regexp(
                 r"^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]*$",
                 message="El país solo puede contener letras y espacios.",
@@ -411,7 +461,11 @@ class UpdateClienteForm(FlaskForm):
         "Código postal",
         validators=[
             Optional(),
-            Length(min=5, max=10, message="El código postal debe tener entre 5 y 10 caracteres."),
+            Length(
+                min=5,
+                max=10,
+                message="El código postal debe tener entre 5 y 10 caracteres.",
+            ),
             Regexp(
                 r"^[0-9\-]*$",
                 message="El código postal solo puede contener números y guiones.",
@@ -422,14 +476,22 @@ class UpdateClienteForm(FlaskForm):
         "Contraseña actual",
         validators=[
             Optional(),
-            Length(min=6, max=100, message="La contraseña actual debe tener entre 6 y 100 caracteres."),
+            Length(
+                min=6,
+                max=100,
+                message="La contraseña actual debe tener entre 6 y 100 caracteres.",
+            ),
         ],
     )
     new_password = PasswordField(
         "Nueva contraseña",
         validators=[
             Optional(),
-            Length(min=6, max=100, message="La nueva contraseña debe tener entre 6 y 100 caracteres."),
+            Length(
+                min=6,
+                max=100,
+                message="La nueva contraseña debe tener entre 6 y 100 caracteres.",
+            ),
             Regexp(
                 r"^(?=.*[A-Za-z])(?=.*\d).*$",
                 message="La nueva contraseña debe contener al menos una letra y un número.",
@@ -454,6 +516,7 @@ class UpdateClienteForm(FlaskForm):
             field.data = _normalize_spaces(field.data)
             digitos = "".join(char for char in field.data if char.isdigit())
             if len(digitos) < 10 or len(digitos) > 15:
+                raise ValidationError("Ingresa un teléfono válido de 10 a 15 dígitos.")
                 raise ValidationError("Ingresa un teléfono válido de 10 a 15 dígitos.")
 
     def validate_calle(self, field):
@@ -525,7 +588,9 @@ class UpdateClienteForm(FlaskForm):
                 self.confirm_new_password.errors.append("Confirma la nueva contraseña.")
                 return False
             if current_password == new_password:
-                self.new_password.errors.append("La nueva contraseña no puede ser igual a la actual.")
+                self.new_password.errors.append(
+                    "La nueva contraseña no puede ser igual a la actual."
+                )
                 return False
 
         return True
@@ -536,7 +601,9 @@ class CreateStaffForm(FlaskForm):
         "Nombre",
         validators=[
             DataRequired(message="El nombre es obligatorio."),
-            Length(min=2, max=120, message="El nombre debe tener entre 2 y 120 caracteres."),
+            Length(
+                min=2, max=120, message="El nombre debe tener entre 2 y 120 caracteres."
+            ),
             Regexp(
                 r"^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+$",
                 message="El nombre solo puede contener letras y espacios.",
@@ -555,7 +622,11 @@ class CreateStaffForm(FlaskForm):
         "Contraseña",
         validators=[
             DataRequired(message="La contraseña es obligatoria."),
-            Length(min=6, max=100, message="La contraseña debe tener entre 6 y 100 caracteres."),
+            Length(
+                min=6,
+                max=100,
+                message="La contraseña debe tener entre 6 y 100 caracteres.",
+            ),
             Regexp(
                 r"^(?=.*[A-Za-z])(?=.*\d).+$",
                 message="La contraseña debe contener al menos una letra y un número.",
@@ -587,7 +658,9 @@ class UsuarioForm(FlaskForm):
         "Nombre completo",
         validators=[
             DataRequired(message="El nombre es requerido"),
-            Length(min=3, max=120, message="El nombre debe tener entre 3 y 120 caracteres"),
+            Length(
+                min=3, max=120, message="El nombre debe tener entre 3 y 120 caracteres"
+            ),
         ],
     )
     email = StringField(
@@ -615,7 +688,11 @@ class UsuarioForm(FlaskForm):
         "Contraseña",
         validators=[
             Optional(),
-            Length(min=8, max=128, message="La contraseña debe tener entre 8 y 128 caracteres"),
+            Length(
+                min=8,
+                max=128,
+                message="La contraseña debe tener entre 8 y 128 caracteres",
+            ),
         ],
     )
 
@@ -625,7 +702,9 @@ class ProveedorForm(FlaskForm):
         "Nombre",
         validators=[
             DataRequired(message="El nombre es requerido"),
-            Length(min=3, max=150, message="El nombre debe tener entre 3 y 150 caracteres"),
+            Length(
+                min=3, max=150, message="El nombre debe tener entre 3 y 150 caracteres"
+            ),
         ],
     )
     rfc = StringField(
@@ -646,35 +725,59 @@ class ProveedorForm(FlaskForm):
     )
     telefono = StringField(
         "Teléfono",
-        validators=[Optional(), Length(max=30, message="El teléfono no puede exceder 30 caracteres")],
+        validators=[
+            Optional(),
+            Length(max=30, message="El teléfono no puede exceder 30 caracteres"),
+        ],
     )
     calle = StringField(
         "Calle",
-        validators=[Optional(), Length(max=120, message="La calle no puede exceder 120 caracteres")],
+        validators=[
+            Optional(),
+            Length(max=120, message="La calle no puede exceder 120 caracteres"),
+        ],
     )
     numero = StringField(
         "Número",
-        validators=[Optional(), Length(max=20, message="El número no puede exceder 20 caracteres")],
+        validators=[
+            Optional(),
+            Length(max=20, message="El número no puede exceder 20 caracteres"),
+        ],
     )
     colonia = StringField(
         "Colonia",
-        validators=[Optional(), Length(max=120, message="La colonia no puede exceder 120 caracteres")],
+        validators=[
+            Optional(),
+            Length(max=120, message="La colonia no puede exceder 120 caracteres"),
+        ],
     )
     ciudad = StringField(
         "Ciudad",
-        validators=[Optional(), Length(max=80, message="La ciudad no puede exceder 80 caracteres")],
+        validators=[
+            Optional(),
+            Length(max=80, message="La ciudad no puede exceder 80 caracteres"),
+        ],
     )
     estado = StringField(
         "Estado",
-        validators=[Optional(), Length(max=80, message="El estado no puede exceder 80 caracteres")],
+        validators=[
+            Optional(),
+            Length(max=80, message="El estado no puede exceder 80 caracteres"),
+        ],
     )
     pais = StringField(
         "País",
-        validators=[Optional(), Length(max=80, message="El país no puede exceder 80 caracteres")],
+        validators=[
+            Optional(),
+            Length(max=80, message="El país no puede exceder 80 caracteres"),
+        ],
     )
     cp = StringField(
         "Código Postal",
-        validators=[Optional(), Length(max=10, message="El código postal no puede exceder 10 caracteres")],
+        validators=[
+            Optional(),
+            Length(max=10, message="El código postal no puede exceder 10 caracteres"),
+        ],
     )
     activo = SelectField(
         "Estado",
@@ -692,25 +795,32 @@ class ProductoForm(FlaskForm):
         validators=[DataRequired(message="La categoría es requerida")],
         choices=[],
     )
-    sku = StringField(
-        "SKU",
-        validators=[Optional(), Length(max=40, message="El SKU no puede exceder 40 caracteres")],
+
+    id_receta = SelectField(
+        "Receta",
+        coerce=int,
+        validators=[DataRequired(message="La receta es requerida")],
+        choices=[],
     )
+
     nombre = StringField(
         "Nombre",
         validators=[
             DataRequired(message="El nombre es requerido"),
-            Length(min=3, max=120, message="El nombre debe tener entre 3 y 120 caracteres"),
+            Length(
+                min=3, max=120, message="El nombre debe tener entre 3 y 120 caracteres"
+            ),
         ],
     )
+
     descripcion = StringField(
         "Descripción",
-        validators=[Optional(), Length(max=255, message="La descripción no puede exceder 255 caracteres")],
+        validators=[
+            Optional(),
+            Length(max=255, message="La descripción no puede exceder 255 caracteres"),
+        ],
     )
-    imagen = StringField(
-        "Imagen",
-        validators=[Optional(), Length(max=255, message="La ruta de la imagen no puede exceder 255 caracteres")],
-    )
+
     precio_venta = DecimalField(
         "Precio de Venta",
         validators=[
@@ -718,50 +828,35 @@ class ProductoForm(FlaskForm):
             NumberRange(min=0, message="El precio debe ser mayor o igual a 0"),
         ],
     )
-    stock_actual = DecimalField(
-        "Stock Actual",
+
+    imagen = FileField(
+        "Imagen",
         validators=[
-            DataRequired(message="El stock actual es requerido"),
-            NumberRange(min=0, message="El stock debe ser mayor o igual a 0"),
+            Optional(),
+            FileAllowed(
+                ["jpg", "jpeg", "png", "webp"],
+                message="Solo se permiten imágenes JPG, JPEG, PNG o WEBP",
+            ),
         ],
-    )
-    costo_unit_prom = DecimalField(
-        "Costo Unitario Promedio",
-        validators=[
-            DataRequired(message="El costo unitario es requerido"),
-            NumberRange(min=0, message="El costo debe ser mayor o igual a 0"),
-        ],
-    )
-    activo = SelectField(
-        "Estado",
-        coerce=int,
-        validators=[DataRequired(message="El estado es requerido")],
-        choices=[(1, "Activo"), (0, "Inactivo")],
-        default=1,
     )
 
     def validate_nombre(self, field):
         field.data = _normalize_spaces(field.data)
 
-    def validate_sku(self, field):
-        field.data = _normalize_spaces(field.data).upper() if field.data else None
-
     def validate_descripcion(self, field):
-        field.data = _normalize_spaces(field.data) if field.data else None
-
-    def validate_imagen(self, field):
         if field.data:
-            field.data = field.data.strip().replace("\\", "/")
-            if field.data.startswith("/"):
-                field.data = field.data[1:]
+            field.data = _normalize_spaces(field.data)
 
 
+# MATERIA PRIMA
 class MateriaPrimaForm(FlaskForm):
     nombre = StringField(
         "Nombre",
         validators=[
             DataRequired(message="El nombre es requerido"),
-            Length(min=3, max=120, message="El nombre debe tener entre 3 y 120 caracteres"),
+            Length(
+                min=3, max=120, message="El nombre debe tener entre 3 y 120 caracteres"
+            ),
         ],
     )
     id_categoria_materia_prima = SelectField(
@@ -776,31 +871,35 @@ class MateriaPrimaForm(FlaskForm):
         validators=[DataRequired(message="La unidad de medida es requerida")],
         choices=[],
     )
+
     stock_actual = DecimalField(
         "Stock Actual",
         validators=[
-            DataRequired(message="El stock actual es requerido"),
+            InputRequired(message="El stock actual es requerido"),
             NumberRange(min=0, message="El stock debe ser mayor o igual a 0"),
         ],
     )
+
     stock_minimo = DecimalField(
         "Stock Mínimo",
         validators=[
-            DataRequired(message="El stock mínimo es requerido"),
+            InputRequired(message="El stock mínimo es requerido"),
             NumberRange(min=0, message="El stock mínimo debe ser mayor o igual a 0"),
         ],
     )
+
     costo_unit_prom = DecimalField(
         "Costo Unitario Promedio",
         validators=[
-            DataRequired(message="El costo unitario es requerido"),
+            InputRequired(message="El costo unitario es requerido"),
             NumberRange(min=0, message="El costo debe ser mayor o igual a 0"),
         ],
     )
+
     merma_pct = DecimalField(
         "Merma %",
         validators=[
-            DataRequired(message="La merma es requerida"),
+            InputRequired(message="La merma es requerida"),
             NumberRange(min=0, message="La merma debe ser mayor o igual a 0"),
         ],
     )
@@ -816,18 +915,15 @@ class MateriaPrimaForm(FlaskForm):
         field.data = _normalize_spaces(field.data)
 
 
+# RECETAS
 class RecetaForm(FlaskForm):
-    id_producto = SelectField(
-        "Producto",
-        coerce=int,
-        validators=[DataRequired(message="El producto es requerido")],
-        choices=[],
-    )
     nombre = StringField(
         "Nombre de la Receta",
         validators=[
             DataRequired(message="El nombre de la receta es requerido"),
-            Length(min=3, max=150, message="El nombre debe tener entre 3 y 150 caracteres"),
+            Length(
+                min=3, max=150, message="El nombre debe tener entre 3 y 150 caracteres"
+            ),
         ],
     )
     rendimiento = DecimalField(
@@ -849,6 +945,7 @@ class RecetaForm(FlaskForm):
         field.data = _normalize_spaces(field.data)
 
 
+# PRODUCCIÓN
 class ProduccionForm(FlaskForm):
     id_producto = SelectField(
         "Producto",
@@ -878,6 +975,8 @@ class ProduccionForm(FlaskForm):
         "Observaciones",
         validators=[
             Optional(),
-            Length(max=255, message="Las observaciones no pueden exceder 255 caracteres."),
+            Length(
+                max=255, message="Las observaciones no pueden exceder 255 caracteres."
+            ),
         ],
     )

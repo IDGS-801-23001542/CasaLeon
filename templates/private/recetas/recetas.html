@@ -93,7 +93,7 @@
           type="text"
           name="search"
           value="{{ search }}"
-          placeholder="Buscar por receta o producto..."
+          placeholder="Buscar por receta..."
           class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
@@ -107,107 +107,160 @@
     </form>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-    {% for receta in recetas_db %}
-      {% set total_insumos = receta.detalles | length %}
+  <div class="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[1000px]">
+        <thead class="bg-gray-50 border-b border-gray-200">
+          <tr class="text-left text-sm text-gray-600">
+            <th class="px-4 py-4 font-semibold">Receta</th>
+            <th class="px-4 py-4 font-semibold">Costo estimado</th>
+            <th class="px-4 py-4 font-semibold">Rendimiento</th>
+            <th class="px-4 py-4 font-semibold">Estado</th>
+            <th class="px-4 py-4 font-semibold text-center">Insumos</th>
+            <th class="px-4 py-4 font-semibold text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for receta in recetas_db %}
+          <tr class="border-b border-gray-100 hover:bg-gray-50">
+            <td class="px-4 py-4">
+              <div class="font-semibold text-gray-900">{{ receta.nombre }}</div>
+            </td>
 
-      <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all">
-        <div class="flex items-start justify-between mb-4 gap-3">
-          <div class="flex-1">
-            <h3 class="font-bold text-lg mb-1">{{ receta.nombre }}</h3>
-            <p class="text-sm text-gray-500">
-              {{ receta.producto.nombre if receta.producto else 'Sin producto' }}
-            </p>
+            <td class="px-4 py-4 text-gray-700">
+              ${{ receta.costo_estimado|money }}
+            </td>
+
+            <td class="px-4 py-4 text-gray-700">
+              {{ receta.rendimiento|num(4) }}
+            </td>
+
+            <td class="px-4 py-4">
+              <span class="px-3 py-1 rounded-full text-xs font-medium {% if receta.activo == 1 %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">
+                {{ 'Activa' if receta.activo == 1 else 'Inactiva' }}
+              </span>
+            </td>
+
+            <td class="px-4 py-4 text-center">
+              <a
+                href="{{ url_for('recetas.recetas_view', search=search, ver_insumos=receta.id_receta) }}"
+                class="inline-block px-4 py-2 bg-emerald-100 text-emerald-700 rounded-xl hover:bg-emerald-200 transition-colors"
+              >
+                Ver insumos
+              </a>
+            </td>
+
+            <td class="px-4 py-4">
+              <div class="flex items-center justify-center gap-2">
+                <a
+                  href="{{ url_for('recetas.actualizar_receta', id=receta.id_receta) }}"
+                  class="px-4 py-2 bg-blue-100 text-blue-700 rounded-xl hover:bg-blue-200 transition-colors"
+                >
+                  Editar
+                </a>
+
+                <a
+                  href="{{ url_for('recetas.eliminar_receta', id=receta.id_receta) }}"
+                  class="px-4 py-2 bg-red-100 text-red-700 rounded-xl hover:bg-red-200 transition-colors"
+                >
+                  Desactivar
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="6" class="px-6 py-10 text-center text-gray-500">
+              No hay recetas registradas.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% set modal_data = namespace(receta=None) %}
+  {% if request.args.get('ver_insumos') %}
+    {% set receta_id_modal = request.args.get('ver_insumos')|int %}
+    {% for receta in recetas_db %}
+      {% if receta.id_receta == receta_id_modal %}
+        {% set modal_data.receta = receta %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+
+  {% if modal_data.receta %}
+  <div class="fixed inset-0 z-50">
+    <div class="absolute inset-0 bg-black/50"></div>
+
+    <div class="relative min-h-screen flex items-center justify-center p-4">
+      <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-gray-200">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+          <div>
+            <h2 class="text-xl font-bold text-gray-900">Insumos de la receta</h2>
+            <p class="text-sm text-gray-500">{{ modal_data.receta.nombre }}</p>
           </div>
 
-          {% if receta.activo == 1 %}
-            <span class="px-3 py-1 rounded-full text-xs bg-green-100 text-green-700">
-              Activa
-            </span>
-          {% else %}
-            <span class="px-3 py-1 rounded-full text-xs bg-red-100 text-red-700">
-              Inactiva
-            </span>
-          {% endif %}
+          <a
+            href="{{ url_for('recetas.recetas_view', search=search) }}"
+            class="text-gray-400 hover:text-gray-700 text-xl"
+          >
+            ✕
+          </a>
         </div>
 
-        <div class="space-y-3 mb-4">
-          <div class="flex justify-between text-sm gap-3">
-            <span class="text-gray-500">Rendimiento:</span>
-            <span class="font-medium text-right">{{ receta.rendimiento|num(4) }}</span>
-          </div>
-
-          <div class="flex justify-between text-sm gap-3">
-            <span class="text-gray-500">Costo estimado:</span>
-            <span class="font-medium text-right">${{ receta.costo_estimado|money }}</span>
-          </div>
-
-          <div class="flex justify-between text-sm gap-3">
-            <span class="text-gray-500">Insumos:</span>
-            <span class="font-medium text-right">{{ total_insumos }}</span>
-          </div>
-
-          <div class="pt-2 border-t border-gray-200">
-            <p class="text-sm text-gray-500 mb-2">Materiales de la receta:</p>
-
-            {% if receta.detalles %}
-              <div class="space-y-2 max-h-44 overflow-y-auto pr-1">
-                {% for detalle in receta.detalles %}
-                  <div class="rounded-xl bg-gray-50 border border-gray-200 p-3">
-                    <div class="flex justify-between gap-3">
+        <div class="p-6">
+          {% if modal_data.receta.detalles %}
+            <div class="space-y-3 max-h-[420px] overflow-y-auto pr-1">
+              {% for detalle in modal_data.receta.detalles %}
+                <div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+                  <div class="flex justify-between gap-3">
+                    <div>
                       <p class="text-sm font-medium text-gray-800">
                         {{ detalle.materia_prima.nombre if detalle.materia_prima else 'Materia prima no disponible' }}
                       </p>
-                      <p class="text-sm font-semibold text-blue-600 text-right">
+
+                      {% if detalle.materia_prima %}
+                      <p class="text-xs text-gray-500 mt-1">
+                        Costo unitario: ${{ detalle.materia_prima.costo_unit_prom|money }}
+                      </p>
+                      {% endif %}
+                    </div>
+
+                    <div class="text-right">
+                      <p class="text-sm font-semibold text-blue-600">
                         {{ detalle.cantidad|num(4) }}
-                        {% if detalle.materia_prima %}
+                        {% if detalle.materia_prima and detalle.materia_prima.unidad_medida_rel %}
                           {{ detalle.materia_prima.unidad_medida_rel.nombre }}
                         {% endif %}
                       </p>
                     </div>
-
-                    {% if detalle.materia_prima %}
-                      <p class="text-xs text-gray-500 mt-1">
-                        Costo unitario: ${{ detalle.materia_prima.costo_unit_prom|money }}
-                      </p>
-                    {% endif %}
                   </div>
-                {% endfor %}
-              </div>
-            {% else %}
-              <div class="rounded-xl bg-yellow-50 border border-yellow-200 p-3">
-                <p class="text-sm text-yellow-700">
-                  Esta receta no tiene insumos registrados.
-                </p>
-              </div>
-            {% endif %}
-          </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="rounded-xl bg-yellow-50 border border-yellow-200 p-4">
+              <p class="text-sm text-yellow-700">
+                Esta receta no tiene insumos registrados.
+              </p>
+            </div>
+          {% endif %}
         </div>
 
-        <div class="flex gap-2">
+        <div class="px-6 pb-6">
           <a
-            href="{{ url_for('recetas.actualizar_receta', id=receta.id_receta) }}"
-            class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all"
+            href="{{ url_for('recetas.recetas_view', search=search) }}"
+            class="block w-full text-center px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors"
           >
-            Editar
-          </a>
-
-          <a
-            href="{{ url_for('recetas.eliminar_receta', id=receta.id_receta) }}"
-            class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl hover:shadow-lg transition-all"
-          >
-            Desactivar
+            Cerrar
           </a>
         </div>
       </div>
-
-    {% else %}
-      <div class="md:col-span-2 lg:col-span-3 bg-white rounded-2xl p-8 border border-gray-200 shadow-md text-center">
-        <p class="text-lg font-semibold text-gray-700 mb-2">No hay recetas registradas</p>
-        <p class="text-gray-500">Cuando agregues recetas, aparecerán aquí.</p>
-      </div>
-    {% endfor %}
+    </div>
   </div>
+  {% endif %}
 
 </div>
 {% endblock %}

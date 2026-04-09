@@ -122,8 +122,8 @@ class Producto(db.Model):
     nombre = db.Column(db.String(120), nullable=False, unique=True)
     descripcion = db.Column(db.String(255))
     precio_venta = db.Column(db.Numeric(12, 2), nullable=False, default=0)
-    stock_actual = db.Column(db.Numeric(14, 4), nullable=False, default=0)
-    costo_unit_prom = db.Column(db.Numeric(12, 4), nullable=False, default=0)
+    stock_actual = db.Column(db.Numeric(14, 2), nullable=False, default=0)
+    costo_unit_prom = db.Column(db.Numeric(12, 2), nullable=False, default=0)
     activo = db.Column(db.Integer, nullable=False, default=1)
     imagen = db.Column(db.String(255))
 
@@ -219,7 +219,7 @@ class VentaDetalle(db.Model):
     id_producto = db.Column(db.Integer, db.ForeignKey("productos.id_producto"), nullable=False)
     producto_nombre = db.Column(db.String(120), nullable=False)
     precio_unitario = db.Column(db.Numeric(12, 2), nullable=False, default=0)
-    cantidad = db.Column(db.Numeric(14, 4), nullable=False, default=1)
+    cantidad = db.Column(db.Numeric(14, 2), nullable=False, default=1)
     subtotal = db.Column(db.Numeric(12, 2), nullable=False, default=0)
 
     producto = db.relationship("Producto")
@@ -272,9 +272,9 @@ class MateriaPrima(db.Model):
         nullable=False,
     )
 
-    stock_actual = db.Column(db.Numeric(14, 4), nullable=False, default=0)
-    stock_minimo = db.Column(db.Numeric(14, 4), nullable=False, default=0)
-    costo_unit_prom = db.Column(db.Numeric(12, 4), nullable=False, default=0)
+    stock_actual = db.Column(db.Numeric(14, 2), nullable=False, default=0)
+    stock_minimo = db.Column(db.Numeric(14, 2), nullable=False, default=0)
+    costo_unit_prom = db.Column(db.Numeric(12, 2), nullable=False, default=0)
     merma_pct = db.Column(db.Numeric(5, 2), nullable=False, default=0)
     activo = db.Column(db.Integer, nullable=False, default=1)
 
@@ -285,15 +285,44 @@ class MateriaPrima(db.Model):
     def __repr__(self):
         return f"<MateriaPrima {self.id_materia_prima} - {self.nombre}>"
 
+class MovimientoMateriaPrima(db.Model):
+    __tablename__ = "movimientos_materia_prima"
+
+    id_movimiento_materia_prima = db.Column(db.Integer, primary_key=True)
+
+    id_materia_prima = db.Column(
+        db.Integer,
+        db.ForeignKey("materias_primas.id_materia_prima"),
+        nullable=False,
+    )
+
+    id_proveedor = db.Column(
+        db.Integer,
+        db.ForeignKey("proveedores.id_proveedor"),
+        nullable=True,
+    )
+
+    tipo = db.Column(db.String(20), nullable=False)  # ENTRADA / SALIDA
+    cantidad = db.Column(db.Numeric(14, 2), nullable=False, default=0)
+    motivo = db.Column(db.String(255))
+    creado_en = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
+
+    materia_prima = db.relationship("MateriaPrima")
+    proveedor = db.relationship("Proveedor")
+
+    def __repr__(self):
+        return f"<MovimientoMateriaPrima {self.id_movimiento_materia_prima} - {self.tipo}>"
+
+
 
 class Receta(db.Model):
     __tablename__ = "recetas"
 
     id_receta = db.Column(db.Integer, primary_key=True)
-    id_producto = db.Column(db.Integer, db.ForeignKey("productos.id_producto"), nullable=False, unique=True)
+    id_producto = db.Column(db.Integer, db.ForeignKey("productos.id_producto"), nullable=True, unique=True)
     nombre = db.Column(db.String(150), nullable=False)
-    rendimiento = db.Column(db.Numeric(14, 4), nullable=False, default=1)
-    costo_estimado = db.Column(db.Numeric(12, 4), nullable=False, default=0)
+    rendimiento = db.Column(db.Numeric(14, 2), nullable=False, default=1)
+    costo_estimado = db.Column(db.Numeric(12, 2), nullable=False, default=0)
     activo = db.Column(db.Integer, nullable=False, default=1)
     creado_en = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
 
@@ -315,7 +344,7 @@ class RecetaDetalle(db.Model):
     id_receta_detalle = db.Column(db.Integer, primary_key=True)
     id_receta = db.Column(db.Integer, db.ForeignKey("recetas.id_receta"), nullable=False)
     id_materia_prima = db.Column(db.Integer, db.ForeignKey("materias_primas.id_materia_prima"), nullable=False)
-    cantidad = db.Column(db.Numeric(14, 4), nullable=False, default=0)
+    cantidad = db.Column(db.Numeric(14, 2), nullable=False, default=0)
 
     materia_prima = db.relationship("MateriaPrima")
 
@@ -334,9 +363,9 @@ class OrdenProduccion(db.Model):
     )
 
     folio = db.Column(db.String(30), unique=True, nullable=False)
-    cantidad = db.Column(db.Numeric(14, 4), nullable=False, default=0)
+    cantidad = db.Column(db.Numeric(14, 2), nullable=False, default=0)
     estado = db.Column(db.String(30), nullable=False, default="COMPLETADA")
-    costo_estimado = db.Column(db.Numeric(12, 4), nullable=False, default=0)
+    costo_estimado = db.Column(db.Numeric(12, 2), nullable=False, default=0)
     observaciones = db.Column(db.String(255))
     creado_en = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
 
@@ -375,11 +404,11 @@ class OrdenProduccionDetalle(db.Model):
 
     materia_prima_nombre = db.Column(db.String(120), nullable=False)
     unidad_medida = db.Column(db.String(20), nullable=False)
-    cantidad_base = db.Column(db.Numeric(14, 4), nullable=False, default=0)
-    cantidad_teorica = db.Column(db.Numeric(14, 4), nullable=False, default=0)
-    cantidad_consumida = db.Column(db.Numeric(14, 4), nullable=False, default=0)
-    costo_unitario = db.Column(db.Numeric(12, 4), nullable=False, default=0)
-    subtotal = db.Column(db.Numeric(12, 4), nullable=False, default=0)
+    cantidad_base = db.Column(db.Numeric(14, 2), nullable=False, default=0)
+    cantidad_teorica = db.Column(db.Numeric(14, 2), nullable=False, default=0)
+    cantidad_consumida = db.Column(db.Numeric(14, 2), nullable=False, default=0)
+    costo_unitario = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    subtotal = db.Column(db.Numeric(12, 2), nullable=False, default=0)
 
     materia_prima = db.relationship("MateriaPrima")
 
@@ -429,10 +458,10 @@ class MermaDetalle(db.Model):
 
     materia_prima_nombre = db.Column(db.String(120), nullable=False)
     unidad_medida = db.Column(db.String(20), nullable=False)
-    cantidad = db.Column(db.Numeric(14, 4), nullable=False, default=0)
+    cantidad = db.Column(db.Numeric(14, 2), nullable=False, default=0)
     clasificacion = db.Column(db.String(50), nullable=False, default="RECORTE_UTIL")
-    valor_estimado_unit = db.Column(db.Numeric(12, 4), nullable=False, default=0)
-    valor_estimado_total = db.Column(db.Numeric(12, 4), nullable=False, default=0)
+    valor_estimado_unit = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    valor_estimado_total = db.Column(db.Numeric(12, 2), nullable=False, default=0)
 
     materia_prima = db.relationship("MateriaPrima")
 
