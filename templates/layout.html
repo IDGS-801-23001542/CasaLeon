@@ -23,7 +23,6 @@
       --cl-cart-red-hover: #b91c1c;
     }
 
-    /* Botones oscuros globales: de negro -> café oscuro */
     .bg-stone-900,
     .bg-stone-950 {
       background-color: var(--cl-brown) !important;
@@ -202,10 +201,7 @@
                 <p class="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">Casa León</p>
               </div>
               <ul class="space-y-1 text-sm text-stone-700">
-                <li><a href="{{ url_for('tienda.nosotros') }}#historia" class="block rounded-2xl px-3 py-2.5 hover:bg-stone-100">Nuestra historia</a></li>
-                <li><a href="{{ url_for('tienda.nosotros') }}#artesania" class="block rounded-2xl px-3 py-2.5 hover:bg-stone-100">Artesanía</a></li>
-                <li><a href="{{ url_for('tienda.nosotros') }}#sostenibilidad" class="block rounded-2xl px-3 py-2.5 hover:bg-stone-100">Sostenibilidad</a></li>
-                <li><a href="{{ url_for('tienda.nosotros') }}#cuidado" class="block rounded-2xl px-3 py-2.5 hover:bg-stone-100">Cuidado del producto</a></li>
+                <li><a href="{{ url_for('tienda.nosotros') }}" class="block rounded-2xl px-3 py-2.5 hover:bg-stone-100">Nuestra historia</a></li>
                 <li><a href="{{ url_for('tienda.contacto') }}" class="block rounded-2xl px-3 py-2.5 hover:bg-stone-100">Contacto</a></li>
               </ul>
             </div>
@@ -324,10 +320,8 @@
           <div>
             <p class="mb-2 px-2 text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">Descubrir</p>
             <div class="grid gap-2 text-sm">
-              <a href="{{ url_for('tienda.home') }}" class="rounded-2xl bg-stone-50 px-3 py-2.5 hover:bg-stone-100">Inicio</a>
               <a href="{{ url_for('tienda.nosotros') }}" class="rounded-2xl bg-stone-50 px-3 py-2.5 hover:bg-stone-100">Nuestra historia</a>
               <a href="{{ url_for('tienda.contacto') }}" class="rounded-2xl bg-stone-50 px-3 py-2.5 hover:bg-stone-100">Contacto</a>
-              <a href="{{ url_for('tienda.carrito') }}" class="rounded-2xl bg-stone-50 px-3 py-2.5 hover:bg-stone-100">Carrito {% if g.cart_count and g.cart_count > 0 %}({{ g.cart_count }}){% endif %}</a>
             </div>
           </div>
 
@@ -410,8 +404,6 @@
           <h3 class="text-sm font-semibold uppercase tracking-[0.18em] footer-muted">Descubrir</h3>
           <ul class="mt-4 space-y-3 text-sm">
             <li><a href="{{ url_for('tienda.nosotros') }}" class="footer-link">Nuestra historia</a></li>
-            <li><a href="{{ url_for('tienda.nosotros') }}#artesania" class="footer-link">Artesanía</a></li>
-            <li><a href="{{ url_for('tienda.nosotros') }}#sostenibilidad" class="footer-link">Sostenibilidad</a></li>
             <li><a href="{{ url_for('tienda.contacto') }}" class="footer-link">Contacto</a></li>
             <li class="pt-2 footer-muted">León, Guanajuato, México</li>
           </ul>
@@ -420,7 +412,6 @@
 
       <div class="mt-10 flex flex-col gap-3 border-t pt-6 text-sm footer-border footer-muted md:flex-row md:items-center md:justify-between">
         <p>© 2026 Casa León. Todos los derechos reservados.</p>
-        <p>Diseño inspirado en marroquinería premium.</p>
       </div>
     </div>
   </footer>

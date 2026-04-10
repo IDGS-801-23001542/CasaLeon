@@ -4,37 +4,96 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}Casa León{% endblock %}</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    function toggleSidebar() {
-      const sidebar = document.getElementById("sidebar");
-      const overlay = document.getElementById("mobile-overlay");
-      sidebar.classList.toggle("-translate-x-full");
-      overlay.classList.toggle("hidden");
-      document.body.classList.toggle("overflow-hidden");
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.5.1/flowbite.min.css" rel="stylesheet" />
+
+  <style>
+    :root{
+      --cl-forest: #1f4d3a;
+      --cl-forest-2: #295a46;
+      --cl-forest-3: #183b2d;
+      --cl-forest-soft: #edf4f0;
+      --cl-forest-border: #d9e6df;
+
+      --cl-text: #1f2937;
+      --cl-bg: #f7f8f7;
     }
 
-    function closeSidebar() {
-      const sidebar = document.getElementById("sidebar");
-      const overlay = document.getElementById("mobile-overlay");
-      sidebar.classList.add("-translate-x-full");
-      overlay.classList.add("hidden");
-      document.body.classList.remove("overflow-hidden");
+    .sidebar-shell {
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.05), transparent 28%),
+        linear-gradient(180deg, var(--cl-forest) 0%, var(--cl-forest-2) 55%, var(--cl-forest-3) 100%);
     }
-  </script>
+
+    .sidebar-scroll::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.12);
+      border-radius: 999px;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .nav-active {
+      background: rgba(255,255,255,0.14);
+      color: #ffffff;
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+    }
+
+    .nav-idle {
+      color: rgba(255,255,255,0.80);
+    }
+
+    .nav-idle:hover {
+      background: rgba(255,255,255,0.08);
+      color: #ffffff;
+    }
+
+    .panel-card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+    }
+
+    .topbar-chip {
+      background: var(--cl-forest-soft);
+      color: var(--cl-forest);
+      border: 1px solid var(--cl-forest-border);
+    }
+
+    .accordion-btn {
+      color: rgba(255,255,255,0.88);
+    }
+
+    .accordion-btn:hover {
+      background: rgba(255,255,255,0.08);
+      color: #ffffff;
+    }
+
+    .accordion-btn svg {
+      color: rgba(255,255,255,0.72);
+    }
+
+    .accordion-btn[aria-expanded="true"] {
+      background: rgba(255,255,255,0.08);
+      color: #ffffff;
+    }
+  </style>
 </head>
-<body class="min-h-screen bg-gray-100 text-gray-900">
+<body class="min-h-screen bg-[var(--cl-bg)] text-[var(--cl-text)]">
   {% set current_path = request.path %}
 
   {% if g.role == "ADMIN" %}
-    {% set nav_sections = [
+    {% set home_item = {"label": "Inicio", "path": url_for('tienda.admin_dashboard'), "icon": "🏠"} %}
+    {% set collapsible_sections = [
       {
-        "title": "Dashboard",
-        "items": [
-          {"label": "Inicio", "path": url_for('tienda.admin_dashboard'), "icon": "🏠"}
-        ]
-      },
-      {
+        "id": "produccion_catalogo",
         "title": "Producción y catálogo",
         "items": [
           {"label": "Proveedores", "path": url_for('proveedores.listado_proveedores'), "icon": "🚚"},
@@ -46,18 +105,21 @@
         ]
       },
       {
+        "id": "comercial",
         "title": "Comercial",
         "items": [
           {"label": "Ventas", "path": url_for('ventas.listado_ventas'), "icon": "💳"}
         ]
       },
       {
+        "id": "administracion",
         "title": "Administración",
         "items": [
           {"label": "Usuarios", "path": url_for('usuarios.listado_usuarios'), "icon": "👥"}
         ]
       },
       {
+        "id": "control_analisis",
         "title": "Control y análisis",
         "items": [
           {"label": "Reportes", "path": url_for('reportes.vista_reportes'), "icon": "📊"},
@@ -66,14 +128,10 @@
       }
     ] %}
   {% elif g.role == "EMPLEADO" %}
-    {% set nav_sections = [
+    {% set home_item = {"label": "Inicio", "path": url_for('tienda.vendedor_dashboard'), "icon": "🏠"} %}
+    {% set collapsible_sections = [
       {
-        "title": "Dashboard",
-        "items": [
-          {"label": "Inicio", "path": url_for('tienda.vendedor_dashboard'), "icon": "🏠"}
-        ]
-      },
-      {
+        "id": "produccion_catalogo",
         "title": "Producción y catálogo",
         "items": [
           {"label": "Recetas", "path": url_for('recetas.recetas_view'), "icon": "🧾"},
@@ -84,6 +142,7 @@
         ]
       },
       {
+        "id": "comercial",
         "title": "Comercial",
         "items": [
           {"label": "Ventas", "path": url_for('ventas.listado_ventas'), "icon": "💳"}
@@ -91,23 +150,27 @@
       }
     ] %}
   {% else %}
-    {% set nav_sections = [] %}
+    {% set home_item = None %}
+    {% set collapsible_sections = [] %}
   {% endif %}
 
-  <header class="lg:hidden sticky top-0 z-30 bg-white border-b border-gray-200 shadow-sm">
+  <header class="lg:hidden sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-stone-200 shadow-sm">
     <div class="flex items-center justify-between px-4 py-3">
       <div class="flex items-center gap-3 min-w-0">
         <button
           type="button"
-          onclick="toggleSidebar()"
-          class="inline-flex items-center justify-center w-10 h-10 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-100"
+          data-drawer-target="sidebar"
+          data-drawer-show="sidebar"
+          data-drawer-placement="left"
+          aria-controls="sidebar"
+          class="inline-flex items-center justify-center w-10 h-10 rounded-2xl border border-stone-200 text-stone-700 hover:bg-stone-100"
         >
           ☰
         </button>
 
         <div class="min-w-0">
-          <p class="font-bold text-lg truncate">Casa León</p>
-          <p class="text-xs text-gray-500 truncate">
+          <p class="font-semibold text-lg truncate text-stone-900">Casa León</p>
+          <p class="text-xs text-stone-500 truncate">
             {{ "Administrador" if g.role == "ADMIN" else "Empleado" if g.role == "EMPLEADO" else "Panel" }}
           </p>
         </div>
@@ -115,7 +178,7 @@
 
       <a
         href="{{ url_for('auth.logout') }}"
-        class="text-sm px-3 py-2 rounded-xl border border-gray-200 hover:bg-gray-100"
+        class="text-sm px-3 py-2 rounded-2xl border border-stone-200 hover:bg-stone-100 text-stone-700"
       >
         Salir
       </a>
@@ -124,67 +187,133 @@
 
   <aside
     id="sidebar"
-    class="fixed top-0 left-0 h-full w-72 bg-slate-950 text-white z-40 transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0 shadow-2xl"
+    class="sidebar-shell fixed top-0 left-0 z-40 h-screen w-72 -translate-x-full lg:translate-x-0 transition-transform"
+    aria-label="Sidebar"
   >
-    <div class="flex flex-col h-full">
-      <div class="p-6 border-b border-slate-800">
-        <div class="flex items-center gap-3">
-          <div class="w-12 h-12 bg-amber-400 rounded-2xl flex items-center justify-center shadow-lg">
-            <span class="text-slate-950 font-bold text-xl">CL</span>
+    <div class="flex h-full flex-col text-white">
+      <div class="p-6 border-b border-white/10">
+        <div class="flex items-center justify-between gap-3 lg:justify-start">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-lg ring-1 ring-black/5">
+              <img
+                src="{{ url_for('static', filename='img/casaLeon.png') }}"
+                alt="Casa León"
+                class="h-10 w-auto object-contain"
+              >
+            </div>
+
+            <div class="min-w-0">
+              <h1 class="font-semibold text-xl text-white truncate">Casa León</h1>
+              <p class="text-xs text-white/65 truncate">Panel interno</p>
+            </div>
           </div>
-          <div class="min-w-0">
-            <h1 class="font-bold text-xl text-white truncate">Casa León</h1>
-            <p class="text-xs text-slate-400 truncate">Panel interno</p>
-          </div>
+
+          <button
+            type="button"
+            data-drawer-hide="sidebar"
+            aria-controls="sidebar"
+            class="lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-2xl text-white/80 hover:bg-white/10 hover:text-white"
+          >
+            ✕
+          </button>
         </div>
       </div>
 
-      <div class="px-4 pt-4 pb-3 border-b border-slate-800">
-        <p class="text-xs uppercase tracking-wide text-slate-500">Sesión</p>
+      <div class="px-4 pt-4 pb-3 border-b border-white/10">
+        <p class="text-[11px] uppercase tracking-[0.14em] text-white/45">Sesión activa</p>
         <p class="font-semibold text-white truncate mt-1">{{ g.user.nombre if g.user else "Usuario" }}</p>
-        <p class="text-xs text-slate-400 mt-1">{{ g.role if g.role else "SIN ROL" }}</p>
+        <p class="text-xs text-white/65 mt-1">
+          {{ "Administrador" if g.role == "ADMIN" else "Empleado" if g.role == "EMPLEADO" else "Sin rol" }}
+        </p>
       </div>
 
-      <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-5">
-        {% for section in nav_sections %}
-          <div>
-            <p class="px-3 mb-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">
-              {{ section["title"] }}
-            </p>
-
-            <div class="space-y-1">
-              {% for item in section["items"] %}
-                {% set active =
-                  (item["path"] == current_path)
-                  or
-                  (item["path"] != "/" and current_path.startswith(item["path"])
-                    and item["path"] != url_for('tienda.admin_dashboard')
-                    and item["path"] != url_for('tienda.vendedor_dashboard'))
-                %}
-                <a
-                  href="{{ item['path'] }}"
-                  onclick="closeSidebar()"
-                  class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200
-                    {% if active %}
-                      bg-slate-800 text-white shadow-lg border border-slate-700
-                    {% else %}
-                      text-slate-300 hover:bg-slate-900 hover:text-white
-                    {% endif %}
-                  "
-                >
-                  <span class="text-lg">{{ item["icon"] }}</span>
-                  <span class="text-sm font-medium">{{ item["label"] }}</span>
-                </a>
-              {% endfor %}
-            </div>
+      <nav class="sidebar-scroll flex-1 overflow-y-auto px-3 py-4 space-y-4">
+        {% if home_item %}
+          {% set home_active = (home_item["path"] == current_path) %}
+          <div class="space-y-1">
+            <a
+              href="{{ home_item['path'] }}"
+              class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 {% if home_active %}nav-active{% else %}nav-idle{% endif %}"
+            >
+              <span class="text-lg">{{ home_item["icon"] }}</span>
+              <span class="text-sm font-medium">{{ home_item["label"] }}</span>
+            </a>
           </div>
-        {% endfor %}
+        {% endif %}
+
+        <div id="sidebar-accordion" data-accordion="open" class="space-y-3">
+          {% for section in collapsible_sections %}
+            {% set section_ns = namespace(has_active=false) %}
+            {% for item in section["items"] %}
+              {% set item_active =
+                (item["path"] == current_path)
+                or
+                (item["path"] != "/" and current_path.startswith(item["path"])
+                  and item["path"] != url_for('tienda.admin_dashboard')
+                  and item["path"] != url_for('tienda.vendedor_dashboard'))
+              %}
+              {% if item_active %}
+                {% set section_ns.has_active = true %}
+              {% endif %}
+            {% endfor %}
+
+            <div class="border-0">
+              <h2 id="accordion-heading-{{ section['id'] }}">
+                <button
+                  type="button"
+                  class="accordion-btn flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left transition-all duration-200"
+                  data-accordion-target="#accordion-body-{{ section['id'] }}"
+                  aria-expanded="{{ 'true' if section_ns.has_active else 'false' }}"
+                  aria-controls="accordion-body-{{ section['id'] }}"
+                >
+                  <span class="text-[11px] font-semibold uppercase tracking-[0.14em]">
+                    {{ section["title"] }}
+                  </span>
+                  <svg
+                    data-accordion-icon
+                    class="h-4 w-4 shrink-0"
+                    aria-hidden="true"
+                    viewBox="0 0 10 6"
+                    fill="none"
+                  >
+                    <path d="M9 5 5 1 1 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </h2>
+
+              <div
+                id="accordion-body-{{ section['id'] }}"
+                class="{% if not section_ns.has_active %}hidden{% endif %}"
+                aria-labelledby="accordion-heading-{{ section['id'] }}"
+              >
+                <div class="mt-2 space-y-1">
+                  {% for item in section["items"] %}
+                    {% set active =
+                      (item["path"] == current_path)
+                      or
+                      (item["path"] != "/" and current_path.startswith(item["path"])
+                        and item["path"] != url_for('tienda.admin_dashboard')
+                        and item["path"] != url_for('tienda.vendedor_dashboard'))
+                    %}
+                    <a
+                      href="{{ item['path'] }}"
+                      class="ml-2 w-[calc(100%-0.5rem)] flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 {% if active %}nav-active{% else %}nav-idle{% endif %}"
+                    >
+                      <span class="text-lg">{{ item["icon"] }}</span>
+                      <span class="text-sm font-medium">{{ item["label"] }}</span>
+                    </a>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
       </nav>
 
-      <div class="p-4 border-t border-slate-800 space-y-2">
+      <div class="p-4 border-t border-white/10 space-y-2">
         <a
           href="{{ url_for('tienda.home') }}"
-          class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-300 hover:bg-slate-900 hover:text-white transition-all duration-200"
+          class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-white/80 hover:bg-white/10 hover:text-white transition-all duration-200"
         >
           <span>🌐</span>
           <span class="text-sm font-medium">Ir al sitio público</span>
@@ -192,7 +321,7 @@
 
         <a
           href="{{ url_for('auth.logout') }}"
-          class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-300 hover:bg-red-600 hover:text-white transition-all duration-200"
+          class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-white/80 hover:bg-red-600 hover:text-white transition-all duration-200"
         >
           <span>⎋</span>
           <span class="text-sm font-medium">Cerrar sesión</span>
@@ -201,16 +330,39 @@
     </div>
   </aside>
 
-  <div
-    id="mobile-overlay"
-    class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden"
-    onclick="closeSidebar()"
-  ></div>
-
   <main class="lg:ml-72 min-h-screen">
+    <div class="border-b border-stone-200 bg-white/75 backdrop-blur">
+      <div class="px-4 py-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-stone-400">Panel Casa León</p>
+            <h2 class="mt-1 text-2xl font-semibold text-stone-900">
+              {% block page_title %}Gestión interna{% endblock %}
+            </h2>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="topbar-chip inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium">
+              {{ "Administrador" if g.role == "ADMIN" else "Empleado" if g.role == "EMPLEADO" else "Panel" }}
+            </span>
+
+            {% if g.user %}
+              <span class="inline-flex items-center rounded-full border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-600">
+                {{ g.user.nombre }}
+              </span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="p-4 sm:p-6 lg:p-8">
-      {% block content %}{% endblock %}
+      <div class="panel-card rounded-[28px] p-4 sm:p-6 lg:p-8">
+        {% block content %}{% endblock %}
+      </div>
     </div>
   </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.5.1/flowbite.min.js"></script>
 </body>
 </html>
