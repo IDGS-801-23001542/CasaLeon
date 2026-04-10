@@ -56,10 +56,20 @@
           </div>
 
           <div>
-            <label class="block mb-2 text-sm font-medium text-gray-900">Cantidad a producir</label>
+            <label class="block mb-2 text-sm font-medium text-gray-900">Lote</label>
             <input
               type="text"
-              value="{{ orden_db.cantidad|num(4) }}"
+              value="{{ orden_db.lote.nombre if orden_db.lote else 'Sin lote' }}"
+              disabled
+              class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed"
+            />
+          </div>
+
+          <div>
+            <label class="block mb-2 text-sm font-medium text-gray-900">Cantidad producida</label>
+            <input
+              type="text"
+              value="{{ orden_db.cantidad|num(2) }}"
               disabled
               class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed"
             />
@@ -130,7 +140,7 @@
 
           <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
             <p class="text-sm text-gray-500 mb-1">Cantidad</p>
-            <p class="font-semibold text-gray-800">{{ orden_db.cantidad|num(4) }}</p>
+            <p class="font-semibold text-gray-800">{{ orden_db.cantidad|num(2) }}</p>
           </div>
 
           <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">

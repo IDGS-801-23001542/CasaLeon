@@ -16,6 +16,7 @@ from models import (
     OrdenProduccionDetalle,
     Merma,
     MermaDetalle,
+    Lote,
 )
 from utils.auth import login_required
 from utils.audit import log_event
@@ -37,6 +38,10 @@ def truncar_detalle_auditoria(texto, limite=255):
 def cargar_productos_produccion(form):
     productos = Producto.query.filter_by(activo=1).order_by(Producto.nombre.asc()).all()
     form.id_producto.choices = [(p.id_producto, p.nombre) for p in productos]
+
+def cargar_lotes_produccion(form):
+    lotes = Lote.query.filter_by(activo=1).order_by(Lote.cantidad.asc()).all()
+    form.id_lote.choices = [(l.id_lote, l.nombre) for l in lotes]
 
 
 def generar_folio_produccion():
@@ -108,6 +113,7 @@ def obtener_resumen_receta_para_produccion(receta_db, cantidad_producir):
 def produccion_view():
     create_form = forms.ProduccionForm()
     cargar_productos_produccion(create_form)
+    cargar_lotes_produccion(create_form)
 
     producciones_db = OrdenProduccion.query.order_by(OrdenProduccion.id_orden_produccion.desc()).all()
     total_producciones = len(producciones_db)
@@ -131,6 +137,7 @@ def produccion_view():
 def crear_produccion():
     create_form = forms.ProduccionForm()
     cargar_productos_produccion(create_form)
+    cargar_lotes_produccion(create_form)
 
     resumen_materiales = []
     producto_db = None
@@ -170,7 +177,19 @@ def crear_produccion():
                 costo_total=costo_total,
             )
 
-        cantidad_producir = Decimal(str(create_form.cantidad.data))
+        lote = Lote.query.get(create_form.id_lote.data)
+        if not lote:
+            flash("Lote inválido.", "danger")
+            return render_template(
+                "private/produccion/produccion_create.html",
+                form=create_form,
+                resumen_materiales=resumen_materiales,
+                producto_db=producto_db,
+                receta_db=receta_db,
+                costo_total=costo_total,
+            )
+
+        cantidad_producir = Decimal(str(lote.cantidad))
         resumen_materiales = obtener_resumen_receta_para_produccion(receta_db, cantidad_producir)
 
         if not resumen_materiales:
@@ -218,6 +237,7 @@ def crear_produccion():
 
         orden_db = OrdenProduccion(
             id_producto=producto_db.id_producto,
+            id_lote=lote.id_lote,
             folio=generar_folio_produccion(),
             cantidad=cantidad_producir,
             estado=estado_nuevo,
@@ -280,6 +300,12 @@ def actualizar_produccion():
         return redirect(url_for("produccion.produccion_view"))
 
     create_form = forms.ProduccionForm()
+
+    create_form.id_lote.choices = [
+        (orden_db.id_lote, orden_db.lote.nombre if orden_db.lote else "Lote actual")
+    ]
+    create_form.id_lote.data = orden_db.id_lote
+    create_form.id_lote.validators = []
     
     create_form.id_producto.choices = [
         (
@@ -289,9 +315,6 @@ def actualizar_produccion():
     ]
     create_form.id_producto.data = orden_db.id_producto
     create_form.id_producto.validators = []
-
-    create_form.cantidad.data = orden_db.cantidad
-    create_form.cantidad.validators = []
 
     create_form.estado.choices = [
         ("PENDIENTE", "Pendiente"),
