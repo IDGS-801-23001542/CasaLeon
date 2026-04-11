@@ -23,7 +23,7 @@ class Usuario(db.Model):
     id_rol = db.Column(db.Integer, db.ForeignKey("Rol.id_rol"), nullable=False)
     nombre = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    telefono = db.Column(db.String(10))
+    telefono = db.Column(db.String(10), nullable=False, unique=True)
     password_hash = db.Column(db.String(255), nullable=False)
     activo = db.Column(db.Integer, nullable=False, default=1)
     creado_en = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)

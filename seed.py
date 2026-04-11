@@ -25,6 +25,8 @@ from models import (
     Merma,
     MermaDetalle,
     Lote,
+    Venta,
+    VentaDetalle,
 )
 
 
@@ -42,14 +44,17 @@ def reset_data():
 
     MovimientoMateriaPrima.query.delete()
 
+    VentaDetalle.query.delete()
+    Venta.query.delete()
+
+    PedidoDetalle.query.delete()
+    Pedido.query.delete()
+
     MateriaPrima.query.delete()
     CategoriaMateriaPrima.query.delete()
     UnidadMedida.query.delete()
 
     AuditoriaLog.query.delete()
-
-    PedidoDetalle.query.delete()
-    Pedido.query.delete()
 
     AuthToken.query.delete()
     Cliente.query.delete()
@@ -60,6 +65,8 @@ def reset_data():
 
     Producto.query.delete()
     CategoriaProducto.query.delete()
+
+    Lote.query.delete()
 
     db.session.commit()
     print("✔ Datos anteriores eliminados")
@@ -72,7 +79,8 @@ def seed_categorias_materia_prima():
         "Herrajes",
         "Químicos",
         "Costura",
-        "Relleno",
+        "Refuerzo",
+        "Empaque",
     ]
 
     for nombre in categorias:
@@ -117,36 +125,41 @@ def seed_staff():
     usuarios = [
         Usuario(
             id_rol=admin_rol.id_rol,
-            nombre="Administrador Casa León",
+            nombre="Martín López Herrera",
             email="admin@casaleon.com",
+            telefono="4771010101",
             password_hash=generate_password_hash("Admin123"),
             activo=1,
         ),
         Usuario(
             id_rol=empleado_rol.id_rol,
-            nombre="Empleado Casa León",
+            nombre="Ana Sofía Ramírez",
             email="empleado@casaleon.com",
+            telefono="4772020202",
             password_hash=generate_password_hash("Empleado123"),
             activo=1,
         ),
         Usuario(
             id_rol=empleado_rol.id_rol,
-            nombre="Ventas Casa León",
+            nombre="Diego Fernández Cruz",
             email="ventas@casaleon.com",
+            telefono="4773030303",
             password_hash=generate_password_hash("Ventas123"),
             activo=1,
         ),
         Usuario(
             id_rol=empleado_rol.id_rol,
-            nombre="Producción Casa León",
+            nombre="Luis Arturo Navarro",
             email="produccion@casaleon.com",
+            telefono="4774040404",
             password_hash=generate_password_hash("Produccion123"),
             activo=1,
         ),
         Usuario(
             id_rol=empleado_rol.id_rol,
-            nombre="Compras Casa León",
+            nombre="Paola Jiménez Ortega",
             email="compras@casaleon.com",
+            telefono="4775050505",
             password_hash=generate_password_hash("Compras123"),
             activo=1,
         ),
@@ -160,30 +173,47 @@ def seed_staff():
 def seed_clientes():
     clientes = [
         Cliente(
-            nombre="Juan Cliente",
-            email="cliente1@correo.com",
-            telefono="4771234567",
-            calle="Av. Roma",
-            numero="101",
-            colonia="Centro",
+            nombre="Juan Carlos Gómez Torres",
+            rfc="GOTJ900315KJ2",
+            email="juan.gomez@correo.com",
+            telefono="4776123456",
+            calle="Av. Panorama",
+            numero="145",
+            colonia="Panorama",
             ciudad="León",
             estado="Guanajuato",
             pais="México",
-            cp="37000",
+            cp="37160",
             password_hash=generate_password_hash("Cliente123"),
             activo=1,
         ),
         Cliente(
-            nombre="María Compradora",
-            email="cliente2@correo.com",
-            telefono="4779876543",
-            calle="Blvd. Delta",
-            numero="220",
-            colonia="San Isidro",
+            nombre="María Fernanda Ruiz Saldaña",
+            rfc="RUSM920824PU4",
+            email="maria.ruiz@correo.com",
+            telefono="4776987412",
+            calle="Blvd. Campestre",
+            numero="2208",
+            colonia="Jardines del Moral",
             ciudad="León",
             estado="Guanajuato",
             pais="México",
-            cp="37200",
+            cp="37160",
+            password_hash=generate_password_hash("Cliente123"),
+            activo=1,
+        ),
+        Cliente(
+            nombre="Carlos Alberto Mendoza Vega",
+            rfc="MEVC910112NB7",
+            email="carlos.mendoza@correo.com",
+            telefono="4423012298",
+            calle="Av. Universidad",
+            numero="812",
+            colonia="Centro Sur",
+            ciudad="Querétaro",
+            estado="Querétaro",
+            pais="México",
+            cp="76090",
             password_hash=generate_password_hash("Cliente123"),
             activo=1,
         ),
@@ -197,43 +227,73 @@ def seed_clientes():
 def seed_proveedores():
     proveedores = [
         Proveedor(
-            nombre="Curtidos del Bajío",
-            rfc="CUBA900101AAA",
-            email="ventas@curtidosbajio.com",
-            telefono="4771112233",
+            nombre="Pieles y Acabados del Bajío",
+            rfc="PAB190315QH1",
+            email="ventas@pabajio.com",
+            telefono="4777142201",
+            calle="Blvd. Timoteo Lozano",
+            numero="4210",
+            colonia="Ciudad Industrial",
             ciudad="León",
             estado="Guanajuato",
             pais="México",
+            cp="37490",
             activo=1,
         ),
         Proveedor(
-            nombre="Herrajes León",
-            rfc="HELE900101BBB",
-            email="contacto@herrajesleon.com",
-            telefono="4772223344",
+            nombre="Herrajes Finos de León",
+            rfc="HFL180928LJ3",
+            email="contacto@herrajesfinosleon.com",
+            telefono="4777138842",
+            calle="Calle Delta",
+            numero="152",
+            colonia="Industrial Delta",
             ciudad="León",
             estado="Guanajuato",
             pais="México",
+            cp="37545",
             activo=1,
         ),
         Proveedor(
-            nombre="Pegamentos Industriales MX",
-            rfc="PEIM900101CCC",
-            email="ventas@pegamentosmx.com",
-            telefono="4773334455",
+            nombre="Textiles y Forros del Centro",
+            rfc="TFC170611MT8",
+            email="pedidos@forroscentro.com",
+            telefono="3331457788",
+            calle="Av. Colón",
+            numero="1880",
+            colonia="Del Fresno",
             ciudad="Guadalajara",
             estado="Jalisco",
             pais="México",
+            cp="44900",
             activo=1,
         ),
         Proveedor(
-            nombre="Textiles y Forros del Norte",
-            rfc="TEFN900101DDD",
-            email="compras@forrosnorte.com",
-            telefono="8185556677",
+            nombre="Suministros Químicos Industriales MX",
+            rfc="SQI160902DA5",
+            email="ventas@sqmexico.com",
+            telefono="8183321109",
+            calle="Av. Ruiz Cortines",
+            numero="5400",
+            colonia="Mitras Norte",
             ciudad="Monterrey",
             estado="Nuevo León",
             pais="México",
+            cp="64320",
+            activo=1,
+        ),
+        Proveedor(
+            nombre="Empaques y Accesorios de Piel Occidente",
+            rfc="EAP210430TR6",
+            email="info@eapoccidente.com",
+            telefono="3319274650",
+            calle="Calzada Independencia",
+            numero="3245",
+            colonia="San Andrés",
+            ciudad="Guadalajara",
+            estado="Jalisco",
+            pais="México",
+            cp="44810",
             activo=1,
         ),
     ]
@@ -271,21 +331,126 @@ def seed_categorias():
 
 def seed_productos():
     data = [
-        ("Carteras", "CL-CAR-001", "Cartera Clásica León", 699, 18, "img/Producto1.jfif"),
-        ("Monederos", "CL-MON-001", "Monedero Compacto", 349, 25, "img/Producto2.jpeg"),
-        ("Tarjeteros", "CL-TAR-001", "Tarjetero Ejecutivo", 299, 30, "img/Producto2.jpeg"),
-        ("Cinturones", "CL-CIN-001", "Cinturón Heritage", 549, 20, "img/Producto3.jpeg"),
-        ("Bolsas tote", "CL-TOT-001", "Bolsa Tote Siena", 1299, 14, "img/Producto1.jfif"),
-        ("Bolsos de mano", "CL-BOL-001", "Bolso de Mano Verona", 1199, 12, "img/Producto4.jpeg"),
-        ("Mochilas", "CL-MOC-001", "Mochila Andanza", 1699, 10, "img/Producto5.jpeg"),
-        ("Mariconeras", "CL-MAR-001", "Mariconera Urbana", 899, 16, "img/Producto4.jpeg"),
-        ("Portafolios", "CL-POR-001", "Portafolio Ejecutivo", 1899, 8, "img/Producto1.jfif"),
-        ("Neceseres", "CL-NEC-001", "Neceser Voyage", 599, 22, "img/Producto5.jpeg"),
-        ("Fundas laptop", "CL-FUN-001", "Funda Laptop 15", 999, 11, "img/Producto5.jpeg"),
-        ("Porta pasaportes", "CL-PAS-001", "Porta Pasaporte Atlas", 399, 26, "img/Producto2.jpeg"),
-        ("Estuches lentes", "CL-EST-001", "Estuche Óptico Classic", 379, 24, "img/Producto4.jpeg"),
-        ("Llaveros", "CL-LLA-001", "Llavero Artesanal", 149, 40, "img/Producto3.jpeg"),
-        ("Pulseras", "CL-PUL-001", "Pulsera Trenzada León", 199, 35, "img/Producto3.jpeg"),
+        (
+            "Carteras",
+            "CL-CAR-001",
+            "Cartera Bifold Clásica",
+            Decimal("899.00"),
+            Decimal("18.00"),
+            "img/Producto1.jfif",
+        ),
+        (
+            "Monederos",
+            "CL-MON-001",
+            "Monedero Compacto con Cierre",
+            Decimal("429.00"),
+            Decimal("28.00"),
+            "img/Producto2.jpeg",
+        ),
+        (
+            "Tarjeteros",
+            "CL-TAR-001",
+            "Tarjetero Ejecutivo Slim",
+            Decimal("359.00"),
+            Decimal("26.00"),
+            "img/Producto2.jpeg",
+        ),
+        (
+            "Cinturones",
+            "CL-CIN-001",
+            "Cinturón Casual de Piel",
+            Decimal("649.00"),
+            Decimal("20.00"),
+            "img/Producto3.jpeg",
+        ),
+        (
+            "Bolsas tote",
+            "CL-TOT-001",
+            "Bolsa Tote Siena",
+            Decimal("1699.00"),
+            Decimal("12.00"),
+            "img/Producto1.jfif",
+        ),
+        (
+            "Bolsos de mano",
+            "CL-BOL-001",
+            "Bolso de Mano Verona",
+            Decimal("1499.00"),
+            Decimal("10.00"),
+            "img/Producto4.jpeg",
+        ),
+        (
+            "Mochilas",
+            "CL-MOC-001",
+            "Mochila Urbana de Piel",
+            Decimal("2199.00"),
+            Decimal("8.00"),
+            "img/Producto5.jpeg",
+        ),
+        (
+            "Mariconeras",
+            "CL-MAR-001",
+            "Mariconera Crossbody",
+            Decimal("1099.00"),
+            Decimal("14.00"),
+            "img/Producto4.jpeg",
+        ),
+        (
+            "Portafolios",
+            "CL-POR-001",
+            "Portafolio Ejecutivo Premium",
+            Decimal("2699.00"),
+            Decimal("6.00"),
+            "img/Producto1.jfif",
+        ),
+        (
+            "Neceseres",
+            "CL-NEC-001",
+            "Neceser de Viaje",
+            Decimal("649.00"),
+            Decimal("22.00"),
+            "img/Producto5.jpeg",
+        ),
+        (
+            "Fundas laptop",
+            "CL-FUN-001",
+            "Funda Laptop 15 Pulgadas",
+            Decimal("1299.00"),
+            Decimal("11.00"),
+            "img/Producto5.jpeg",
+        ),
+        (
+            "Porta pasaportes",
+            "CL-PAS-001",
+            "Porta Pasaporte Atlas",
+            Decimal("469.00"),
+            Decimal("24.00"),
+            "img/Producto2.jpeg",
+        ),
+        (
+            "Estuches lentes",
+            "CL-EST-001",
+            "Estuche para Lentes Soft Case",
+            Decimal("399.00"),
+            Decimal("23.00"),
+            "img/Producto4.jpeg",
+        ),
+        (
+            "Llaveros",
+            "CL-LLA-001",
+            "Llavero de Piel Artesanal",
+            Decimal("189.00"),
+            Decimal("45.00"),
+            "img/Producto3.jpeg",
+        ),
+        (
+            "Pulseras",
+            "CL-PUL-001",
+            "Pulsera Trenzada de Piel",
+            Decimal("249.00"),
+            Decimal("34.00"),
+            "img/Producto3.jpeg",
+        ),
     ]
 
     for categoria_nombre, sku, nombre, precio, stock, imagen in data:
@@ -295,10 +460,10 @@ def seed_productos():
             id_categoria_producto=categoria.id_categoria_producto,
             sku=sku,
             nombre=nombre,
-            descripcion="Producto de cuero premium Casa León.",
+            descripcion=f"{nombre} elaborada con materiales para marroquinería y acabado artesanal.",
             precio_venta=precio,
             stock_actual=stock,
-            costo_unit_prom=round(precio * 0.4, 2),
+            costo_unit_prom=(precio * Decimal("0.42")).quantize(Decimal("0.01")),
             activo=1,
             imagen=imagen,
         )
@@ -310,28 +475,201 @@ def seed_productos():
 
 def seed_materias_primas():
     materias = [
-        ("Cuero vacuno premium café", "Cuero", "dm2", Decimal("850.00"), Decimal("100.00"), Decimal("28.00"), Decimal("5.00")),
-        ("Cuero vacuno negro", "Cuero", "dm2", Decimal("700.00"), Decimal("100.00"), Decimal("26.50"), Decimal("5.00")),
-
-        ("Forro textil beige", "Forro", "m", Decimal("150.00"), Decimal("20.00"), Decimal("45.00"), Decimal("2.00")),
-        ("Forro textil negro", "Forro", "m", Decimal("120.00"), Decimal("20.00"), Decimal("45.00"), Decimal("2.00")),
-
-        ("Cierre metálico 20cm", "Herrajes", "pieza", Decimal("320.00"), Decimal("50.00"), Decimal("18.00"), Decimal("0.00")),
-        ("Cierre metálico 35cm", "Herrajes", "pieza", Decimal("240.00"), Decimal("40.00"), Decimal("22.00"), Decimal("0.00")),
-        ("Hebilla cinturón clásica", "Herrajes", "pieza", Decimal("110.00"), Decimal("20.00"), Decimal("35.00"), Decimal("0.00")),
-        ("Broche magnético", "Herrajes", "pieza", Decimal("180.00"), Decimal("30.00"), Decimal("12.00"), Decimal("0.00")),
-        ("Remache decorativo", "Herrajes", "pieza", Decimal("500.00"), Decimal("100.00"), Decimal("2.50"), Decimal("0.00")),
-
-        ("Pegamento industrial", "Químicos", "litro", Decimal("40.00"), Decimal("5.00"), Decimal("90.00"), Decimal("3.00")),
-
-        ("Hilo encerado café", "Costura", "m", Decimal("6000.00"), Decimal("1000.00"), Decimal("0.06"), Decimal("0.00")),
-        ("Hilo encerado negro", "Costura", "m", Decimal("6000.00"), Decimal("1000.00"), Decimal("0.06"), Decimal("0.00")),
-
-        ("Espuma de protección", "Relleno", "m", Decimal("80.00"), Decimal("10.00"), Decimal("30.00"), Decimal("1.00")),
+        # nombre, categoria, unidad, stock_actual, stock_minimo, costo_unit_prom, merma_pct
+        (
+            "Cuero vacuno liso color café",
+            "Cuero",
+            "dm2",
+            Decimal("950.00"),
+            Decimal("120.00"),
+            Decimal("29.50"),
+            Decimal("6.00"),
+        ),
+        (
+            "Cuero vacuno liso color negro",
+            "Cuero",
+            "dm2",
+            Decimal("1100.00"),
+            Decimal("140.00"),
+            Decimal("28.80"),
+            Decimal("6.00"),
+        ),
+        (
+            "Cuero vacuno graneado miel",
+            "Cuero",
+            "dm2",
+            Decimal("700.00"),
+            Decimal("100.00"),
+            Decimal("31.20"),
+            Decimal("6.00"),
+        ),
+        (
+            "Forro textil poliéster beige",
+            "Forro",
+            "m",
+            Decimal("180.00"),
+            Decimal("25.00"),
+            Decimal("42.00"),
+            Decimal("2.00"),
+        ),
+        (
+            "Forro textil poliéster negro",
+            "Forro",
+            "m",
+            Decimal("220.00"),
+            Decimal("30.00"),
+            Decimal("42.00"),
+            Decimal("2.00"),
+        ),
+        (
+            "Microfibra gamuzada camel",
+            "Forro",
+            "m",
+            Decimal("90.00"),
+            Decimal("15.00"),
+            Decimal("68.00"),
+            Decimal("2.00"),
+        ),
+        (
+            "Cierre metálico 20 cm níquel",
+            "Herrajes",
+            "pieza",
+            Decimal("350.00"),
+            Decimal("60.00"),
+            Decimal("8.50"),
+            Decimal("0.00"),
+        ),
+        (
+            "Cierre metálico 35 cm níquel",
+            "Herrajes",
+            "pieza",
+            Decimal("240.00"),
+            Decimal("40.00"),
+            Decimal("14.50"),
+            Decimal("0.00"),
+        ),
+        (
+            "Hebilla clásica para cinturón 40 mm",
+            "Herrajes",
+            "pieza",
+            Decimal("180.00"),
+            Decimal("30.00"),
+            Decimal("32.00"),
+            Decimal("0.00"),
+        ),
+        (
+            "Broche magnético 18 mm",
+            "Herrajes",
+            "pieza",
+            Decimal("420.00"),
+            Decimal("80.00"),
+            Decimal("6.80"),
+            Decimal("0.00"),
+        ),
+        (
+            "Argolla D 25 mm",
+            "Herrajes",
+            "pieza",
+            Decimal("300.00"),
+            Decimal("50.00"),
+            Decimal("4.20"),
+            Decimal("0.00"),
+        ),
+        (
+            "Remache doble cabeza 9 mm",
+            "Herrajes",
+            "pieza",
+            Decimal("1000.00"),
+            Decimal("200.00"),
+            Decimal("1.20"),
+            Decimal("0.00"),
+        ),
+        (
+            "Pegamento para cuero base solvente",
+            "Químicos",
+            "litro",
+            Decimal("55.00"),
+            Decimal("8.00"),
+            Decimal("118.00"),
+            Decimal("3.00"),
+        ),
+        (
+            "Tinta para canto color café",
+            "Químicos",
+            "litro",
+            Decimal("18.00"),
+            Decimal("3.00"),
+            Decimal("165.00"),
+            Decimal("2.00"),
+        ),
+        (
+            "Hilo encerado café 0.8 mm",
+            "Costura",
+            "m",
+            Decimal("8000.00"),
+            Decimal("1200.00"),
+            Decimal("0.55"),
+            Decimal("0.00"),
+        ),
+        (
+            "Hilo encerado negro 0.8 mm",
+            "Costura",
+            "m",
+            Decimal("8200.00"),
+            Decimal("1200.00"),
+            Decimal("0.55"),
+            Decimal("0.00"),
+        ),
+        (
+            "Espuma laminada 3 mm",
+            "Refuerzo",
+            "m",
+            Decimal("110.00"),
+            Decimal("15.00"),
+            Decimal("36.00"),
+            Decimal("1.00"),
+        ),
+        (
+            "Entretela rígida adhesiva",
+            "Refuerzo",
+            "m",
+            Decimal("130.00"),
+            Decimal("20.00"),
+            Decimal("24.00"),
+            Decimal("1.00"),
+        ),
+        (
+            "Caja kraft mediana",
+            "Empaque",
+            "pieza",
+            Decimal("250.00"),
+            Decimal("50.00"),
+            Decimal("11.50"),
+            Decimal("0.00"),
+        ),
+        (
+            "Bolsa cubrepolvo de tela",
+            "Empaque",
+            "pieza",
+            Decimal("180.00"),
+            Decimal("40.00"),
+            Decimal("9.80"),
+            Decimal("0.00"),
+        ),
     ]
 
-    for nombre, categoria_nombre, unidad_nombre, stock, minimo, costo, merma in materias:
-        categoria = CategoriaMateriaPrima.query.filter_by(nombre=categoria_nombre).first()
+    for (
+        nombre,
+        categoria_nombre,
+        unidad_nombre,
+        stock,
+        minimo,
+        costo,
+        merma,
+    ) in materias:
+        categoria = CategoriaMateriaPrima.query.filter_by(
+            nombre=categoria_nombre
+        ).first()
         unidad = UnidadMedida.query.filter_by(nombre=unidad_nombre).first()
 
         db.session.add(
@@ -368,48 +706,50 @@ def costo_receta(detalles):
 def seed_recetas():
     recetas_data = [
         (
-            "Cartera Clásica León",
-            "Receta Cartera Clásica León",
+            "Cartera Bifold Clásica",
+            "Receta Cartera Bifold Clásica",
             Decimal("1.00"),
             [
-                ("Cuero vacuno premium café", Decimal("35.00")),
-                ("Forro textil beige", Decimal("0.20")),
-                ("Cierre metálico 20cm", Decimal("1.00")),
-                ("Pegamento industrial", Decimal("0.05")),
-                ("Hilo encerado café", Decimal("10.00")),
+                ("Cuero vacuno liso color café", Decimal("18.00")),
+                ("Forro textil poliéster beige", Decimal("0.12")),
+                ("Pegamento para cuero base solvente", Decimal("0.02")),
+                ("Hilo encerado café 0.8 mm", Decimal("5.00")),
+                ("Tinta para canto color café", Decimal("0.01")),
             ],
         ),
         (
-            "Monedero Compacto",
-            "Receta Monedero Compacto",
+            "Monedero Compacto con Cierre",
+            "Receta Monedero Compacto con Cierre",
             Decimal("1.00"),
             [
-                ("Cuero vacuno negro", Decimal("12.00")),
-                ("Forro textil negro", Decimal("0.08")),
-                ("Cierre metálico 20cm", Decimal("1.00")),
-                ("Pegamento industrial", Decimal("0.02")),
-                ("Hilo encerado negro", Decimal("5.00")),
+                ("Cuero vacuno liso color negro", Decimal("8.00")),
+                ("Forro textil poliéster negro", Decimal("0.06")),
+                ("Cierre metálico 20 cm níquel", Decimal("1.00")),
+                ("Pegamento para cuero base solvente", Decimal("0.01")),
+                ("Hilo encerado negro 0.8 mm", Decimal("3.00")),
             ],
         ),
         (
-            "Tarjetero Ejecutivo",
-            "Receta Tarjetero Ejecutivo",
+            "Tarjetero Ejecutivo Slim",
+            "Receta Tarjetero Ejecutivo Slim",
             Decimal("1.00"),
             [
-                ("Cuero vacuno negro", Decimal("10.00")),
-                ("Forro textil negro", Decimal("0.04")),
-                ("Pegamento industrial", Decimal("0.01")),
-                ("Hilo encerado negro", Decimal("3.00")),
+                ("Cuero vacuno liso color negro", Decimal("7.00")),
+                ("Microfibra gamuzada camel", Decimal("0.04")),
+                ("Pegamento para cuero base solvente", Decimal("0.01")),
+                ("Hilo encerado negro 0.8 mm", Decimal("2.50")),
+                ("Tinta para canto color café", Decimal("0.01")),
             ],
         ),
         (
-            "Cinturón Heritage",
-            "Receta Cinturón Heritage",
+            "Cinturón Casual de Piel",
+            "Receta Cinturón Casual de Piel",
             Decimal("1.00"),
             [
-                ("Cuero vacuno premium café", Decimal("45.00")),
-                ("Hebilla cinturón clásica", Decimal("1.00")),
-                ("Hilo encerado café", Decimal("6.00")),
+                ("Cuero vacuno liso color café", Decimal("22.00")),
+                ("Hebilla clásica para cinturón 40 mm", Decimal("1.00")),
+                ("Hilo encerado café 0.8 mm", Decimal("2.00")),
+                ("Tinta para canto color café", Decimal("0.01")),
             ],
         ),
         (
@@ -417,12 +757,13 @@ def seed_recetas():
             "Receta Bolsa Tote Siena",
             Decimal("1.00"),
             [
-                ("Cuero vacuno premium café", Decimal("90.00")),
-                ("Forro textil beige", Decimal("0.45")),
-                ("Cierre metálico 35cm", Decimal("1.00")),
-                ("Pegamento industrial", Decimal("0.08")),
-                ("Hilo encerado café", Decimal("16.00")),
-                ("Espuma de protección", Decimal("0.25")),
+                ("Cuero vacuno graneado miel", Decimal("42.00")),
+                ("Forro textil poliéster beige", Decimal("0.45")),
+                ("Cierre metálico 35 cm níquel", Decimal("1.00")),
+                ("Argolla D 25 mm", Decimal("2.00")),
+                ("Pegamento para cuero base solvente", Decimal("0.05")),
+                ("Hilo encerado café 0.8 mm", Decimal("12.00")),
+                ("Entretela rígida adhesiva", Decimal("0.20")),
             ],
         ),
         (
@@ -430,80 +771,83 @@ def seed_recetas():
             "Receta Bolso de Mano Verona",
             Decimal("1.00"),
             [
-                ("Cuero vacuno premium café", Decimal("75.00")),
-                ("Forro textil beige", Decimal("0.40")),
-                ("Cierre metálico 35cm", Decimal("1.00")),
-                ("Broche magnético", Decimal("1.00")),
-                ("Pegamento industrial", Decimal("0.08")),
-                ("Hilo encerado café", Decimal("15.00")),
-                ("Espuma de protección", Decimal("0.20")),
+                ("Cuero vacuno liso color café", Decimal("34.00")),
+                ("Microfibra gamuzada camel", Decimal("0.35")),
+                ("Cierre metálico 35 cm níquel", Decimal("1.00")),
+                ("Broche magnético 18 mm", Decimal("1.00")),
+                ("Pegamento para cuero base solvente", Decimal("0.04")),
+                ("Hilo encerado café 0.8 mm", Decimal("9.00")),
+                ("Entretela rígida adhesiva", Decimal("0.18")),
             ],
         ),
         (
-            "Mochila Andanza",
-            "Receta Mochila Andanza",
+            "Mochila Urbana de Piel",
+            "Receta Mochila Urbana de Piel",
             Decimal("1.00"),
             [
-                ("Cuero vacuno negro", Decimal("120.00")),
-                ("Forro textil negro", Decimal("0.80")),
-                ("Cierre metálico 35cm", Decimal("3.00")),
-                ("Broche magnético", Decimal("2.00")),
-                ("Pegamento industrial", Decimal("0.12")),
-                ("Hilo encerado negro", Decimal("25.00")),
-                ("Espuma de protección", Decimal("0.35")),
+                ("Cuero vacuno liso color negro", Decimal("58.00")),
+                ("Forro textil poliéster negro", Decimal("0.75")),
+                ("Cierre metálico 35 cm níquel", Decimal("2.00")),
+                ("Broche magnético 18 mm", Decimal("2.00")),
+                ("Argolla D 25 mm", Decimal("4.00")),
+                ("Pegamento para cuero base solvente", Decimal("0.08")),
+                ("Hilo encerado negro 0.8 mm", Decimal("18.00")),
+                ("Espuma laminada 3 mm", Decimal("0.35")),
             ],
         ),
         (
-            "Mariconera Urbana",
-            "Receta Mariconera Urbana",
+            "Mariconera Crossbody",
+            "Receta Mariconera Crossbody",
             Decimal("1.00"),
             [
-                ("Cuero vacuno negro", Decimal("50.00")),
-                ("Forro textil negro", Decimal("0.25")),
-                ("Cierre metálico 20cm", Decimal("2.00")),
-                ("Pegamento industrial", Decimal("0.05")),
-                ("Hilo encerado negro", Decimal("10.00")),
-                ("Broche magnético", Decimal("1.00")),
+                ("Cuero vacuno liso color negro", Decimal("24.00")),
+                ("Forro textil poliéster negro", Decimal("0.18")),
+                ("Cierre metálico 20 cm níquel", Decimal("2.00")),
+                ("Argolla D 25 mm", Decimal("2.00")),
+                ("Pegamento para cuero base solvente", Decimal("0.03")),
+                ("Hilo encerado negro 0.8 mm", Decimal("7.00")),
             ],
         ),
         (
-            "Portafolio Ejecutivo",
-            "Receta Portafolio Ejecutivo",
+            "Portafolio Ejecutivo Premium",
+            "Receta Portafolio Ejecutivo Premium",
             Decimal("1.00"),
             [
-                ("Cuero vacuno premium café", Decimal("140.00")),
-                ("Forro textil beige", Decimal("0.90")),
-                ("Cierre metálico 35cm", Decimal("2.00")),
-                ("Broche magnético", Decimal("2.00")),
-                ("Pegamento industrial", Decimal("0.15")),
-                ("Hilo encerado café", Decimal("30.00")),
-                ("Espuma de protección", Decimal("0.40")),
-                ("Remache decorativo", Decimal("6.00")),
+                ("Cuero vacuno liso color café", Decimal("68.00")),
+                ("Microfibra gamuzada camel", Decimal("0.80")),
+                ("Cierre metálico 35 cm níquel", Decimal("2.00")),
+                ("Broche magnético 18 mm", Decimal("2.00")),
+                ("Argolla D 25 mm", Decimal("4.00")),
+                ("Remache doble cabeza 9 mm", Decimal("6.00")),
+                ("Pegamento para cuero base solvente", Decimal("0.10")),
+                ("Hilo encerado café 0.8 mm", Decimal("20.00")),
+                ("Espuma laminada 3 mm", Decimal("0.40")),
+                ("Entretela rígida adhesiva", Decimal("0.30")),
             ],
         ),
         (
-            "Neceser Voyage",
-            "Receta Neceser Voyage",
+            "Neceser de Viaje",
+            "Receta Neceser de Viaje",
             Decimal("1.00"),
             [
-                ("Cuero vacuno negro", Decimal("30.00")),
-                ("Forro textil negro", Decimal("0.20")),
-                ("Cierre metálico 20cm", Decimal("1.00")),
-                ("Pegamento industrial", Decimal("0.03")),
-                ("Hilo encerado negro", Decimal("6.00")),
+                ("Cuero vacuno liso color negro", Decimal("16.00")),
+                ("Forro textil poliéster negro", Decimal("0.16")),
+                ("Cierre metálico 20 cm níquel", Decimal("1.00")),
+                ("Pegamento para cuero base solvente", Decimal("0.02")),
+                ("Hilo encerado negro 0.8 mm", Decimal("4.00")),
             ],
         ),
         (
-            "Funda Laptop 15",
-            "Receta Funda Laptop 15",
+            "Funda Laptop 15 Pulgadas",
+            "Receta Funda Laptop 15 Pulgadas",
             Decimal("1.00"),
             [
-                ("Cuero vacuno negro", Decimal("80.00")),
-                ("Forro textil negro", Decimal("0.50")),
-                ("Cierre metálico 35cm", Decimal("2.00")),
-                ("Pegamento industrial", Decimal("0.08")),
-                ("Hilo encerado negro", Decimal("12.00")),
-                ("Espuma de protección", Decimal("0.50")),
+                ("Cuero vacuno liso color negro", Decimal("30.00")),
+                ("Microfibra gamuzada camel", Decimal("0.40")),
+                ("Cierre metálico 35 cm níquel", Decimal("2.00")),
+                ("Pegamento para cuero base solvente", Decimal("0.04")),
+                ("Hilo encerado negro 0.8 mm", Decimal("8.00")),
+                ("Espuma laminada 3 mm", Decimal("0.45")),
             ],
         ),
         (
@@ -511,43 +855,44 @@ def seed_recetas():
             "Receta Porta Pasaporte Atlas",
             Decimal("1.00"),
             [
-                ("Cuero vacuno premium café", Decimal("18.00")),
-                ("Forro textil beige", Decimal("0.08")),
-                ("Pegamento industrial", Decimal("0.02")),
-                ("Hilo encerado café", Decimal("4.00")),
+                ("Cuero vacuno liso color café", Decimal("9.00")),
+                ("Microfibra gamuzada camel", Decimal("0.05")),
+                ("Pegamento para cuero base solvente", Decimal("0.01")),
+                ("Hilo encerado café 0.8 mm", Decimal("2.00")),
+                ("Tinta para canto color café", Decimal("0.01")),
             ],
         ),
         (
-            "Estuche Óptico Classic",
-            "Receta Estuche Óptico Classic",
+            "Estuche para Lentes Soft Case",
+            "Receta Estuche para Lentes Soft Case",
             Decimal("1.00"),
             [
-                ("Cuero vacuno negro", Decimal("20.00")),
-                ("Forro textil negro", Decimal("0.10")),
-                ("Broche magnético", Decimal("1.00")),
-                ("Pegamento industrial", Decimal("0.02")),
-                ("Hilo encerado negro", Decimal("4.00")),
-                ("Espuma de protección", Decimal("0.05")),
+                ("Cuero vacuno liso color negro", Decimal("10.00")),
+                ("Microfibra gamuzada camel", Decimal("0.08")),
+                ("Broche magnético 18 mm", Decimal("1.00")),
+                ("Pegamento para cuero base solvente", Decimal("0.01")),
+                ("Hilo encerado negro 0.8 mm", Decimal("2.00")),
+                ("Espuma laminada 3 mm", Decimal("0.05")),
             ],
         ),
         (
-            "Llavero Artesanal",
-            "Receta Llavero Artesanal",
+            "Llavero de Piel Artesanal",
+            "Receta Llavero de Piel Artesanal",
             Decimal("1.00"),
             [
-                ("Cuero vacuno premium café", Decimal("3.00")),
-                ("Remache decorativo", Decimal("1.00")),
-                ("Hilo encerado café", Decimal("1.00")),
+                ("Cuero vacuno liso color café", Decimal("1.50")),
+                ("Remache doble cabeza 9 mm", Decimal("1.00")),
+                ("Hilo encerado café 0.8 mm", Decimal("0.50")),
             ],
         ),
         (
-            "Pulsera Trenzada León",
-            "Receta Pulsera Trenzada León",
+            "Pulsera Trenzada de Piel",
+            "Receta Pulsera Trenzada de Piel",
             Decimal("1.00"),
             [
-                ("Cuero vacuno negro", Decimal("5.00")),
-                ("Broche magnético", Decimal("1.00")),
-                ("Hilo encerado negro", Decimal("1.00")),
+                ("Cuero vacuno liso color negro", Decimal("2.50")),
+                ("Broche magnético 18 mm", Decimal("1.00")),
+                ("Hilo encerado negro 0.8 mm", Decimal("0.50")),
             ],
         ),
     ]
@@ -579,76 +924,77 @@ def seed_recetas():
     print("✔ Recetas insertadas")
 
 
-def seed_pedidos():
-    cliente = Cliente.query.filter_by(email="cliente1@correo.com").first()
-    producto1 = Producto.query.filter_by(nombre="Cartera Clásica León").first()
-    producto2 = Producto.query.filter_by(nombre="Monedero Compacto").first()
+def seed_movimientos_materia_prima():
+    proveedor_cuero = Proveedor.query.filter_by(
+        nombre="Pieles y Acabados del Bajío"
+    ).first()
+    proveedor_herrajes = Proveedor.query.filter_by(
+        nombre="Herrajes Finos de León"
+    ).first()
+    proveedor_quimicos = Proveedor.query.filter_by(
+        nombre="Suministros Químicos Industriales MX"
+    ).first()
 
-    pedido = Pedido(
-        id_cliente=cliente.id_cliente,
-        folio="PED20260401-0001",
-        estado="Pendiente",
-        total=Decimal("1048.00"),
-        nombre_envio=cliente.nombre,
-        telefono_envio=cliente.telefono,
-        calle_envio=cliente.calle,
-        numero_envio=cliente.numero,
-        colonia_envio=cliente.colonia,
-        ciudad_envio=cliente.ciudad,
-        estado_envio=cliente.estado,
-        pais_envio=cliente.pais,
-        cp_envio=cliente.cp,
-        notas="Entregar por la tarde",
-    )
-    db.session.add(pedido)
-    db.session.flush()
-
-    detalles = [
-        PedidoDetalle(
-            id_pedido=pedido.id_pedido,
-            id_producto=producto1.id_producto,
-            producto_nombre=producto1.nombre,
-            precio_unitario=producto1.precio_venta,
-            cantidad=1,
-            subtotal=producto1.precio_venta,
+    movimientos = [
+        (
+            "Cuero vacuno liso color café",
+            proveedor_cuero.id_proveedor,
+            "ENTRADA",
+            Decimal("180.00"),
+            "Compra inicial de cuero café",
         ),
-        PedidoDetalle(
-            id_pedido=pedido.id_pedido,
-            id_producto=producto2.id_producto,
-            producto_nombre=producto2.nombre,
-            precio_unitario=producto2.precio_venta,
-            cantidad=1,
-            subtotal=producto2.precio_venta,
+        (
+            "Cuero vacuno liso color negro",
+            proveedor_cuero.id_proveedor,
+            "ENTRADA",
+            Decimal("220.00"),
+            "Compra inicial de cuero negro",
+        ),
+        (
+            "Forro textil poliéster beige",
+            None,
+            "ENTRADA",
+            Decimal("40.00"),
+            "Ingreso por ajuste de inventario",
+        ),
+        (
+            "Cierre metálico 20 cm níquel",
+            proveedor_herrajes.id_proveedor,
+            "ENTRADA",
+            Decimal("100.00"),
+            "Compra de cierres 20 cm",
+        ),
+        (
+            "Hebilla clásica para cinturón 40 mm",
+            proveedor_herrajes.id_proveedor,
+            "ENTRADA",
+            Decimal("40.00"),
+            "Compra de hebillas",
+        ),
+        (
+            "Pegamento para cuero base solvente",
+            proveedor_quimicos.id_proveedor,
+            "ENTRADA",
+            Decimal("10.00"),
+            "Compra de adhesivo",
         ),
     ]
 
-    db.session.add_all(detalles)
+    for nombre_mp, id_proveedor, tipo, cantidad, motivo in movimientos:
+        mp = MateriaPrima.query.filter_by(nombre=nombre_mp).first()
+
+        db.session.add(
+            MovimientoMateriaPrima(
+                id_materia_prima=mp.id_materia_prima,
+                id_proveedor=id_proveedor,
+                tipo=tipo,
+                cantidad=cantidad,
+                motivo=motivo,
+            )
+        )
+
     db.session.commit()
-    print("✔ Pedidos demo insertados")
-
-
-def seed_auditoria():
-    logs = [
-        AuditoriaLog(modulo="Autenticación", accion="Inicio de sesión", detalle="Usuario administrador inició sesión exitosamente", severidad="INFO", actor_nombre="Administrador Casa León", actor_email="admin@casaleon.com", ip_addr="192.168.1.100"),
-        AuditoriaLog(modulo="Compras", accion="Orden de compra creada", detalle="Nueva orden OC-2026-045 creada", severidad="INFO", actor_nombre="Compras Casa León", actor_email="compras@casaleon.com", ip_addr="192.168.1.105"),
-        AuditoriaLog(modulo="Ventas", accion="Error de validación", detalle="Intento de venta con stock insuficiente", severidad="WARNING", actor_nombre="Ventas Casa León", actor_email="ventas@casaleon.com", ip_addr="192.168.1.108"),
-        AuditoriaLog(modulo="Usuarios", accion="Usuario creado", detalle="Nuevo usuario 'produccion@casaleon.com' creado", severidad="INFO", actor_nombre="Administrador Casa León", actor_email="admin@casaleon.com", ip_addr="192.168.1.100"),
-        AuditoriaLog(modulo="Inventario", accion="Inventario actualizado", detalle="Stock del producto CL-CAR-001 actualizado", severidad="INFO", actor_nombre="Empleado Casa León", actor_email="empleado@casaleon.com", ip_addr="192.168.1.112"),
-        AuditoriaLog(modulo="Pagos", accion="Error de conexión", detalle="Timeout con proveedor de pagos", severidad="ERROR", actor_nombre="Sistema", actor_email="sistema@casaleon.com", ip_addr="192.168.1.1"),
-        AuditoriaLog(modulo="Autenticación", accion="Cambio de contraseña", detalle="Usuario cambió su contraseña exitosamente", severidad="INFO", actor_nombre="Ventas Casa León", actor_email="ventas@casaleon.com", ip_addr="192.168.1.108"),
-        AuditoriaLog(modulo="Producción", accion="Orden de producción completada", detalle="Orden OP-2026-123 completada", severidad="INFO", actor_nombre="Producción Casa León", actor_email="produccion@casaleon.com", ip_addr="192.168.1.110"),
-        AuditoriaLog(modulo="Autenticación", accion="Acceso denegado", detalle="Intento de acceso sin permisos suficientes", severidad="WARNING", actor_nombre="Invitado", actor_email="invitado@casaleon.com", ip_addr="192.168.1.200"),
-        AuditoriaLog(modulo="Sistema", accion="Backup completado", detalle="Respaldo automático completado", severidad="INFO", actor_nombre="Sistema", actor_email="sistema@casaleon.com", ip_addr="192.168.1.1"),
-        AuditoriaLog(modulo="Usuarios", accion="Permisos modificados", detalle="Permisos de usuario 'ventas@casaleon.com' actualizados", severidad="WARNING", actor_nombre="Administrador Casa León", actor_email="admin@casaleon.com", ip_addr="192.168.1.100"),
-        AuditoriaLog(modulo="Ventas", accion="Venta procesada", detalle="Venta VEN-2026-892 procesada exitosamente", severidad="INFO", actor_nombre="Ventas Casa León", actor_email="ventas@casaleon.com", ip_addr="192.168.1.108"),
-        AuditoriaLog(modulo="Sistema", accion="Error crítico", detalle="Espacio en disco por debajo del 10%", severidad="CRITICAL", actor_nombre="Sistema", actor_email="sistema@casaleon.com", ip_addr="192.168.1.1"),
-        AuditoriaLog(modulo="Usuarios", accion="Usuario eliminado", detalle="Usuario temporal eliminado del sistema", severidad="WARNING", actor_nombre="Administrador Casa León", actor_email="admin@casaleon.com", ip_addr="192.168.1.100"),
-        AuditoriaLog(modulo="Proveedores", accion="Proveedor actualizado", detalle="Información de proveedor PROV-015 actualizada", severidad="INFO", actor_nombre="Compras Casa León", actor_email="compras@casaleon.com", ip_addr="192.168.1.105"),
-    ]
-
-    db.session.add_all(logs)
-    db.session.commit()
-    print("✔ Auditoría demo insertada")
+    print("✔ Movimientos de materia prima insertados")
 
 
 def seed_lotes():
@@ -661,16 +1007,272 @@ def seed_lotes():
     ]
 
     for nombre, cantidad in lotes:
-        db.session.add(
-            Lote(
-                nombre=nombre,
-                cantidad=cantidad,
-                activo=1
-            )
-        )
+        db.session.add(Lote(nombre=nombre, cantidad=cantidad, activo=1))
 
     db.session.commit()
     print("✔ Lotes insertados")
+
+
+def seed_pedidos():
+    cliente_1 = Cliente.query.filter_by(email="juan.gomez@correo.com").first()
+    cliente_2 = Cliente.query.filter_by(email="maria.ruiz@correo.com").first()
+
+    cartera = Producto.query.filter_by(nombre="Cartera Bifold Clásica").first()
+    monedero = Producto.query.filter_by(nombre="Monedero Compacto con Cierre").first()
+    tote = Producto.query.filter_by(nombre="Bolsa Tote Siena").first()
+    llavero = Producto.query.filter_by(nombre="Llavero de Piel Artesanal").first()
+
+    pedido_1 = Pedido(
+        id_cliente=cliente_1.id_cliente,
+        folio="PED20260401-0001",
+        estado="Entregado",
+        total=Decimal("1508.00"),
+        nombre_envio=cliente_1.nombre,
+        telefono_envio=cliente_1.telefono,
+        calle_envio=cliente_1.calle,
+        numero_envio=cliente_1.numero,
+        colonia_envio=cliente_1.colonia,
+        ciudad_envio=cliente_1.ciudad,
+        estado_envio=cliente_1.estado,
+        pais_envio=cliente_1.pais,
+        cp_envio=cliente_1.cp,
+        notas="Entregar por la tarde",
+    )
+    db.session.add(pedido_1)
+    db.session.flush()
+
+    detalles_1 = [
+        PedidoDetalle(
+            id_pedido=pedido_1.id_pedido,
+            id_producto=cartera.id_producto,
+            producto_nombre=cartera.nombre,
+            precio_unitario=cartera.precio_venta,
+            cantidad=1,
+            subtotal=cartera.precio_venta,
+        ),
+        PedidoDetalle(
+            id_pedido=pedido_1.id_pedido,
+            id_producto=monedero.id_producto,
+            producto_nombre=monedero.nombre,
+            precio_unitario=monedero.precio_venta,
+            cantidad=1,
+            subtotal=monedero.precio_venta,
+        ),
+        PedidoDetalle(
+            id_pedido=pedido_1.id_pedido,
+            id_producto=llavero.id_producto,
+            producto_nombre=llavero.nombre,
+            precio_unitario=llavero.precio_venta,
+            cantidad=1,
+            subtotal=llavero.precio_venta,
+        ),
+    ]
+    db.session.add_all(detalles_1)
+
+    pedido_2 = Pedido(
+        id_cliente=cliente_2.id_cliente,
+        folio="PED20260402-0002",
+        estado="Pendiente",
+        total=Decimal("1699.00"),
+        nombre_envio=cliente_2.nombre,
+        telefono_envio=cliente_2.telefono,
+        calle_envio=cliente_2.calle,
+        numero_envio=cliente_2.numero,
+        colonia_envio=cliente_2.colonia,
+        ciudad_envio=cliente_2.ciudad,
+        estado_envio=cliente_2.estado,
+        pais_envio=cliente_2.pais,
+        cp_envio=cliente_2.cp,
+        notas="Tocar antes de entregar",
+    )
+    db.session.add(pedido_2)
+    db.session.flush()
+
+    detalles_2 = [
+        PedidoDetalle(
+            id_pedido=pedido_2.id_pedido,
+            id_producto=tote.id_producto,
+            producto_nombre=tote.nombre,
+            precio_unitario=tote.precio_venta,
+            cantidad=1,
+            subtotal=tote.precio_venta,
+        ),
+    ]
+    db.session.add_all(detalles_2)
+
+    db.session.commit()
+    print("✔ Pedidos demo insertados")
+
+
+def seed_ventas():
+    usuario_ventas = Usuario.query.filter_by(email="ventas@casaleon.com").first()
+
+    tarjetero = Producto.query.filter_by(nombre="Tarjetero Ejecutivo Slim").first()
+    cinturon = Producto.query.filter_by(nombre="Cinturón Casual de Piel").first()
+    estuche = Producto.query.filter_by(nombre="Estuche para Lentes Soft Case").first()
+
+    venta_1 = Venta(
+        folio="VEN20260401-0001",
+        id_usuario=usuario_ventas.id_usuario,
+        total=Decimal("1367.00"),
+        metodo_pago="TARJETA",
+        observaciones="Venta en mostrador",
+    )
+    db.session.add(venta_1)
+    db.session.flush()
+
+    detalles_venta_1 = [
+        VentaDetalle(
+            id_venta=venta_1.id_venta,
+            id_producto=tarjetero.id_producto,
+            producto_nombre=tarjetero.nombre,
+            precio_unitario=tarjetero.precio_venta,
+            cantidad=Decimal("2.00"),
+            subtotal=Decimal("718.00"),
+        ),
+        VentaDetalle(
+            id_venta=venta_1.id_venta,
+            id_producto=cinturon.id_producto,
+            producto_nombre=cinturon.nombre,
+            precio_unitario=cinturon.precio_venta,
+            cantidad=Decimal("1.00"),
+            subtotal=Decimal("649.00"),
+        ),
+    ]
+    db.session.add_all(detalles_venta_1)
+
+    venta_2 = Venta(
+        folio="VEN20260402-0002",
+        id_usuario=usuario_ventas.id_usuario,
+        total=Decimal("798.00"),
+        metodo_pago="EFECTIVO",
+        observaciones="Venta directa en tienda",
+    )
+    db.session.add(venta_2)
+    db.session.flush()
+
+    detalles_venta_2 = [
+        VentaDetalle(
+            id_venta=venta_2.id_venta,
+            id_producto=estuche.id_producto,
+            producto_nombre=estuche.nombre,
+            precio_unitario=estuche.precio_venta,
+            cantidad=Decimal("2.00"),
+            subtotal=Decimal("798.00"),
+        ),
+    ]
+    db.session.add_all(detalles_venta_2)
+
+    db.session.commit()
+    print("✔ Ventas demo insertadas")
+
+
+def seed_auditoria():
+    logs = [
+        AuditoriaLog(
+            modulo="Autenticación",
+            accion="Inicio de sesión",
+            detalle="Usuario administrador inició sesión exitosamente",
+            severidad="INFO",
+            actor_nombre="Martín López Herrera",
+            actor_email="admin@casaleon.com",
+            ip_addr="192.168.1.100",
+        ),
+        AuditoriaLog(
+            modulo="Compras",
+            accion="Orden de compra registrada",
+            detalle="Se registró una compra de cuero vacuno liso color café",
+            severidad="INFO",
+            actor_nombre="Paola Jiménez Ortega",
+            actor_email="compras@casaleon.com",
+            ip_addr="192.168.1.105",
+        ),
+        AuditoriaLog(
+            modulo="Ventas",
+            accion="Venta procesada",
+            detalle="Venta VEN20260401-0001 procesada correctamente",
+            severidad="INFO",
+            actor_nombre="Diego Fernández Cruz",
+            actor_email="ventas@casaleon.com",
+            ip_addr="192.168.1.108",
+        ),
+        AuditoriaLog(
+            modulo="Usuarios",
+            accion="Usuario creado",
+            detalle="Nuevo usuario 'produccion@casaleon.com' creado",
+            severidad="INFO",
+            actor_nombre="Martín López Herrera",
+            actor_email="admin@casaleon.com",
+            ip_addr="192.168.1.100",
+        ),
+        AuditoriaLog(
+            modulo="Inventario",
+            accion="Materia prima actualizada",
+            detalle="Se actualizó el stock del material 'Cierre metálico 20 cm níquel'",
+            severidad="INFO",
+            actor_nombre="Ana Sofía Ramírez",
+            actor_email="empleado@casaleon.com",
+            ip_addr="192.168.1.112",
+        ),
+        AuditoriaLog(
+            modulo="Producción",
+            accion="Receta recalculada",
+            detalle="Se recalculó el costo estimado de la receta 'Receta Bolsa Tote Siena'",
+            severidad="INFO",
+            actor_nombre="Luis Arturo Navarro",
+            actor_email="produccion@casaleon.com",
+            ip_addr="192.168.1.110",
+        ),
+        AuditoriaLog(
+            modulo="Autenticación",
+            accion="Cambio de contraseña",
+            detalle="Usuario actualizó su contraseña correctamente",
+            severidad="INFO",
+            actor_nombre="Diego Fernández Cruz",
+            actor_email="ventas@casaleon.com",
+            ip_addr="192.168.1.108",
+        ),
+        AuditoriaLog(
+            modulo="Pedidos",
+            accion="Pedido entregado",
+            detalle="Pedido PED20260401-0001 marcado como entregado",
+            severidad="INFO",
+            actor_nombre="Sistema",
+            actor_email="sistema@casaleon.com",
+            ip_addr="192.168.1.1",
+        ),
+        AuditoriaLog(
+            modulo="Usuarios",
+            accion="Acceso denegado",
+            detalle="Intento de acceso sin permisos suficientes",
+            severidad="WARNING",
+            actor_nombre="Invitado",
+            actor_email="invitado@casaleon.com",
+            ip_addr="192.168.1.200",
+        ),
+        AuditoriaLog(
+            modulo="Sistema",
+            accion="Backup completado",
+            detalle="Respaldo automático completado correctamente",
+            severidad="INFO",
+            actor_nombre="Sistema",
+            actor_email="sistema@casaleon.com",
+            ip_addr="192.168.1.1",
+        ),
+        AuditoriaLog(
+            modulo="Proveedores",
+            accion="Proveedor actualizado",
+            detalle="Se actualizó información de 'Herrajes Finos de León'",
+            severidad="INFO",
+            actor_nombre="Paola Jiménez Ortega",
+            actor_email="compras@casaleon.com",
+            ip_addr="192.168.1.105",
+        ),
+    ]
+
+    db.session.add_all(logs)
+    db.session.commit()
+    print("✔ Auditoría demo insertada")
 
 
 def run_seed():
@@ -691,9 +1293,11 @@ def run_seed():
         seed_unidades_medida()
         seed_materias_primas()
         seed_recetas()
-        seed_pedidos()
-        seed_auditoria()
+        seed_movimientos_materia_prima()
         seed_lotes()
+        seed_pedidos()
+        seed_ventas()
+        seed_auditoria()
 
         print("✅ Seed completado")
 

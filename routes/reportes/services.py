@@ -1,16 +1,15 @@
 import hashlib
 import json
-from datetime import datetime, date
-
-from sqlalchemy import func
+from datetime import datetime, timedelta
 
 from models import db, Pedido, PedidoDetalle
 from mongo import get_mongo_db
 
 
 # =========================
-# 🔹 HELPERS
+# HELPERS
 # =========================
+
 
 def _normalize_date(fecha):
     if isinstance(fecha, str):
@@ -24,9 +23,20 @@ def _date_range(fecha):
     return start, end
 
 
+def _normalize_range(start_date, end_date):
+    start_date = _normalize_date(start_date)
+    end_date = _normalize_date(end_date)
+
+    if start_date > end_date:
+        start_date, end_date = end_date, start_date
+
+    return start_date, end_date
+
+
 # =========================
-# 🔹 QUERY SQL
+# QUERY SQL
 # =========================
+
 
 def get_sales_data_by_day(fecha):
     fecha = _normalize_date(fecha)
@@ -53,8 +63,9 @@ def get_sales_data_by_day(fecha):
 
 
 # =========================
-# 🔹 CALCULOS
+# CÁLCULOS
 # =========================
+
 
 def build_snapshot_structure(rows, fecha):
     total_sales = 0
@@ -81,7 +92,7 @@ def build_snapshot_structure(rows, fecha):
     top_productos = sorted(
         productos.values(),
         key=lambda x: (x["cantidad_vendida"], x["monto_vendido"]),
-        reverse=True
+        reverse=True,
     )[:5]
 
     return {
@@ -91,13 +102,14 @@ def build_snapshot_structure(rows, fecha):
             "total_orders": len(pedidos_ids),
         },
         "top_products": top_productos,
-        "generated_at": datetime.utcnow().isoformat()
+        "generated_at": datetime.utcnow().isoformat(),
     }
 
 
 # =========================
-# 🔹 HASH
+# HASH
 # =========================
+
 
 def generate_hash(snapshot_data):
     data_string = json.dumps(snapshot_data, sort_keys=True)
@@ -105,8 +117,9 @@ def generate_hash(snapshot_data):
 
 
 # =========================
-# 🔹 MONGO
+# MONGO
 # =========================
+
 
 def get_collection():
     db = get_mongo_db()
@@ -123,16 +136,38 @@ def save_snapshot(fecha, snapshot, hash_value):
 
     snapshot["hash"] = hash_value
 
-    col.replace_one(
-        {"report_date": fecha},
-        snapshot,
-        upsert=True
+    col.replace_one({"report_date": fecha}, snapshot, upsert=True)
+
+
+def get_snapshots_by_range(start_date, end_date):
+    start_date, end_date = _normalize_range(start_date, end_date)
+
+    col = get_collection()
+
+    docs = list(
+        col.find(
+            {
+                "report_date": {
+                    "$gte": start_date.strftime("%Y-%m-%d"),
+                    "$lte": end_date.strftime("%Y-%m-%d"),
+                }
+            },
+            {
+                "_id": 0,
+                "report_date": 1,
+                "summary.total_sales": 1,
+                "summary.total_orders": 1,
+            },
+        ).sort("report_date", 1)
     )
 
+    return docs
+
 
 # =========================
-# 🔹 ORQUESTADOR
+# ORQUESTADOR
 # =========================
+
 
 def generate_daily_snapshot(fecha):
     fecha = _normalize_date(fecha)
@@ -148,26 +183,14 @@ def generate_daily_snapshot(fecha):
 
     if not existing:
         save_snapshot(fecha_str, snapshot, hash_value)
-        return {
-            "updated": True,
-            "reason": "created",
-            "snapshot": snapshot
-        }
+        return {"updated": True, "reason": "created", "snapshot": snapshot}
 
     if existing.get("hash") == hash_value:
-        return {
-            "updated": False,
-            "reason": "no_changes",
-            "snapshot": existing
-        }
+        return {"updated": False, "reason": "no_changes", "snapshot": existing}
 
     save_snapshot(fecha_str, snapshot, hash_value)
 
-    return {
-        "updated": True,
-        "reason": "hash_changed",
-        "snapshot": snapshot
-    }
+    return {"updated": True, "reason": "hash_changed", "snapshot": snapshot}
 
 
 def get_daily_snapshot(fecha):
@@ -177,12 +200,92 @@ def get_daily_snapshot(fecha):
     snapshot = get_existing_snapshot(fecha_str)
 
     if not snapshot:
+        return {"exists": False, "message": "No hay snapshot para esta fecha"}
+
+    return {"exists": True, "snapshot": snapshot}
+
+
+# =========================
+# GRÁFICA DE LÍNEA
+# =========================
+
+
+def build_line_chart_data(start_date, end_date):
+    start_date, end_date = _normalize_range(start_date, end_date)
+    snapshots = get_snapshots_by_range(start_date, end_date)
+
+    if not snapshots:
         return {
-            "exists": False,
-            "message": "No hay snapshot para esta fecha"
+            "points": [],
+            "polyline_points": "",
+            "max_sales": 0,
+            "has_data": False,
         }
 
+    width = 640
+    height = 260
+    padding_x = 40
+    padding_y = 30
+
+    total_days = (end_date - start_date).days + 1
+
+    snapshot_map = {
+        item["report_date"]: float(item.get("summary", {}).get("total_sales", 0) or 0)
+        for item in snapshots
+    }
+
+    full_series = []
+    current = start_date
+    while current <= end_date:
+        key = current.strftime("%Y-%m-%d")
+        full_series.append(
+            {
+                "date": key,
+                "label": current.strftime("%d/%m"),
+                "total_sales": snapshot_map.get(key, 0.0),
+            }
+        )
+        current += timedelta(days=1)
+
+    max_sales = max((item["total_sales"] for item in full_series), default=0)
+
+    if total_days == 1:
+        step_x = 0
+    else:
+        step_x = (width - (padding_x * 2)) / (total_days - 1)
+
+    points = []
+    polyline_parts = []
+
+    for index, item in enumerate(full_series):
+        x = padding_x + (index * step_x)
+
+        if max_sales > 0:
+            y = (
+                height
+                - padding_y
+                - ((item["total_sales"] / max_sales) * (height - (padding_y * 2)))
+            )
+        else:
+            y = height - padding_y
+
+        point = {
+            "date": item["date"],
+            "label": item["label"],
+            "total_sales": item["total_sales"],
+            "x": round(x, 2),
+            "y": round(y, 2),
+        }
+        points.append(point)
+        polyline_parts.append(f"{round(x, 2)},{round(y, 2)}")
+
     return {
-        "exists": True,
-        "snapshot": snapshot
+        "points": points,
+        "polyline_points": " ".join(polyline_parts),
+        "max_sales": max_sales,
+        "has_data": True,
+        "width": width,
+        "height": height,
+        "padding_x": padding_x,
+        "padding_y": padding_y,
     }
