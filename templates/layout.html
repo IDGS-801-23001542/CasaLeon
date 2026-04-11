@@ -8,134 +8,334 @@
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/casaLeon.png') }}">
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.5.1/flowbite.min.css" rel="stylesheet" />
+
+  <style>
+    :root{
+      --cl-brown: #4a2f22;
+      --cl-brown-hover: #3a241a;
+      --cl-brown-soft: #f4ece7;
+      --cl-brown-border: #d8c5b8;
+
+      --cl-forest: #1f4d3a;
+      --cl-forest-hover: #183b2d;
+
+      --cl-cart-red: #dc2626;
+      --cl-cart-red-hover: #b91c1c;
+    }
+
+    .bg-stone-900,
+    .bg-stone-950 {
+      background-color: var(--cl-brown) !important;
+    }
+
+    .hover\:bg-stone-800:hover,
+    .hover\:bg-stone-900:hover,
+    .hover\:bg-stone-950:hover {
+      background-color: var(--cl-brown-hover) !important;
+    }
+
+    .border-stone-900 {
+      border-color: var(--cl-brown) !important;
+    }
+
+    .text-stone-900 {
+      color: inherit;
+    }
+
+    .btn-brand {
+      background-color: var(--cl-brown);
+      color: #fff;
+    }
+
+    .btn-brand:hover {
+      background-color: var(--cl-brown-hover);
+    }
+
+    .btn-brand-outline {
+      border: 1px solid var(--cl-brown-border);
+      color: var(--cl-brown);
+      background: #fff;
+    }
+
+    .btn-brand-outline:hover {
+      background: var(--cl-brown-soft);
+    }
+
+    .badge-cart {
+      background-color: var(--cl-cart-red);
+      color: #fff;
+    }
+
+    .badge-cart:hover {
+      background-color: var(--cl-cart-red-hover);
+    }
+
+    .account-chip {
+      background: linear-gradient(135deg, var(--cl-forest) 0%, #295a46 100%);
+      color: #fff;
+    }
+
+    .footer-white {
+      background: #ffffff;
+      color: #44403c;
+    }
+
+    .footer-white .footer-title {
+      color: #1c1917;
+    }
+
+    .footer-white .footer-muted {
+      color: #78716c;
+    }
+
+    .footer-white .footer-link:hover {
+      color: var(--cl-brown);
+    }
+
+    .footer-white .footer-border {
+      border-color: #e7e5e4;
+    }
+  </style>
 </head>
-<body class="bg-stone-50 text-gray-900 min-h-screen flex flex-col">
+<body class="bg-white text-stone-900 min-h-screen flex flex-col">
 
-  <nav class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
-    <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 py-3">
-      <div class="flex items-center justify-between gap-4">
+  <nav class="sticky top-0 z-50 border-b border-stone-200 bg-white/95 backdrop-blur">
+    <div class="mx-auto max-w-screen-2xl px-4 sm:px-6">
+      <div class="flex h-22 items-center justify-between py-3 lg:hidden">
+        <button
+          data-collapse-toggle="mobile-menu"
+          type="button"
+          class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-stone-200 text-stone-700 hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-stone-200"
+          aria-controls="mobile-menu"
+          aria-expanded="false"
+        >
+          <span class="sr-only">Abrir menú</span>
+          <svg class="h-5 w-5" viewBox="0 0 17 14" fill="none">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M1 1h15M1 7h15M1 13h15"/>
+          </svg>
+        </button>
 
-        <a href="{{ url_for('tienda.home') }}" class="flex items-center gap-3 min-w-0">
-          <img src="{{ url_for('static', filename='img/casaLeon.png') }}" alt="Casa León" class="h-11 sm:h-14 w-auto shrink-0">
-          <div class="min-w-0">
-            <span class="block text-lg sm:text-2xl font-bold text-emerald-900 leading-tight truncate">Casa León</span>
-            <p class="text-xs sm:text-sm text-gray-500 leading-tight">Marroquinería de Calidad</p>
-          </div>
+        <a href="{{ url_for('tienda.home') }}" class="flex items-center justify-center">
+          <img
+            src="{{ url_for('static', filename='img/casaLeon.png') }}"
+            alt="Casa León"
+            class="h-16 w-auto"
+          >
         </a>
 
-        <div class="flex items-center gap-2 md:hidden">
-          <a href="{{ url_for('tienda.carrito') }}" class="relative inline-flex items-center justify-center p-2 rounded-lg text-gray-700 hover:text-emerald-700 hover:bg-gray-100">
-            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none">
-              <path d="M3 4h2l2.2 10.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.7L21 7H7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-              <circle cx="10" cy="19" r="1.5" fill="currentColor"/>
-              <circle cx="18" cy="19" r="1.5" fill="currentColor"/>
-            </svg>
-            {% if g.cart_count and g.cart_count > 0 %}
-              <span class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center">
-                {{ g.cart_count }}
-              </span>
-            {% endif %}
-          </a>
+        <a href="{{ url_for('tienda.carrito') }}" class="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-stone-200 text-stone-700 hover:bg-stone-50">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none">
+            <path d="M3 4h2l2.2 10.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.7L21 7H7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="10" cy="19" r="1.5" fill="currentColor"/>
+            <circle cx="18" cy="19" r="1.5" fill="currentColor"/>
+          </svg>
+          {% if g.cart_count and g.cart_count > 0 %}
+            <span class="badge-cart absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full px-1 text-[10px] font-bold">
+              {{ g.cart_count }}
+            </span>
+          {% endif %}
+        </a>
+      </div>
 
-          <button data-collapse-toggle="navbar-default" type="button"
-            class="inline-flex items-center justify-center p-2 w-10 h-10 text-sm text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
-            aria-controls="navbar-default" aria-expanded="false">
-            <span class="sr-only">Abrir menú</span>
-            <svg class="w-5 h-5" viewBox="0 0 17 14" fill="none">
-              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M1 1h15M1 7h15M1 13h15"/>
+      <div class="hidden lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-center lg:gap-6 lg:min-h-[110px]">
+        <div class="flex items-center gap-3">
+          <div class="relative">
+            <button
+              id="dropdownComprarButton"
+              data-dropdown-toggle="dropdownComprar"
+              data-dropdown-placement="bottom-start"
+              class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100 hover:text-stone-900"
+              type="button"
+            >
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none">
+                <path d="M3 4h2l2.2 10.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.7L21 7H7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="10" cy="19" r="1.5" fill="currentColor"/>
+                <circle cx="18" cy="19" r="1.5" fill="currentColor"/>
+              </svg>
+              Comprar
+              <svg class="h-3 w-3" viewBox="0 0 10 6" fill="none">
+                <path d="m1 1 4 4 4-4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+              </svg>
+            </button>
+
+            <div id="dropdownComprar" class="z-10 hidden w-72 rounded-3xl border border-stone-200 bg-white p-3 shadow-xl">
+              <div class="mb-2 px-3 pt-2">
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">Colecciones</p>
+              </div>
+              <ul class="space-y-1 text-sm text-stone-700">
+                <li><a href="{{ url_for('tienda.productos_publico') }}" class="block rounded-2xl px-3 py-2.5 hover:bg-stone-100">Ver todo el catálogo</a></li>
+                <li><a href="{{ url_for('tienda.productos_publico', q='bolsa') }}" class="block rounded-2xl px-3 py-2.5 hover:bg-stone-100">Bolsas</a></li>
+                <li><a href="{{ url_for('tienda.productos_publico', q='mochila') }}" class="block rounded-2xl px-3 py-2.5 hover:bg-stone-100">Mochilas</a></li>
+                <li><a href="{{ url_for('tienda.productos_publico', q='cartera') }}" class="block rounded-2xl px-3 py-2.5 hover:bg-stone-100">Carteras</a></li>
+                <li><a href="{{ url_for('tienda.productos_publico', q='monedero') }}" class="block rounded-2xl px-3 py-2.5 hover:bg-stone-100">Monederos</a></li>
+                <li><a href="{{ url_for('tienda.productos_publico', q='cinturón') }}" class="block rounded-2xl px-3 py-2.5 hover:bg-stone-100">Cinturones</a></li>
+                <li><a href="{{ url_for('tienda.productos_publico', q='funda') }}" class="block rounded-2xl px-3 py-2.5 hover:bg-stone-100">Fundas</a></li>
+                <li><a href="{{ url_for('tienda.productos_publico', q='portafolio') }}" class="block rounded-2xl px-3 py-2.5 hover:bg-stone-100">Portafolios</a></li>
+                <li><a href="{{ url_for('tienda.productos_publico', q='llavero') }}" class="block rounded-2xl px-3 py-2.5 hover:bg-stone-100">Llaveros</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="relative">
+            <button
+              id="dropdownDescubrirButton"
+              data-dropdown-toggle="dropdownDescubrir"
+              data-dropdown-placement="bottom-start"
+              class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100 hover:text-stone-900"
+              type="button"
+            >
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none">
+                <path d="M12 3 4 7l8 4 8-4-8-4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                <path d="M4 12l8 4 8-4" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                <path d="M4 17l8 4 8-4" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+              </svg>
+              Descubrir
+              <svg class="h-3 w-3" viewBox="0 0 10 6" fill="none">
+                <path d="m1 1 4 4 4-4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+              </svg>
+            </button>
+
+            <div id="dropdownDescubrir" class="z-10 hidden w-72 rounded-3xl border border-stone-200 bg-white p-3 shadow-xl">
+              <div class="mb-2 px-3 pt-2">
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">Casa León</p>
+              </div>
+              <ul class="space-y-1 text-sm text-stone-700">
+                <li><a href="{{ url_for('tienda.nosotros') }}" class="block rounded-2xl px-3 py-2.5 hover:bg-stone-100">Nuestra historia</a></li>
+                <li><a href="{{ url_for('tienda.contacto') }}" class="block rounded-2xl px-3 py-2.5 hover:bg-stone-100">Contacto</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            data-modal-target="search-modal"
+            data-modal-toggle="search-modal"
+            class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100 hover:text-stone-900"
+          >
+            <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none">
+              <path d="m19 19-4-4m1-5a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
+            Buscar
           </button>
         </div>
 
-        <div class="hidden md:flex items-center gap-3">
-          <a href="{{ url_for('tienda.home') }}" class="text-emerald-900 font-semibold hover:text-emerald-700">Inicio</a>
-          <a href="{{ url_for('tienda.productos_publico') }}" class="text-gray-700 hover:text-emerald-700">Productos</a>
-          <a href="{{ url_for('tienda.nosotros') }}" class="text-gray-700 hover:text-emerald-700">Nosotros</a>
-          <a href="{{ url_for('tienda.contacto') }}" class="text-gray-700 hover:text-emerald-700">Contacto</a>
+        <div class="flex justify-center">
+          <a href="{{ url_for('tienda.home') }}" class="flex items-center justify-center">
+            <img
+              src="{{ url_for('static', filename='img/casaLeon.png') }}"
+              alt="Casa León"
+              class="h-24 w-auto"
+            >
+          </a>
+        </div>
 
-          <a href="{{ url_for('tienda.carrito') }}" class="relative text-gray-700 hover:text-emerald-700 ml-2">
-            <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none">
+        <div class="flex items-center justify-end gap-2">
+          <div class="relative">
+            <button
+              id="dropdownCuentaButton"
+              data-dropdown-toggle="dropdownCuenta"
+              data-dropdown-placement="bottom-end"
+              class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-stone-200 text-stone-700 hover:bg-stone-50"
+              type="button"
+            >
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none">
+                <path d="M20 21a8 8 0 1 0-16 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/>
+              </svg>
+            </button>
+
+            <div id="dropdownCuenta" class="z-10 hidden w-64 rounded-3xl border border-stone-200 bg-white p-3 shadow-xl">
+              {% if g.user %}
+                <div class="account-chip rounded-2xl px-4 pb-4 pt-3">
+                  <p class="text-sm font-semibold">{{ g.user.nombre }}</p>
+                  <p class="text-xs text-white/80">
+                    {% if g.role == "CLIENTE" %}Cliente{% else %}{{ g.role }}{% endif %}
+                  </p>
+                </div>
+
+                <ul class="mt-3 space-y-1 text-sm text-stone-700">
+                  {% if g.role == "CLIENTE" %}
+                    <li><a href="{{ url_for('tienda.cliente_dashboard') }}" class="block rounded-2xl px-3 py-2.5 hover:bg-stone-100">Mi cuenta</a></li>
+                    <li><a href="{{ url_for('tienda.mis_pedidos') }}" class="block rounded-2xl px-3 py-2.5 hover:bg-stone-100">Mis pedidos</a></li>
+                    <li><a href="{{ url_for('tienda.carrito') }}" class="block rounded-2xl px-3 py-2.5 hover:bg-stone-100">Mi carrito</a></li>
+                  {% else %}
+                    <li><a href="{{ url_for('auth.post_login') }}" class="block rounded-2xl px-3 py-2.5 hover:bg-stone-100">Ir al panel</a></li>
+                  {% endif %}
+                  <li><a href="{{ url_for('auth.logout') }}" class="block rounded-2xl px-3 py-2.5 text-red-700 hover:bg-red-50">Cerrar sesión</a></li>
+                </ul>
+              {% else %}
+                <div class="px-3 pb-3 pt-1">
+                  <p class="text-sm font-semibold text-stone-900">Tu cuenta</p>
+                  <p class="text-xs text-stone-500">Inicia sesión o crea una cuenta para comprar.</p>
+                </div>
+                <div class="mt-2 grid gap-2">
+                  <a href="{{ url_for('auth.login') }}" class="rounded-2xl px-4 py-3 text-center text-sm font-medium text-white btn-brand">Iniciar sesión</a>
+                  <a href="{{ url_for('auth.register') }}" class="rounded-2xl px-4 py-3 text-center text-sm font-medium btn-brand-outline">Registrarme</a>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <a href="{{ url_for('tienda.carrito') }}" class="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-stone-200 text-stone-700 hover:bg-stone-50">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none">
               <path d="M3 4h2l2.2 10.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.7L21 7H7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
               <circle cx="10" cy="19" r="1.5" fill="currentColor"/>
               <circle cx="18" cy="19" r="1.5" fill="currentColor"/>
             </svg>
             {% if g.cart_count and g.cart_count > 0 %}
-              <span class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full min-w-[20px] h-5 px-1 flex items-center justify-center">
+              <span class="badge-cart absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full px-1 text-[10px] font-bold">
                 {{ g.cart_count }}
               </span>
             {% endif %}
           </a>
-
-          {% if g.user %}
-            {% if g.role == "CLIENTE" %}
-              <a href="{{ url_for('tienda.cliente_dashboard') }}"
-                 class="text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-full text-sm px-5 py-2.5 text-center">
-                Mi cuenta
-              </a>
-              <a href="{{ url_for('auth.logout') }}"
-                 class="text-emerald-900 bg-white border border-emerald-800 hover:bg-emerald-50 focus:ring-4 focus:outline-none focus:ring-emerald-200 font-medium rounded-full text-sm px-5 py-2.5 text-center">
-                Cerrar sesión
-              </a>
-            {% else %}
-              <a href="{{ url_for('auth.post_login') }}"
-                 class="text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-full text-sm px-5 py-2.5 text-center">
-                Ir al panel
-              </a>
-            {% endif %}
-          {% else %}
-            <a href="{{ url_for('auth.login') }}"
-               class="text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-full text-sm px-5 py-2.5 text-center">
-              Iniciar sesión
-            </a>
-            <a href="{{ url_for('auth.register') }}"
-               class="text-emerald-900 bg-white border border-emerald-800 hover:bg-emerald-50 focus:ring-4 focus:outline-none focus:ring-emerald-200 font-medium rounded-full text-sm px-5 py-2.5 text-center">
-              Registrarme
-            </a>
-          {% endif %}
         </div>
       </div>
 
-      <div class="hidden w-full pt-3 md:hidden" id="navbar-default">
-        <div class="border border-gray-200 rounded-2xl bg-white shadow-sm p-4 space-y-4">
-          <ul class="space-y-2">
-            <li><a href="{{ url_for('tienda.home') }}" class="block rounded-xl px-3 py-2 text-emerald-900 font-semibold hover:bg-emerald-50">Inicio</a></li>
-            <li><a href="{{ url_for('tienda.productos_publico') }}" class="block rounded-xl px-3 py-2 text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">Productos</a></li>
-            <li><a href="{{ url_for('tienda.nosotros') }}" class="block rounded-xl px-3 py-2 text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">Nosotros</a></li>
-            <li><a href="{{ url_for('tienda.contacto') }}" class="block rounded-xl px-3 py-2 text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">Contacto</a></li>
-            <li>
-              <a href="{{ url_for('tienda.carrito') }}" class="block rounded-xl px-3 py-2 text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">
-                Carrito {% if g.cart_count and g.cart_count > 0 %}({{ g.cart_count }}){% endif %}
-              </a>
-            </li>
-          </ul>
+      <div class="hidden pb-4 lg:hidden" id="mobile-menu">
+        <div class="space-y-4 rounded-3xl border border-stone-200 bg-white p-4 shadow-lg">
+          <form method="GET" action="{{ url_for('tienda.productos_publico') }}">
+            <label class="sr-only" for="mobile-search">Buscar</label>
+            <input
+              id="mobile-search"
+              type="text"
+              name="q"
+              class="block w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-900 focus:border-stone-400 focus:ring-stone-300"
+              placeholder="Buscar productos..."
+            >
+          </form>
 
-          <div class="grid grid-cols-1 gap-3">
+          <div>
+            <p class="mb-2 px-2 text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">Comprar</p>
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <a href="{{ url_for('tienda.productos_publico') }}" class="rounded-2xl bg-stone-50 px-3 py-2.5 hover:bg-stone-100">Ver todo</a>
+              <a href="{{ url_for('tienda.productos_publico', q='bolsa') }}" class="rounded-2xl bg-stone-50 px-3 py-2.5 hover:bg-stone-100">Bolsas</a>
+              <a href="{{ url_for('tienda.productos_publico', q='mochila') }}" class="rounded-2xl bg-stone-50 px-3 py-2.5 hover:bg-stone-100">Mochilas</a>
+              <a href="{{ url_for('tienda.productos_publico', q='cartera') }}" class="rounded-2xl bg-stone-50 px-3 py-2.5 hover:bg-stone-100">Carteras</a>
+              <a href="{{ url_for('tienda.productos_publico', q='funda') }}" class="rounded-2xl bg-stone-50 px-3 py-2.5 hover:bg-stone-100">Fundas</a>
+              <a href="{{ url_for('tienda.productos_publico', q='cinturón') }}" class="rounded-2xl bg-stone-50 px-3 py-2.5 hover:bg-stone-100">Cinturones</a>
+            </div>
+          </div>
+
+          <div>
+            <p class="mb-2 px-2 text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">Descubrir</p>
+            <div class="grid gap-2 text-sm">
+              <a href="{{ url_for('tienda.nosotros') }}" class="rounded-2xl bg-stone-50 px-3 py-2.5 hover:bg-stone-100">Nuestra historia</a>
+              <a href="{{ url_for('tienda.contacto') }}" class="rounded-2xl bg-stone-50 px-3 py-2.5 hover:bg-stone-100">Contacto</a>
+            </div>
+          </div>
+
+          <div class="grid gap-2">
             {% if g.user %}
               {% if g.role == "CLIENTE" %}
-                <a href="{{ url_for('tienda.cliente_dashboard') }}"
-                   class="w-full text-center text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-xl text-sm px-5 py-3">
-                  Mi cuenta
-                </a>
-                <a href="{{ url_for('auth.logout') }}"
-                   class="w-full text-center text-emerald-900 bg-white border border-emerald-800 hover:bg-emerald-50 focus:ring-4 focus:outline-none focus:ring-emerald-200 font-medium rounded-xl text-sm px-5 py-3">
-                  Cerrar sesión
-                </a>
+                <a href="{{ url_for('tienda.cliente_dashboard') }}" class="rounded-2xl px-4 py-3 text-center text-sm font-medium text-white btn-brand">Mi cuenta</a>
               {% else %}
-                <a href="{{ url_for('auth.post_login') }}"
-                   class="w-full text-center text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-xl text-sm px-5 py-3">
-                  Ir al panel
-                </a>
+                <a href="{{ url_for('auth.post_login') }}" class="rounded-2xl px-4 py-3 text-center text-sm font-medium text-white btn-brand">Ir al panel</a>
               {% endif %}
+              <a href="{{ url_for('auth.logout') }}" class="rounded-2xl border border-stone-200 px-4 py-3 text-center text-sm font-medium text-stone-700 hover:bg-stone-50">Cerrar sesión</a>
             {% else %}
-              <a href="{{ url_for('auth.login') }}"
-                 class="w-full text-center text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-xl text-sm px-5 py-3">
-                Iniciar sesión
-              </a>
-              <a href="{{ url_for('auth.register') }}"
-                 class="w-full text-center text-emerald-900 bg-white border border-emerald-800 hover:bg-emerald-50 focus:ring-4 focus:outline-none focus:ring-emerald-200 font-medium rounded-xl text-sm px-5 py-3">
-                Registrarme
-              </a>
+              <a href="{{ url_for('auth.login') }}" class="rounded-2xl px-4 py-3 text-center text-sm font-medium text-white btn-brand">Iniciar sesión</a>
+              <a href="{{ url_for('auth.register') }}" class="rounded-2xl border border-stone-200 px-4 py-3 text-center text-sm font-medium text-stone-700 hover:bg-stone-50">Registrarme</a>
             {% endif %}
           </div>
         </div>
@@ -145,13 +345,13 @@
 
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-      <div class="max-w-screen-xl mx-auto px-4 sm:px-6 pt-4 w-full">
+      <div class="mx-auto w-full max-w-screen-xl px-4 sm:px-6 pt-4">
         {% for category, message in messages %}
-          {% set cls = "bg-emerald-50 text-emerald-800 border-emerald-200" if category=="success"
-                    else "bg-red-50 text-red-800 border-red-200" if category=="danger"
-                    else "bg-amber-50 text-amber-800 border-amber-200" if category=="warning"
-                    else "bg-blue-50 text-blue-800 border-blue-200" %}
-          <div class="mb-3 p-4 text-sm rounded-xl border {{ cls }}">
+          {% set cls = "border-emerald-200 bg-emerald-50 text-emerald-800" if category=="success"
+                    else "border-red-200 bg-red-50 text-red-800" if category=="danger"
+                    else "border-amber-200 bg-amber-50 text-amber-800" if category=="warning"
+                    else "border-blue-200 bg-blue-50 text-blue-800" %}
+          <div class="mb-3 rounded-2xl border px-4 py-3 text-sm {{ cls }}">
             {{ message }}
           </div>
         {% endfor %}
@@ -163,59 +363,96 @@
     {% block body %}{% endblock %}
   </main>
 
-  <footer class="mt-auto bg-emerald-900 text-white">
-    <div class="mx-auto w-full max-w-screen-2xl px-4 sm:px-6 py-10">
-      <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+  <footer class="mt-auto border-t border-stone-200 footer-white">
+    <div class="mx-auto max-w-screen-2xl px-4 py-12 sm:px-6">
+      <div class="grid gap-10 lg:grid-cols-4">
         <div>
-          <div class="flex items-center gap-3 mb-4">
-            <img src="{{ url_for('static', filename='img/casaLeon.png') }}" alt="Casa León" class="h-12 w-auto bg-white rounded-xl p-1">
+          <a href="{{ url_for('tienda.home') }}" class="inline-flex items-center gap-3">
+            <img src="{{ url_for('static', filename='img/casaLeon.png') }}" alt="Casa León" class="h-14 w-auto rounded-xl bg-stone-50 p-1.5">
             <div>
-              <h2 class="text-xl font-bold">Casa León</h2>
-              <p class="text-sm text-emerald-100">Marroquinería</p>
+              <h2 class="text-lg font-semibold footer-title">Casa León</h2>
+              <p class="text-sm footer-muted">Marroquinería contemporánea</p>
             </div>
-          </div>
-          <p class="text-emerald-50 leading-7 text-sm sm:text-base">
-            Productos de cuero de alta calidad, elaborados con dedicación, estilo y tradición.
+          </a>
+          <p class="mt-4 max-w-sm text-sm leading-7 footer-muted">
+            Piezas inspiradas en la tradición marroquinera de León, pensadas para acompañar tu día con diseño, carácter y funcionalidad.
           </p>
         </div>
 
         <div>
-          <h2 class="mb-4 text-lg font-semibold">Cliente</h2>
-          <ul class="space-y-3 text-emerald-50 text-sm sm:text-base">
-            <li><a href="{{ url_for('tienda.productos_publico') }}" class="hover:underline">Catálogo</a></li>
-            <li><a href="{{ url_for('tienda.carrito') }}" class="hover:underline">Carrito</a></li>
-            <li><a href="{{ url_for('tienda.checkout') }}" class="hover:underline">Checkout</a></li>
-            <li><a href="{{ url_for('tienda.mis_pedidos') }}" class="hover:underline">Mis pedidos</a></li>
+          <h3 class="text-sm font-semibold uppercase tracking-[0.18em] footer-muted">Comprar</h3>
+          <ul class="mt-4 space-y-3 text-sm">
+            <li><a href="{{ url_for('tienda.productos_publico') }}" class="footer-link">Ver todo el catálogo</a></li>
+            <li><a href="{{ url_for('tienda.productos_publico', q='bolsa') }}" class="footer-link">Bolsas</a></li>
+            <li><a href="{{ url_for('tienda.productos_publico', q='mochila') }}" class="footer-link">Mochilas</a></li>
+            <li><a href="{{ url_for('tienda.productos_publico', q='cartera') }}" class="footer-link">Carteras</a></li>
+            <li><a href="{{ url_for('tienda.productos_publico', q='funda') }}" class="footer-link">Fundas</a></li>
           </ul>
         </div>
 
         <div>
-          <h2 class="mb-4 text-lg font-semibold">Cuenta</h2>
-          <ul class="space-y-3 text-emerald-50 text-sm sm:text-base">
-            <li><a href="{{ url_for('tienda.cliente_dashboard') }}" class="hover:underline">Dashboard</a></li>
-            <li><a href="{{ url_for('tienda.mi_cuenta') }}" class="hover:underline">Mi cuenta</a></li>
-            <li><a href="{{ url_for('auth.login') }}" class="hover:underline">Iniciar sesión</a></li>
-            <li><a href="{{ url_for('auth.register') }}" class="hover:underline">Registrarme</a></li>
+          <h3 class="text-sm font-semibold uppercase tracking-[0.18em] footer-muted">Cuenta</h3>
+          <ul class="mt-4 space-y-3 text-sm">
+            <li><a href="{{ url_for('auth.login') }}" class="footer-link">Iniciar sesión</a></li>
+            <li><a href="{{ url_for('auth.register') }}" class="footer-link">Registrarme</a></li>
+            <li><a href="{{ url_for('tienda.mis_pedidos') }}" class="footer-link">Mis pedidos</a></li>
+            <li><a href="{{ url_for('tienda.mi_cuenta') }}" class="footer-link">Mi cuenta</a></li>
           </ul>
         </div>
 
         <div>
-          <h2 class="mb-4 text-lg font-semibold">Contacto</h2>
-          <ul class="space-y-3 text-emerald-50 text-sm sm:text-base">
-            <li>📧 info@casaleon.com</li>
-            <li>📞 +52 123-456-7890</li>
-            <li>📍 León, Guanajuato, México</li>
+          <h3 class="text-sm font-semibold uppercase tracking-[0.18em] footer-muted">Descubrir</h3>
+          <ul class="mt-4 space-y-3 text-sm">
+            <li><a href="{{ url_for('tienda.nosotros') }}" class="footer-link">Nuestra historia</a></li>
+            <li><a href="{{ url_for('tienda.contacto') }}" class="footer-link">Contacto</a></li>
+            <li class="pt-2 footer-muted">León, Guanajuato, México</li>
           </ul>
         </div>
       </div>
 
-      <hr class="my-8 border-emerald-800" />
-
-      <div class="text-center text-emerald-100 text-sm sm:text-base">
-        © 2026 Casa León. Todos los derechos reservados.
+      <div class="mt-10 flex flex-col gap-3 border-t pt-6 text-sm footer-border footer-muted md:flex-row md:items-center md:justify-between">
+        <p>© 2026 Casa León. Todos los derechos reservados.</p>
       </div>
     </div>
   </footer>
+
+  <div id="search-modal" tabindex="-1" aria-hidden="true" class="fixed left-0 right-0 top-0 z-50 hidden h-[calc(100%-1rem)] max-h-full w-full overflow-y-auto overflow-x-hidden p-4 md:inset-0">
+    <div class="relative max-h-full w-full max-w-2xl">
+      <div class="relative rounded-3xl bg-white shadow-2xl">
+        <div class="flex items-center justify-between border-b border-stone-100 px-6 py-4">
+          <div>
+            <h3 class="text-lg font-semibold text-stone-900">Buscar en Casa León</h3>
+            <p class="text-sm text-stone-500">Encuentra productos por nombre o tipo.</p>
+          </div>
+          <button type="button" class="inline-flex h-10 w-10 items-center justify-center rounded-full text-stone-500 hover:bg-stone-100" data-modal-hide="search-modal">
+            <svg class="h-4 w-4" viewBox="0 0 14 14" fill="none">
+              <path d="m1 1 12 12M13 1 1 13" stroke="currentColor" stroke-linecap="round" stroke-width="2"/>
+            </svg>
+          </button>
+        </div>
+
+        <form method="GET" action="{{ url_for('tienda.productos_publico') }}" class="p-6">
+          <label for="desktop-search" class="sr-only">Buscar</label>
+          <input
+            id="desktop-search"
+            type="text"
+            name="q"
+            class="block w-full rounded-2xl border border-stone-200 bg-stone-50 px-5 py-4 text-base text-stone-900 focus:border-stone-400 focus:ring-stone-300"
+            placeholder="Buscar mochila, bolsa, cartera, funda..."
+          >
+          <div class="mt-4 flex flex-wrap gap-2">
+            <a href="{{ url_for('tienda.productos_publico', q='bolsa') }}" class="rounded-full bg-stone-100 px-3 py-1.5 text-sm text-stone-700 hover:bg-stone-200">Bolsas</a>
+            <a href="{{ url_for('tienda.productos_publico', q='mochila') }}" class="rounded-full bg-stone-100 px-3 py-1.5 text-sm text-stone-700 hover:bg-stone-200">Mochilas</a>
+            <a href="{{ url_for('tienda.productos_publico', q='cartera') }}" class="rounded-full bg-stone-100 px-3 py-1.5 text-sm text-stone-700 hover:bg-stone-200">Carteras</a>
+            <a href="{{ url_for('tienda.productos_publico', q='funda') }}" class="rounded-full bg-stone-100 px-3 py-1.5 text-sm text-stone-700 hover:bg-stone-200">Fundas</a>
+          </div>
+          <button type="submit" class="mt-6 w-full rounded-2xl px-5 py-4 text-base font-medium text-white btn-brand">
+            Buscar productos
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.5.1/flowbite.min.js"></script>
 </body>

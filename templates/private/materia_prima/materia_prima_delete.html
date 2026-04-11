@@ -64,12 +64,6 @@
         </div>
 
         <div>
-          <label class="block mb-2 text-sm font-medium text-gray-900">Merma %</label>
-          <input type="text" value="{{ materia_db.merma_pct|num(2) }}%" disabled
-                 class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
-        </div>
-
-        <div>
           <label class="block mb-2 text-sm font-medium text-gray-900">Estado actual</label>
           <input type="text" value="{{ 'Activa' if materia_db.activo == 1 else 'Inactiva' }}" disabled
                  class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />

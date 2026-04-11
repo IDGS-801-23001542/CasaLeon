@@ -3,61 +3,118 @@
 {% block title %}Nosotros | Casa León{% endblock %}
 
 {% block body %}
-<section class="bg-stone-50">
-  <section class="bg-gradient-to-r from-emerald-900 via-emerald-700 to-stone-300">
-    <div class="max-w-screen-2xl mx-auto px-6 py-24 text-white">
-      <h1 class="text-5xl md:text-7xl font-extrabold">Nosotros</h1>
-      <p class="mt-6 text-xl md:text-2xl max-w-4xl leading-relaxed">
-        En Casa León transformamos la tradición marroquinera de León, Guanajuato, en productos funcionales, elegantes y duraderos.
-      </p>
+<section class="bg-white">
+
+  <section class="relative overflow-hidden bg-stone-100">
+    <div class="absolute inset-0">
+      <img src="{{ url_for('static', filename='img/tienda/nosotros-hero.jpg') }}" alt="Nosotros Casa León" class="h-full w-full object-cover">
+      <div class="absolute inset-0 bg-gradient-to-r from-stone-950/75 via-stone-900/40 to-transparent"></div>
+    </div>
+
+    <div class="relative mx-auto max-w-screen-2xl px-4 py-20 sm:px-6 sm:py-24 lg:py-28">
+      <div class="max-w-3xl">
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-white/70">Descubrir Casa León</p>
+        <h1 class="mt-3 text-4xl font-semibold leading-tight text-white sm:text-5xl lg:text-6xl">
+          Tradición, diseño y una forma contemporánea de entender la marroquinería.
+        </h1>
+        <p class="mt-6 text-base leading-8 text-white/85 sm:text-lg">
+          Casa León nace inspirada por la herencia marroquinera de León, Guanajuato, y busca traducirla en piezas funcionales, elegantes y pensadas para el presente.
+        </p>
+      </div>
     </div>
   </section>
 
-  <section class="max-w-screen-2xl mx-auto px-6 py-16">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div class="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
-        <h2 class="text-3xl font-bold text-emerald-900">Nuestra historia</h2>
-        <p class="mt-4 text-gray-600 leading-8">
-          Nacimos con el propósito de representar la calidad del trabajo artesanal leonés en una experiencia moderna de compra.
+  <section id="historia" class="mx-auto max-w-screen-2xl px-4 py-16 sm:px-6 lg:py-20">
+    <div class="grid gap-8 lg:grid-cols-[1fr_.95fr] lg:items-center">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">Nuestra historia</p>
+        <h2 class="mt-3 text-3xl font-semibold text-stone-900 sm:text-4xl">Una marca inspirada por León y su oficio.</h2>
+        <p class="mt-5 text-base leading-8 text-stone-600">
+          Casa León toma como punto de partida el valor de la tradición marroquinera local: un legado de trabajo, detalle y experiencia en la creación de piezas de cuero y accesorios.
+        </p>
+        <p class="mt-4 text-base leading-8 text-stone-600">
+          Nuestra intención es trasladar esa esencia a una experiencia de compra clara, visual y contemporánea, donde cada producto comunique estilo, funcionalidad y permanencia.
         </p>
       </div>
 
-      <div class="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
-        <h2 class="text-3xl font-bold text-emerald-900">Nuestra misión</h2>
-        <p class="mt-4 text-gray-600 leading-8">
-          Ofrecer artículos de marroquinería con gran diseño, excelente manufactura y materiales de alta calidad.
-        </p>
-      </div>
-
-      <div class="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
-        <h2 class="text-3xl font-bold text-emerald-900">Nuestra visión</h2>
-        <p class="mt-4 text-gray-600 leading-8">
-          Ser una marca reconocida por unir tradición, innovación y experiencia digital en el sector del cuero.
-        </p>
+      <div class="overflow-hidden rounded-[32px] bg-stone-100">
+        <img src="{{ url_for('static', filename='img/tienda/nosotros-historia.jpg') }}" alt="Historia Casa León" class="h-full w-full object-cover">
       </div>
     </div>
+  </section>
 
-    <div class="mt-10 bg-white rounded-3xl border border-gray-200 shadow-sm p-10">
-      <h2 class="text-4xl font-extrabold text-emerald-900">¿Qué nos distingue?</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-        <div class="p-6 rounded-2xl bg-stone-50 border border-stone-200">
-          <h3 class="text-2xl font-bold text-emerald-900">Tradición artesanal</h3>
-          <p class="mt-3 text-gray-600 leading-8">Cada línea de producto parte de la esencia marroquinera de León.</p>
+  <section id="artesania" class="mx-auto max-w-screen-2xl px-4 py-8 sm:px-6 lg:py-10">
+    <div class="grid gap-6 md:grid-cols-3">
+      <article class="rounded-[32px] border border-stone-200 bg-white p-8">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">Artesanía</p>
+        <h3 class="mt-3 text-2xl font-medium text-stone-900">Detalle y precisión</h3>
+        <p class="mt-4 text-sm leading-7 text-stone-600">
+          Valoramos la construcción cuidada de cada pieza, la atención a los acabados y el equilibrio entre forma y función.
+        </p>
+      </article>
+
+      <article class="rounded-[32px] border border-stone-200 bg-white p-8">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">Diseño</p>
+        <h3 class="mt-3 text-2xl font-medium text-stone-900">Funcionalidad con identidad</h3>
+        <p class="mt-4 text-sm leading-7 text-stone-600">
+          Diseñamos productos pensados para acompañar la rutina diaria con comodidad, presencia y carácter visual.
+        </p>
+      </article>
+
+      <article class="rounded-[32px] border border-stone-200 bg-white p-8">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">Calidad</p>
+        <h3 class="mt-3 text-2xl font-medium text-stone-900">Piezas hechas para durar</h3>
+        <p class="mt-4 text-sm leading-7 text-stone-600">
+          Apostamos por materiales y acabados que transmitan solidez, elegancia y una experiencia superior de uso.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section id="sostenibilidad" class="mx-auto max-w-screen-2xl px-4 py-16 sm:px-6 lg:py-20">
+    <div class="overflow-hidden rounded-[36px] bg-stone-950 text-white">
+      <div class="grid gap-8 lg:grid-cols-2 lg:items-center">
+        <div class="p-8 sm:p-12">
+          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">Sostenibilidad</p>
+          <h2 class="mt-3 text-3xl font-semibold sm:text-4xl">Aprovechar mejor, diseñar con intención.</h2>
+          <p class="mt-5 text-base leading-8 text-white/80">
+            En Casa León valoramos una visión consciente del diseño: aprovechar materiales, pensar en piezas durables y priorizar productos que mantengan vigencia en el tiempo.
+          </p>
+          <p class="mt-4 text-base leading-8 text-white/80">
+            Más que seguir tendencias pasajeras, buscamos construir una propuesta sólida, útil y con identidad.
+          </p>
         </div>
-        <div class="p-6 rounded-2xl bg-stone-50 border border-stone-200">
-          <h3 class="text-2xl font-bold text-emerald-900">Diseño funcional</h3>
-          <p class="mt-3 text-gray-600 leading-8">Creamos piezas útiles, resistentes y atractivas para el día a día.</p>
-        </div>
-        <div class="p-6 rounded-2xl bg-stone-50 border border-stone-200">
-          <h3 class="text-2xl font-bold text-emerald-900">Calidad premium</h3>
-          <p class="mt-3 text-gray-600 leading-8">Usamos materiales y acabados pensados para durar.</p>
-        </div>
-        <div class="p-6 rounded-2xl bg-stone-50 border border-stone-200">
-          <h3 class="text-2xl font-bold text-emerald-900">Experiencia digital</h3>
-          <p class="mt-3 text-gray-600 leading-8">Llevamos la marroquinería a una plataforma clara, visual y funcional.</p>
+
+        <div class="h-full min-h-[320px] bg-stone-900">
+          <img src="{{ url_for('static', filename='img/tienda/nosotros-sostenibilidad.jpg') }}" alt="Sostenibilidad Casa León" class="h-full w-full object-cover">
         </div>
       </div>
     </div>
   </section>
+
+  <section id="cuidado" class="mx-auto max-w-screen-2xl px-4 pb-16 sm:px-6 lg:pb-24">
+    <div class="rounded-[36px] border border-stone-200 bg-stone-50 p-8 sm:p-12">
+      <div class="max-w-3xl">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">Cuidado del producto</p>
+        <h2 class="mt-3 text-3xl font-semibold text-stone-900 sm:text-4xl">Cómo mantener tus piezas en mejor estado.</h2>
+        <p class="mt-5 text-base leading-8 text-stone-600">
+          Para conservar mejor tus productos, procura mantenerlos limpios, evitar humedad prolongada, guardarlos en espacios ventilados y protegerlos del sol directo por tiempos extendidos.
+        </p>
+        <p class="mt-4 text-base leading-8 text-stone-600">
+          El cuidado constante ayuda a preservar textura, forma y apariencia a lo largo del tiempo.
+        </p>
+      </div>
+
+      <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+        <a href="{{ url_for('tienda.productos_publico') }}" class="inline-flex items-center justify-center rounded-full bg-stone-900 px-6 py-3.5 text-sm font-medium text-white hover:bg-stone-800">
+          Explorar productos
+        </a>
+        <a href="{{ url_for('tienda.contacto') }}" class="inline-flex items-center justify-center rounded-full border border-stone-200 bg-white px-6 py-3.5 text-sm font-medium text-stone-700 hover:bg-stone-100">
+          Contacto
+        </a>
+      </div>
+    </div>
+  </section>
+
 </section>
 {% endblock %}

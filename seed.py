@@ -24,6 +24,7 @@ from models import (
     OrdenProduccionDetalle,
     Merma,
     MermaDetalle,
+    Lote,
 )
 
 
@@ -650,6 +651,28 @@ def seed_auditoria():
     print("✔ Auditoría demo insertada")
 
 
+def seed_lotes():
+    lotes = [
+        ("Lote pequeño (10 piezas)", 10),
+        ("Lote básico (20 piezas)", 20),
+        ("Lote medio (50 piezas)", 50),
+        ("Lote grande (100 piezas)", 100),
+        ("Lote producción (200 piezas)", 200),
+    ]
+
+    for nombre, cantidad in lotes:
+        db.session.add(
+            Lote(
+                nombre=nombre,
+                cantidad=cantidad,
+                activo=1
+            )
+        )
+
+    db.session.commit()
+    print("✔ Lotes insertados")
+
+
 def run_seed():
     app = create_app()
     with app.app_context():
@@ -670,6 +693,7 @@ def run_seed():
         seed_recetas()
         seed_pedidos()
         seed_auditoria()
+        seed_lotes()
 
         print("✅ Seed completado")
 

@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+
+{% block title %}Verificación en dos pasos | Casa León{% endblock %}
+
+{% block body %}
+<section class="min-h-[calc(100vh-120px)] bg-cl-bg dark:bg-cl-dark flex items-center justify-center px-6 py-16 transition-colors duration-300">
+  <div class="w-full max-w-md">
+    <div class="bg-white dark:bg-cl-dark2 border border-stone-200 dark:border-cl-darkLine rounded-[2.5rem] shadow-card overflow-hidden">
+      <div class="px-8 py-10 text-center border-b border-stone-200 dark:border-cl-darkLine bg-[#f8f3eb] dark:bg-[#1a1613]">
+        <img src="{{ url_for('static', filename='img/tienda/logo-casa-leon-light.png') }}" alt="Casa León" class="h-16 w-auto mx-auto mb-4">
+        <h1 class="text-3xl font-black text-cl-ink dark:text-cl-darkText">Verificación en dos pasos</h1>
+        <p class="mt-2 text-cl-muted dark:text-cl-darkMuted text-sm">
+          Ingresa el código enviado a tu teléfono
+        </p>
+      </div>
+
+      <div class="p-8">
+        <p class="text-sm text-cl-muted dark:text-cl-darkMuted mb-6">
+          Te enviamos un código por SMS a
+          <span class="font-semibold">{{ phone }}</span>
+        </p>
+
+        <form method="POST" action="{{ url_for('auth.verify_otp') }}" class="space-y-5" novalidate>
+          {{ form.hidden_tag() }}
+
+          <div>
+            <label class="block mb-2 text-sm font-semibold text-cl-ink dark:text-cl-darkText">
+              Código de verificación
+            </label>
+            {{ form.code(
+              class="bg-cl-bg2 dark:bg-[#1b1715] border border-stone-300 dark:border-cl-darkLine text-cl-ink dark:text-cl-darkText text-sm rounded-2xl focus:ring-cl-leather focus:border-cl-leather block w-full p-4 tracking-[0.35em] text-center text-lg",
+              placeholder="123456",
+              maxlength="10",
+              inputmode="numeric",
+              autocomplete="one-time-code"
+            ) }}
+            {% for error in form.code.errors %}
+              <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+            {% endfor %}
+          </div>
+
+          <button type="submit"
+            class="w-full text-white bg-cl-ink hover:bg-cl-green font-semibold rounded-full text-lg px-5 py-4 text-center transition">
+            Verificar código
+          </button>
+        </form>
+
+        <form method="POST" action="{{ url_for('auth.resend_otp') }}" class="mt-4">
+          <button type="submit"
+            class="w-full border border-stone-300 dark:border-cl-darkLine hover:bg-stone-100 dark:hover:bg-[#2a2420] font-semibold rounded-full text-sm px-5 py-3 text-center transition">
+            Reenviar código
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

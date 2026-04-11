@@ -3,113 +3,126 @@
 {% block title %}Checkout | Casa León{% endblock %}
 
 {% block body %}
-<section class="bg-stone-50 min-h-[calc(100vh-120px)]">
-  <div class="max-w-screen-2xl mx-auto px-6 py-16">
-    <div class="mb-8">
-      <h1 class="text-4xl font-extrabold text-emerald-900">Checkout</h1>
-      <p class="text-gray-600 mt-2">Confirma tus datos y simula tu compra.</p>
+<section class="bg-white min-h-[calc(100vh-120px)]">
+  <div class="mx-auto max-w-screen-2xl px-4 py-14 sm:px-6 lg:py-16">
+    <div class="border-b border-stone-200 pb-8">
+      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">Checkout</p>
+      <h1 class="mt-2 text-4xl font-semibold text-stone-900 sm:text-5xl">Confirmar compra</h1>
+      <p class="mt-4 max-w-2xl text-base leading-8 text-stone-600">
+        Verifica tus datos de envío y registra tu pedido simulado.
+      </p>
     </div>
 
-    <form method="POST" class="grid grid-cols-1 xl:grid-cols-3 gap-8" novalidate>
+    <form method="POST" class="mt-10 grid gap-8 xl:grid-cols-[1.2fr_.8fr]" novalidate>
       {{ form.hidden_tag() }}
 
-      <div class="xl:col-span-2 bg-white border border-gray-200 rounded-3xl shadow-sm p-8">
-        <h2 class="text-2xl font-bold text-emerald-900 mb-6">Datos de envío</h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
-            <label class="block mb-2 text-sm font-medium text-gray-900">Nombre completo</label>
-            {{ form.nombre(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-700 focus:border-emerald-700 block w-full p-4", required=True, maxlength="150", minlength="2", autocomplete="name") }}
-            {% for error in form.nombre.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
+      <div class="space-y-8">
+        <section class="rounded-[32px] border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+          <div class="mb-6">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">Envío</p>
+            <h2 class="mt-2 text-2xl font-medium text-stone-900">Datos de envío</h2>
           </div>
 
-          <div>
-            <label class="block mb-2 text-sm font-medium text-gray-900">Teléfono</label>
-            {{ form.telefono(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-700 focus:border-emerald-700 block w-full p-4", maxlength="15", autocomplete="tel", inputmode="tel") }}
-            {% for error in form.telefono.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
-          </div>
+          <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <div>
+              <label class="mb-2 block text-sm font-medium text-stone-700">Nombre completo</label>
+              {{ form.nombre(class="block w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3.5 text-sm text-stone-900 focus:border-stone-400 focus:ring-stone-300", required=True, maxlength="150", minlength="2", autocomplete="name") }}
+              {% for error in form.nombre.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
+            </div>
 
-          <div>
-            <label class="block mb-2 text-sm font-medium text-gray-900">Calle</label>
-            {{ form.calle(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-700 focus:border-emerald-700 block w-full p-4", required=True, maxlength="120", minlength="3", autocomplete="address-line1") }}
-            {% for error in form.calle.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
-          </div>
+            <div>
+              <label class="mb-2 block text-sm font-medium text-stone-700">Teléfono</label>
+              {{ form.telefono(class="block w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3.5 text-sm text-stone-900 focus:border-stone-400 focus:ring-stone-300", maxlength="15", autocomplete="tel", inputmode="tel") }}
+              {% for error in form.telefono.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
+            </div>
 
-          <div>
-            <label class="block mb-2 text-sm font-medium text-gray-900">Número</label>
-            {{ form.numero(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-700 focus:border-emerald-700 block w-full p-4", required=True, maxlength="20", autocomplete="address-line2") }}
-            {% for error in form.numero.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
-          </div>
+            <div>
+              <label class="mb-2 block text-sm font-medium text-stone-700">Calle</label>
+              {{ form.calle(class="block w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3.5 text-sm text-stone-900 focus:border-stone-400 focus:ring-stone-300", required=True, maxlength="120", minlength="3", autocomplete="address-line1") }}
+              {% for error in form.calle.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
+            </div>
 
-          <div>
-            <label class="block mb-2 text-sm font-medium text-gray-900">Colonia</label>
-            {{ form.colonia(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-700 focus:border-emerald-700 block w-full p-4", required=True, maxlength="120") }}
-            {% for error in form.colonia.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
-          </div>
+            <div>
+              <label class="mb-2 block text-sm font-medium text-stone-700">Número</label>
+              {{ form.numero(class="block w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3.5 text-sm text-stone-900 focus:border-stone-400 focus:ring-stone-300", required=True, maxlength="20", autocomplete="address-line2") }}
+              {% for error in form.numero.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
+            </div>
 
-          <div>
-            <label class="block mb-2 text-sm font-medium text-gray-900">Código postal</label>
-            {{ form.cp(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-700 focus:border-emerald-700 block w-full p-4", required=True, maxlength="10", minlength="5", inputmode="numeric", autocomplete="postal-code") }}
-            {% for error in form.cp.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
-          </div>
+            <div>
+              <label class="mb-2 block text-sm font-medium text-stone-700">Colonia</label>
+              {{ form.colonia(class="block w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3.5 text-sm text-stone-900 focus:border-stone-400 focus:ring-stone-300", required=True, maxlength="120") }}
+              {% for error in form.colonia.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
+            </div>
 
-          <div>
-            <label class="block mb-2 text-sm font-medium text-gray-900">Ciudad</label>
-            {{ form.ciudad(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-700 focus:border-emerald-700 block w-full p-4", required=True, maxlength="80", minlength="2", autocomplete="address-level2") }}
-            {% for error in form.ciudad.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
-          </div>
+            <div>
+              <label class="mb-2 block text-sm font-medium text-stone-700">Código postal</label>
+              {{ form.cp(class="block w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3.5 text-sm text-stone-900 focus:border-stone-400 focus:ring-stone-300", required=True, maxlength="10", minlength="5", inputmode="numeric", autocomplete="postal-code") }}
+              {% for error in form.cp.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
+            </div>
 
-          <div>
-            <label class="block mb-2 text-sm font-medium text-gray-900">Estado</label>
-            {{ form.estado(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-700 focus:border-emerald-700 block w-full p-4", required=True, maxlength="80", minlength="2", autocomplete="address-level1") }}
-            {% for error in form.estado.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
-          </div>
+            <div>
+              <label class="mb-2 block text-sm font-medium text-stone-700">Ciudad</label>
+              {{ form.ciudad(class="block w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3.5 text-sm text-stone-900 focus:border-stone-400 focus:ring-stone-300", required=True, maxlength="80", minlength="2", autocomplete="address-level2") }}
+              {% for error in form.ciudad.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
+            </div>
 
-          <div class="md:col-span-2">
-            <label class="block mb-2 text-sm font-medium text-gray-900">País</label>
-            {{ form.pais(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-700 focus:border-emerald-700 block w-full p-4", required=True, maxlength="80", minlength="2", autocomplete="country-name") }}
-            {% for error in form.pais.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
-          </div>
+            <div>
+              <label class="mb-2 block text-sm font-medium text-stone-700">Estado</label>
+              {{ form.estado(class="block w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3.5 text-sm text-stone-900 focus:border-stone-400 focus:ring-stone-300", required=True, maxlength="80", minlength="2", autocomplete="address-level1") }}
+              {% for error in form.estado.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
+            </div>
 
-          <div class="md:col-span-2">
-            <label class="block mb-2 text-sm font-medium text-gray-900">Notas del pedido</label>
-            {{ form.notas(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-700 focus:border-emerald-700 block w-full p-4", rows="4", maxlength="255") }}
-            {% for error in form.notas.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
+            <div class="md:col-span-2">
+              <label class="mb-2 block text-sm font-medium text-stone-700">País</label>
+              {{ form.pais(class="block w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3.5 text-sm text-stone-900 focus:border-stone-400 focus:ring-stone-300", required=True, maxlength="80", minlength="2", autocomplete="country-name") }}
+              {% for error in form.pais.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="mb-2 block text-sm font-medium text-stone-700">Notas del pedido</label>
+              {{ form.notas(class="block w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3.5 text-sm text-stone-900 focus:border-stone-400 focus:ring-stone-300", rows="4", maxlength="255") }}
+              {% for error in form.notas.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
+            </div>
           </div>
-        </div>
+        </section>
       </div>
 
-      <div>
-        <div class="bg-white border border-gray-200 rounded-3xl shadow-sm p-6 sticky top-6">
-          <h2 class="text-2xl font-bold text-emerald-900">Resumen de compra</h2>
+      <aside>
+        <div class="sticky top-28 overflow-hidden rounded-[32px] border border-stone-200 bg-stone-950 p-6 text-white shadow-xl">
+          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">Resumen</p>
+          <h2 class="mt-3 text-3xl font-semibold">Tu compra</h2>
 
-          <div class="mt-6 space-y-4">
+          <div class="mt-8 space-y-4 border-t border-white/10 pt-6">
             {% for item in items %}
               <div class="flex items-start justify-between gap-3">
                 <div>
-                  <p class="font-semibold text-gray-900">{{ item.nombre }}</p>
-                  <p class="text-sm text-gray-500">Cantidad: {{ item.cantidad }}</p>
+                  <p class="font-medium text-white">{{ item.nombre }}</p>
+                  <p class="text-sm text-white/60">Cantidad: {{ item.cantidad }}</p>
                 </div>
-                <p class="font-semibold text-emerald-900">${{ "{:,.2f}".format(item.precio * item.cantidad) }}</p>
+                <p class="text-sm font-medium text-white">${{ "{:,.2f}".format(item.precio * item.cantidad) }}</p>
               </div>
             {% endfor %}
           </div>
 
-          <div class="border-t mt-6 pt-4 flex items-center justify-between text-xl font-bold text-emerald-900">
-            <span>Total</span>
-            <span>${{ "{:,.2f}".format(total) }}</span>
+          <div class="mt-6 border-t border-white/10 pt-5">
+            <div class="flex items-center justify-between text-lg font-medium text-white">
+              <span>Total</span>
+              <span>${{ "{:,.2f}".format(total) }}</span>
+            </div>
           </div>
 
-          <button type="submit"
-            class="mt-6 w-full text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-bold rounded-xl text-lg px-5 py-4 text-center">
+          <button
+            type="submit"
+            class="mt-8 inline-flex w-full items-center justify-center rounded-full bg-white px-6 py-4 text-sm font-medium text-stone-900 transition hover:bg-stone-100"
+          >
             Confirmar compra simulada
           </button>
 
-          <p class="text-sm text-gray-500 mt-4">
+          <p class="mt-4 text-sm leading-7 text-white/60">
             Esta compra es simulada. No se procesa ningún pago real.
           </p>
         </div>
-      </div>
+      </aside>
     </form>
   </div>
 </section>

@@ -3,24 +3,45 @@
 {% block title %}Iniciar sesión | Casa León{% endblock %}
 
 {% block body %}
-<section class="min-h-[calc(100vh-120px)] bg-gradient-to-r from-emerald-900 via-emerald-700 to-stone-300 flex items-center justify-center px-6 py-16">
-  <div class="w-full max-w-lg">
-    <div class="bg-white rounded-3xl shadow-2xl overflow-hidden">
-      <div class="bg-gradient-to-r from-emerald-900 to-stone-300 px-8 py-10 text-center">
-        <img src="{{ url_for('static', filename='img/casaLeon.png') }}" alt="Casa León" class="h-24 w-auto mx-auto mb-4">
-        <h1 class="text-4xl font-extrabold text-white">Casa León</h1>
-        <p class="mt-2 text-white/90 text-lg">Sistema de Gestión de Marroquinería</p>
-      </div>
+<section class="min-h-[calc(100vh-120px)] bg-white">
+  <div class="mx-auto grid min-h-[calc(100vh-120px)] max-w-screen-2xl lg:grid-cols-2">
+    <div class="relative hidden overflow-hidden lg:block">
+      <img
+        src="{{ url_for('static', filename='img/tienda/login-cover.jpg') }}"
+        alt="Casa León"
+        class="absolute inset-0 h-full w-full object-cover"
+      >
+      <div class="absolute inset-0 bg-gradient-to-r from-stone-950/75 via-stone-900/45 to-transparent"></div>
 
-      <div class="p-8">
-        <form method="POST" action="{{ url_for('auth.login') }}" class="space-y-6" novalidate>
+      <div class="relative flex h-full max-w-xl flex-col justify-end p-14 text-white">
+        <p class="text-xs uppercase tracking-[0.2em] text-white/70">Casa León</p>
+        <h1 class="mt-3 text-5xl font-semibold leading-tight">
+          Vuelve a tu cuenta y continúa tu experiencia.
+        </h1>
+        <p class="mt-6 text-base leading-8 text-white/85">
+          Accede para consultar tus pedidos, administrar tu perfil y continuar explorando nuestra colección.
+        </p>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-center px-4 py-14 sm:px-6">
+      <div class="w-full max-w-md">
+        <div class="mb-8 text-center lg:text-left">
+          <img src="{{ url_for('static', filename='img/casaLeon.png') }}" alt="Casa León" class="mx-auto h-16 w-auto lg:mx-0">
+          <h2 class="mt-6 text-3xl font-semibold text-stone-900">Iniciar sesión</h2>
+          <p class="mt-2 text-sm leading-7 text-stone-600">
+            Ingresa con tu cuenta para comprar, revisar tus pedidos y gestionar tu información.
+          </p>
+        </div>
+
+        <form method="POST" action="{{ url_for('auth.login') }}" class="space-y-5" novalidate>
           {{ form.hidden_tag() }}
 
           <div>
-            <label class="block mb-2 text-sm font-medium text-gray-900">Correo Electrónico</label>
+            <label class="mb-2 block text-sm font-medium text-stone-700">Correo electrónico</label>
             {{ form.email(
-              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-700 focus:border-emerald-700 block w-full p-4",
-              placeholder="usuario@casaleon.com",
+              class="block w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3.5 text-sm text-stone-900 focus:border-stone-400 focus:ring-stone-300",
+              placeholder="correo@ejemplo.com",
               required=True,
               maxlength="120",
               autocomplete="email",
@@ -32,9 +53,9 @@
           </div>
 
           <div>
-            <label class="block mb-2 text-sm font-medium text-gray-900">Contraseña</label>
+            <label class="mb-2 block text-sm font-medium text-stone-700">Contraseña</label>
             {{ form.password(
-              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-700 focus:border-emerald-700 block w-full p-4",
+              class="block w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3.5 text-sm text-stone-900 focus:border-stone-400 focus:ring-stone-300",
               placeholder="••••••••",
               required=True,
               minlength="6",
@@ -46,33 +67,31 @@
             {% endfor %}
           </div>
 
-          <div class="flex items-center justify-between">
-            <label class="flex items-center gap-2 text-sm text-gray-600">
-              {{ form.remember(class="w-4 h-4 text-emerald-700 bg-gray-100 border-gray-300 rounded focus:ring-emerald-500") }}
+          <div class="flex items-center justify-between gap-4">
+            <label class="inline-flex items-center gap-2 text-sm text-stone-600">
+              {{ form.remember(class="h-4 w-4 rounded border-stone-300 text-stone-900 focus:ring-stone-400") }}
               Recordarme
             </label>
 
-            <a href="#" class="text-sm font-medium text-emerald-800 hover:underline">
+            <a href="#" class="text-sm font-medium text-stone-700 hover:text-stone-900">
               ¿Olvidaste tu contraseña?
             </a>
           </div>
 
-          <button type="submit"
-            class="w-full text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-bold rounded-xl text-lg px-5 py-4 text-center">
-            Iniciar Sesión
+          <button
+            type="submit"
+            class="w-full rounded-full bg-stone-900 px-5 py-4 text-sm font-medium text-white transition hover:bg-stone-800"
+          >
+            Iniciar sesión
           </button>
         </form>
 
-        <p class="mt-6 text-center text-gray-600">
+        <p class="mt-6 text-center text-sm text-stone-600 lg:text-left">
           ¿No tienes cuenta?
-          <a href="{{ url_for('auth.register') }}" class="font-semibold text-emerald-800 hover:underline">Regístrate</a>
+          <a href="{{ url_for('auth.register') }}" class="font-medium text-stone-900 hover:underline">Regístrate</a>
         </p>
       </div>
     </div>
-
-    <p class="mt-6 text-center text-white/90">
-      © 2026 Casa León - Todos los derechos reservados
-    </p>
   </div>
 </section>
 {% endblock %}

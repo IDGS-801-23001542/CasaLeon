@@ -911,13 +911,6 @@ class MateriaPrimaForm(FlaskForm):
         ],
     )
 
-    merma_pct = DecimalField(
-        "Merma %",
-        validators=[
-            InputRequired(message="La merma es requerida"),
-            NumberRange(min=0, message="La merma debe ser mayor o igual a 0"),
-        ],
-    )
     activo = SelectField(
         "Estado",
         coerce=int,
@@ -968,12 +961,11 @@ class ProduccionForm(FlaskForm):
         validators=[DataRequired(message="El producto es requerido")],
         choices=[],
     )
-    cantidad = DecimalField(
-        "Cantidad a producir",
-        validators=[
-            DataRequired(message="La cantidad es requerida"),
-            NumberRange(min=1, message="La cantidad debe ser mayor o igual a 1"),
-        ],
+    id_lote = SelectField(
+        "Lote de producción",
+        coerce=int,
+        validators=[DataRequired(message="El lote es requerido")],
+        choices=[]
     )
     estado = SelectField(
         "Estado",

@@ -1,115 +1,103 @@
 {% extends "layout.html" %}
 
-{% block title %}Dashboard cliente | Casa León{% endblock %}
+{% block title %}Mi cuenta | Casa León{% endblock %}
 
 {% block body %}
-<section class="bg-stone-50 min-h-[calc(100vh-120px)]">
-  <div class="max-w-screen-2xl mx-auto px-6 py-16">
-
-    <div class="bg-white border border-gray-200 rounded-3xl shadow-sm p-8 mb-8 overflow-hidden relative">
-      <div class="absolute inset-0 bg-gradient-to-r from-emerald-900/5 via-transparent to-stone-200/40 pointer-events-none"></div>
-
-      <div class="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
-        <div>
-          <p class="text-sm uppercase tracking-wide text-emerald-700 font-semibold">Panel del cliente</p>
-          <h1 class="text-4xl font-extrabold text-emerald-900 mt-2">Hola, {{ g.user.nombre }}</h1>
-          <p class="text-gray-600 mt-3 max-w-2xl">
-            Administra tu cuenta, revisa tus pedidos, consulta tu carrito y continúa explorando los productos de Casa León.
+<section class="bg-white min-h-[calc(100vh-120px)]">
+  <div class="mx-auto max-w-screen-2xl px-4 py-14 sm:px-6 lg:py-16">
+    <section class="overflow-hidden rounded-[36px] text-white" style="background: linear-gradient(135deg, #1f4d3a 0%, #295a46 100%);">
+      <div class="grid gap-8 lg:grid-cols-[1.1fr_.9fr] lg:items-center">
+        <div class="p-8 sm:p-10 lg:p-12">
+          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">Mi cuenta</p>
+          <h1 class="mt-3 text-4xl font-semibold sm:text-5xl">Hola, {{ g.user.nombre }}</h1>
+          <p class="mt-5 max-w-2xl text-base leading-8 text-white/85">
+            Administra tu perfil, revisa tus pedidos y continúa explorando la colección de Casa León.
           </p>
+
+          <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+            <a href="{{ url_for('tienda.productos_publico') }}" class="inline-flex items-center justify-center rounded-full bg-white px-6 py-3.5 text-sm font-medium text-stone-900 hover:bg-stone-100">
+              Ver productos
+            </a>
+            <a href="{{ url_for('tienda.carrito') }}" class="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/10 px-6 py-3.5 text-sm font-medium text-white hover:bg-white/15">
+              Ir al carrito
+            </a>
+          </div>
         </div>
 
-        <div class="flex flex-wrap gap-3">
-          <a href="{{ url_for('tienda.productos_publico') }}"
-             class="text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-xl text-sm px-5 py-3 text-center">
-            Ver productos
-          </a>
-          <a href="{{ url_for('tienda.carrito') }}"
-             class="text-emerald-900 bg-white border border-emerald-800 hover:bg-emerald-50 focus:ring-4 focus:outline-none focus:ring-emerald-200 font-medium rounded-xl text-sm px-5 py-3 text-center">
-            Ir al carrito
-          </a>
+        <div class="grid grid-cols-1 gap-4 p-8 pt-0 sm:p-10 sm:pt-0 lg:p-12 lg:pt-12">
+          <div class="rounded-[28px] bg-white/10 p-5 backdrop-blur-sm">
+            <p class="text-xs uppercase tracking-[0.16em] text-white/70">Pedidos registrados</p>
+            <h2 class="mt-2 text-4xl font-semibold">{{ pedidos|length }}</h2>
+          </div>
+          <div class="rounded-[28px] bg-white/10 p-5 backdrop-blur-sm">
+            <p class="text-xs uppercase tracking-[0.16em] text-white/70">Productos en carrito</p>
+            <h2 class="mt-2 text-4xl font-semibold">{{ g.cart_count }}</h2>
+          </div>
+          <div class="rounded-[28px] bg-white/10 p-5 backdrop-blur-sm">
+            <p class="text-xs uppercase tracking-[0.16em] text-white/70">Total estimado carrito</p>
+            <h2 class="mt-2 text-3xl font-semibold">${{ "{:,.2f}".format(total_carrito) }}</h2>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-      <a href="{{ url_for('tienda.mi_cuenta') }}"
-         class="block bg-white border border-gray-200 rounded-3xl shadow-sm p-6 hover:shadow-md hover:-translate-y-0.5 transition">
-        <p class="text-sm font-semibold text-emerald-700 uppercase tracking-wide">Perfil</p>
-        <h3 class="text-2xl font-bold text-emerald-900 mt-2">Mi cuenta</h3>
-        <p class="mt-2 text-gray-600">Edita tus datos personales y tu dirección de envío.</p>
+    <section class="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+      <a href="{{ url_for('tienda.mi_cuenta') }}" class="rounded-[32px] border border-stone-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">Perfil</p>
+        <h3 class="mt-3 text-2xl font-medium text-stone-900">Mi cuenta</h3>
+        <p class="mt-3 text-sm leading-7 text-stone-600">Edita tus datos personales, dirección de envío y contraseña.</p>
       </a>
 
-      <a href="{{ url_for('tienda.mis_pedidos') }}"
-         class="block bg-white border border-gray-200 rounded-3xl shadow-sm p-6 hover:shadow-md hover:-translate-y-0.5 transition">
-        <p class="text-sm font-semibold text-emerald-700 uppercase tracking-wide">Historial</p>
-        <h3 class="text-2xl font-bold text-emerald-900 mt-2">Mis pedidos</h3>
-        <p class="mt-2 text-gray-600">Consulta el historial y el estado de tus compras.</p>
+      <a href="{{ url_for('tienda.mis_pedidos') }}" class="rounded-[32px] border border-stone-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">Historial</p>
+        <h3 class="mt-3 text-2xl font-medium text-stone-900">Mis pedidos</h3>
+        <p class="mt-3 text-sm leading-7 text-stone-600">Consulta el historial y estado de tus compras simuladas.</p>
       </a>
 
-      <a href="{{ url_for('tienda.carrito') }}"
-         class="block bg-white border border-gray-200 rounded-3xl shadow-sm p-6 hover:shadow-md hover:-translate-y-0.5 transition">
-        <p class="text-sm font-semibold text-emerald-700 uppercase tracking-wide">Compra actual</p>
-        <h3 class="text-2xl font-bold text-emerald-900 mt-2">Carrito</h3>
-        <p class="mt-2 text-gray-600">Tienes {{ g.cart_count }} producto(s) agregado(s).</p>
+      <a href="{{ url_for('tienda.carrito') }}" class="rounded-[32px] border border-stone-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">Compra actual</p>
+        <h3 class="mt-3 text-2xl font-medium text-stone-900">Carrito</h3>
+        <p class="mt-3 text-sm leading-7 text-stone-600">Tienes {{ g.cart_count }} producto(s) agregado(s) en tu carrito.</p>
       </a>
 
-      <a href="{{ url_for('tienda.checkout') }}"
-         class="block bg-white border border-gray-200 rounded-3xl shadow-sm p-6 hover:shadow-md hover:-translate-y-0.5 transition">
-        <p class="text-sm font-semibold text-emerald-700 uppercase tracking-wide">Finalizar</p>
-        <h3 class="text-2xl font-bold text-emerald-900 mt-2">Checkout</h3>
-        <p class="mt-2 text-gray-600">Confirma tu compra simulada y registra tu pedido.</p>
+      <a href="{{ url_for('tienda.checkout') }}" class="rounded-[32px] border border-stone-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">Finalizar</p>
+        <h3 class="mt-3 text-2xl font-medium text-stone-900">Checkout</h3>
+        <p class="mt-3 text-sm leading-7 text-stone-600">Confirma tu compra simulada y registra tu pedido.</p>
       </a>
-    </div>
+    </section>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <div class="bg-white border border-gray-200 rounded-3xl shadow-sm p-6">
-        <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Pedidos registrados</p>
-        <h2 class="mt-3 text-4xl font-extrabold text-emerald-900">{{ pedidos|length }}</h2>
-        <p class="mt-2 text-gray-600">Mostrando los pedidos más recientes en tu panel.</p>
-      </div>
-
-      <div class="bg-white border border-gray-200 rounded-3xl shadow-sm p-6">
-        <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Productos en carrito</p>
-        <h2 class="mt-3 text-4xl font-extrabold text-emerald-900">{{ g.cart_count }}</h2>
-        <p class="mt-2 text-gray-600">Productos listos para continuar con tu compra.</p>
-      </div>
-
-      <div class="bg-white border border-gray-200 rounded-3xl shadow-sm p-6">
-        <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Total estimado carrito</p>
-        <h2 class="mt-3 text-4xl font-extrabold text-emerald-900">${{ "{:,.2f}".format(total_carrito) }}</h2>
-        <p class="mt-2 text-gray-600">Monto calculado con base en tu carrito actual.</p>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-      <div class="bg-white border border-gray-200 rounded-3xl shadow-sm p-8">
+    <section class="mt-10 grid gap-8 xl:grid-cols-2">
+      <article class="rounded-[32px] border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
         <div class="flex items-center justify-between gap-4">
-          <h2 class="text-3xl font-extrabold text-emerald-900">Resumen de cuenta</h2>
-          <a href="{{ url_for('tienda.mi_cuenta') }}"
-             class="text-sm font-medium text-emerald-800 hover:underline">
-            Editar datos
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">Perfil</p>
+            <h2 class="mt-2 text-3xl font-medium text-stone-900">Resumen de cuenta</h2>
+          </div>
+          <a href="{{ url_for('tienda.mi_cuenta') }}" class="text-sm font-medium text-stone-700 hover:text-stone-900">
+            Editar
           </a>
         </div>
 
-        <div class="mt-6 space-y-4 text-gray-700">
+        <div class="mt-8 space-y-5">
           <div>
-            <p class="text-sm text-gray-500">Nombre</p>
-            <p class="font-semibold text-emerald-900">{{ g.user.nombre }}</p>
+            <p class="text-sm text-stone-500">Nombre</p>
+            <p class="mt-1 text-base font-medium text-stone-900">{{ g.user.nombre }}</p>
           </div>
 
           <div>
-            <p class="text-sm text-gray-500">Correo electrónico</p>
-            <p class="font-semibold text-emerald-900">{{ g.user.email }}</p>
+            <p class="text-sm text-stone-500">Correo electrónico</p>
+            <p class="mt-1 text-base font-medium text-stone-900">{{ g.user.email }}</p>
           </div>
 
           <div>
-            <p class="text-sm text-gray-500">Teléfono</p>
-            <p class="font-semibold text-emerald-900">{{ g.user.telefono or "No registrado" }}</p>
+            <p class="text-sm text-stone-500">Teléfono</p>
+            <p class="mt-1 text-base font-medium text-stone-900">{{ g.user.telefono or "No registrado" }}</p>
           </div>
 
           <div>
-            <p class="text-sm text-gray-500">Dirección</p>
-            <p class="font-semibold text-emerald-900 leading-7">
+            <p class="text-sm text-stone-500">Dirección</p>
+            <div class="mt-1 text-base font-medium leading-8 text-stone-900">
               {% if g.user.calle or g.user.numero or g.user.colonia or g.user.ciudad or g.user.estado or g.user.pais or g.user.cp %}
                 {{ g.user.calle or "" }} {{ g.user.numero or "" }}<br>
                 {{ g.user.colonia or "" }}<br>
@@ -118,50 +106,53 @@
               {% else %}
                 No registrada
               {% endif %}
-            </p>
+            </div>
           </div>
         </div>
-      </div>
+      </article>
 
-      <div class="bg-white border border-gray-200 rounded-3xl shadow-sm p-8">
+      <article class="rounded-[32px] border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
         <div class="flex items-center justify-between gap-4">
-          <h2 class="text-3xl font-extrabold text-emerald-900">Pedidos recientes</h2>
-          <a href="{{ url_for('tienda.mis_pedidos') }}"
-             class="text-sm font-medium text-emerald-800 hover:underline">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">Historial</p>
+            <h2 class="mt-2 text-3xl font-medium text-stone-900">Pedidos recientes</h2>
+          </div>
+          <a href="{{ url_for('tienda.mis_pedidos') }}" class="text-sm font-medium text-stone-700 hover:text-stone-900">
             Ver todos
           </a>
         </div>
 
         {% if pedidos %}
-          <div class="mt-6 space-y-4">
+          <div class="mt-8 space-y-4">
             {% for pedido in pedidos %}
-              <a href="{{ url_for('tienda.pedido_detalle', id_pedido=pedido.id_pedido) }}"
-                 class="block border border-gray-200 rounded-2xl p-5 hover:bg-stone-50 transition">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <a
+                href="{{ url_for('tienda.pedido_detalle', id_pedido=pedido.id_pedido) }}"
+                class="block rounded-[28px] border border-stone-200 p-5 transition hover:bg-stone-50"
+              >
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p class="font-bold text-emerald-900">{{ pedido.folio }}</p>
-                    <p class="text-gray-500 text-sm">{{ pedido.creado_en.strftime('%d/%m/%Y %H:%M') }}</p>
+                    <p class="text-lg font-medium text-stone-900">{{ pedido.folio }}</p>
+                    <p class="mt-1 text-sm text-stone-500">{{ pedido.creado_en.strftime('%d/%m/%Y %H:%M') }}</p>
                   </div>
-                  <div class="text-left sm:text-right">
-                    <p class="font-bold text-emerald-900">${{ "{:,.2f}".format(pedido.total) }}</p>
-                    <p class="text-sm text-gray-600">{{ pedido.estado }}</p>
+
+                  <div class="sm:text-right">
+                    <p class="text-lg font-medium text-stone-900">${{ "{:,.2f}".format(pedido.total) }}</p>
+                    <p class="mt-1 text-sm text-stone-500">{{ pedido.estado }}</p>
                   </div>
                 </div>
               </a>
             {% endfor %}
           </div>
         {% else %}
-          <div class="mt-6 bg-stone-50 border border-stone-200 rounded-2xl p-6">
-            <p class="text-gray-600">Todavía no tienes pedidos registrados.</p>
-            <a href="{{ url_for('tienda.productos_publico') }}"
-               class="inline-block mt-4 text-white bg-emerald-800 hover:bg-emerald-900 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-xl text-sm px-5 py-3 text-center">
+          <div class="mt-8 rounded-[28px] bg-stone-50 p-6">
+            <p class="text-stone-600">Todavía no tienes pedidos registrados.</p>
+            <a href="{{ url_for('tienda.productos_publico') }}" class="mt-4 inline-flex rounded-full bg-stone-900 px-5 py-3 text-sm font-medium text-white hover:bg-stone-800">
               Explorar productos
             </a>
           </div>
         {% endif %}
-      </div>
-    </div>
-
+      </article>
+    </section>
   </div>
 </section>
 {% endblock %}

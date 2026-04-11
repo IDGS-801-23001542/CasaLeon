@@ -275,8 +275,8 @@ class MateriaPrima(db.Model):
 
     stock_actual = db.Column(db.Numeric(14, 2), nullable=False, default=0)
     stock_minimo = db.Column(db.Numeric(14, 2), nullable=False, default=0)
-    costo_unit_prom = db.Column(db.Numeric(12, 2), nullable=False, default=0)
-    merma_pct = db.Column(db.Numeric(5, 2), nullable=False, default=0)
+    costo_unit_prom = db.Column(db.Numeric(12, 2), nullable=False, default=None)
+    merma_pct = db.Column(db.Numeric(5, 2), nullable=True, default=0)
     activo = db.Column(db.Integer, nullable=False, default=1)
 
     receta_detalles = db.relationship("RecetaDetalle", backref="materia_prima_ref_receta", lazy=True)
@@ -364,6 +364,8 @@ class OrdenProduccion(db.Model):
     )
 
     folio = db.Column(db.String(30), unique=True, nullable=False)
+    id_lote = db.Column(db.Integer, db.ForeignKey("lotes.id_lote"), nullable=False)
+    lote = db.relationship("Lote")
     cantidad = db.Column(db.Numeric(14, 2), nullable=False, default=0)
     estado = db.Column(db.String(30), nullable=False, default="COMPLETADA")
     costo_estimado = db.Column(db.Numeric(12, 2), nullable=False, default=0)
@@ -490,3 +492,11 @@ class AuditoriaLog(db.Model):
 
     def __repr__(self):
         return f"<AuditoriaLog {self.id_log} - {self.modulo} - {self.accion}>"
+    
+class Lote(db.Model):
+    __tablename__ = "lotes"
+
+    id_lote = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(50), nullable=False)
+    cantidad = db.Column(db.Integer, nullable=False)
+    activo = db.Column(db.Integer, nullable=False, default=1)

@@ -90,6 +90,7 @@
           <tr class="text-left text-sm text-gray-600">
             <th class="px-4 py-4 font-semibold">Folio</th>
             <th class="px-4 py-4 font-semibold">Producto</th>
+            <th class="px-4 py-4 font-semibold">Lote</th>
             <th class="px-4 py-4 font-semibold">Cantidad producida</th>
             <th class="px-4 py-4 font-semibold">Fecha</th>
             <th class="px-4 py-4 font-semibold">Estatus</th>
@@ -109,7 +110,11 @@
             </td>
 
             <td class="px-4 py-4 text-gray-700">
-              {{ orden.cantidad|num(4) }}
+              {{ orden.lote.nombre if orden.lote else '—' }}
+            </td>
+
+            <td class="px-4 py-4 text-gray-700">
+              {{ orden.cantidad|num(2) }}
             </td>
 
             <td class="px-4 py-4 text-gray-700">

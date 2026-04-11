@@ -136,7 +136,6 @@ def crear_materia_prima():
                 stock_actual=create_form.stock_actual.data,
                 stock_minimo=create_form.stock_minimo.data,
                 costo_unit_prom=create_form.costo_unit_prom.data,
-                merma_pct=create_form.merma_pct.data,
                 activo=1,
             )
 
@@ -187,7 +186,6 @@ def actualizar_materia_prima():
         create_form.stock_actual.data = materia_db.stock_actual
         create_form.stock_minimo.data = materia_db.stock_minimo
         create_form.costo_unit_prom.data = materia_db.costo_unit_prom
-        create_form.merma_pct.data = materia_db.merma_pct
 
         return render_template(
             "private/materia_prima/materia_prima_update.html",
@@ -217,7 +215,6 @@ def actualizar_materia_prima():
         materia_db.stock_actual = create_form.stock_actual.data
         materia_db.stock_minimo = create_form.stock_minimo.data
         materia_db.costo_unit_prom = create_form.costo_unit_prom.data
-        materia_db.merma_pct = create_form.merma_pct.data
 
         db.session.add(materia_db)
         db.session.commit()
@@ -263,7 +260,6 @@ def eliminar_materia_prima():
         create_form.stock_actual.data = materia_db.stock_actual
         create_form.stock_minimo.data = materia_db.stock_minimo
         create_form.costo_unit_prom.data = materia_db.costo_unit_prom
-        create_form.merma_pct.data = materia_db.merma_pct
 
         return render_template(
             "private/materia_prima/materia_prima_delete.html",
