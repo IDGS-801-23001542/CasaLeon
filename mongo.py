@@ -35,6 +35,30 @@ def get_mongo_db():
     return db
 
 
+def get_report_collections():
+    db = get_mongo_db()
+    return {
+        "daily_sales_reports": db["daily_sales_reports"],
+        "period_sales_reports": db["period_sales_reports"],
+    }
+
+
+def ensure_report_indexes():
+    collections = get_report_collections()
+
+    collections["daily_sales_reports"].create_index(
+        [("report_date", 1)],
+        unique=True,
+        name="uq_daily_sales_report_date",
+    )
+
+    collections["period_sales_reports"].create_index(
+        [("start_date", 1), ("end_date", 1)],
+        unique=True,
+        name="uq_period_sales_reports_range",
+    )
+
+
 def close_mongo(exception=None):
     # Si usas un cliente global en app.extensions, normalmente no lo cierres por request.
     pass

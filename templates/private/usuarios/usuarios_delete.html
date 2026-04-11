@@ -65,13 +65,19 @@
                 </div>
 
                 <div>
+                    <label class="block mb-2 text-sm font-medium text-gray-900">Teléfono</label>
+                    <input type="text" value="{{ usuario_db.telefono }}" disabled
+                        class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
+                </div>
+
+                <div>
                     <label class="block mb-2 text-sm font-medium text-gray-900">Rol</label>
                     <input type="text" value="{{ usuario_db.rol.descripcion if usuario_db.rol else 'Sin rol' }}"
                         disabled
                         class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />
                 </div>
 
-                <div>
+                <div class="md:col-span-2">
                     <label class="block mb-2 text-sm font-medium text-gray-900">Estado actual</label>
                     <input type="text" value="{{ 'Activo' if usuario_db.activo == 1 else 'Inactivo' }}" disabled
                         class="bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-xl block w-full p-3 cursor-not-allowed" />

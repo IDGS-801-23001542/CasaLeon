@@ -695,6 +695,21 @@ class UsuarioForm(FlaskForm):
             ),
         ],
     )
+    telefono = StringField(
+        "Teléfono",
+        validators=[
+            DataRequired(message="El teléfono es requerido"),
+            Length(
+                min=10,
+                max=10,
+                message="El teléfono debe tener 10 caracteres",
+            ),
+            Regexp(
+                r"^\d+$",
+                message="El teléfono solo puede contener números",
+            ),
+        ],
+    )
 
 
 class ProveedorForm(FlaskForm):

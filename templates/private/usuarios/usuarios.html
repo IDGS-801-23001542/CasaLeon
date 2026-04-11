@@ -63,7 +63,8 @@
       <form method="GET" action="{{ url_for('usuarios.listado_usuarios') }}" class="flex gap-3">
         <div class="flex-1 relative">
           <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
-          <input type="text" name="search" placeholder="Buscar por nombre, correo o rol..." value="{{ search }}"
+          <input type="text" name="search" placeholder="Buscar por nombre, correo, teléfono o rol..."
+            value="{{ search }}"
             class="w-full pl-10 pr-4 py-4 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
 
@@ -76,11 +77,12 @@
 
   <div class="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden">
     <div class="overflow-x-auto">
-      <table class="w-full min-w-[1000px]">
+      <table class="w-full min-w-[1150px]">
         <thead class="bg-gray-50 border-b border-gray-200">
           <tr class="text-left text-sm text-gray-600">
             <th class="px-4 py-4 font-semibold">Usuario</th>
             <th class="px-4 py-4 font-semibold">Correo</th>
+            <th class="px-4 py-4 font-semibold">Teléfono</th>
             <th class="px-4 py-4 font-semibold">Rol</th>
             <th class="px-4 py-4 font-semibold">Código</th>
             <th class="px-4 py-4 font-semibold">Creado</th>
@@ -112,6 +114,10 @@
 
             <td class="px-4 py-4 text-gray-700">
               <div class="max-w-xs truncate">{{ usuario.email }}</div>
+            </td>
+
+            <td class="px-4 py-4 text-gray-700">
+              {{ usuario.telefono or 'N/D' }}
             </td>
 
             <td class="px-4 py-4 text-gray-700">
@@ -151,7 +157,7 @@
           </tr>
           {% else %}
           <tr>
-            <td colspan="7" class="px-6 py-10 text-center text-gray-500">
+            <td colspan="8" class="px-6 py-10 text-center text-gray-500">
               No hay usuarios registrados.
             </td>
           </tr>

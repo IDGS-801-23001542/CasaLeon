@@ -48,6 +48,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {{ ui.field(form.nombre, placeholder="Nombre completo") }}
                 {{ ui.field(form.email, placeholder="correo@casaleon.com", type="email") }}
+                {{ ui.field(form.telefono, placeholder="4771234567", inputmode="numeric") }}
                 {{ ui.select_field(form.rol) }}
                 {{ ui.select_field(form.activo) }}
 
@@ -58,7 +59,8 @@
 
             <div class="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3">
                 <p class="text-sm text-blue-700">
-                    El usuario solo podrá acceder al sistema si se encuentra en estado activo.
+                    El usuario solo podrá acceder al sistema si se encuentra en estado activo. El teléfono será
+                    obligatorio para procesos futuros de validación y seguridad.
                 </p>
             </div>
 

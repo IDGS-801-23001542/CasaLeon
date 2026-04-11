@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 from config import DevelopmentConfig
 from models import db, Usuario, Cliente
-from mongo import init_mongo
+from mongo import init_mongo, ensure_report_indexes
 from services.mongo_store import count_cart_items
 from utils.auth import get_identity
 
@@ -114,4 +114,5 @@ app = create_app()
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
+        ensure_report_indexes()
     app.run(debug=True)

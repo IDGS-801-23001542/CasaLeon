@@ -1,5 +1,7 @@
+from datetime import datetime
 from decimal import Decimal
-from flask import render_template, request
+
+from flask import render_template, request, redirect, url_for, flash
 
 from models import (
     Producto,
@@ -10,6 +12,7 @@ from models import (
     Merma,
 )
 from utils.auth import login_required
+from .services import generate_daily_snapshot, get_daily_snapshot
 from . import reportes
 
 
@@ -17,9 +20,20 @@ def money(value):
     return f"{float(value or 0):,.2f}"
 
 
-@reportes.route("/private/reportes")
+@reportes.route("/private/reportes", methods=["GET"])
 @login_required("ADMIN")
 def vista_reportes():
+    snapshot_date = request.args.get("snapshot_date", "").strip()
+
+    if not snapshot_date:
+        snapshot_date = datetime.now().strftime("%Y-%m-%d")
+
+    snapshot_result = get_daily_snapshot(snapshot_date)
+    sales_snapshot = snapshot_result.get("snapshot") if snapshot_result.get("exists") else None
+    sales_snapshot_exists = snapshot_result.get("exists", False)
+    sales_snapshot_message = snapshot_result.get("message", "")
+    sales_snapshot_status = request.args.get("snapshot_status", "").strip()
+
     # Inventario PT
     productos_db = Producto.query.order_by(Producto.nombre.asc()).all()
     total_productos = len(productos_db)
@@ -42,12 +56,16 @@ def vista_reportes():
     )
 
     # Producción
-    producciones_db = OrdenProduccion.query.order_by(OrdenProduccion.id_orden_produccion.desc()).all()
+    producciones_db = OrdenProduccion.query.order_by(
+        OrdenProduccion.id_orden_produccion.desc()
+    ).all()
     producciones_completadas = sum(1 for o in producciones_db if o.estado == "COMPLETADA")
-    producciones_pendientes = sum(1 for o in producciones_db if o.estado in ["PENDIENTE", "EN_PROCESO"])
+    producciones_pendientes = sum(
+        1 for o in producciones_db if o.estado in ["PENDIENTE", "EN_PROCESO"]
+    )
     costo_produccion = sum(float(o.costo_estimado or 0) for o in producciones_db)
 
-    # Ventas
+    # Ventas POS
     ventas_db = Venta.query.order_by(Venta.id_venta.desc()).all()
     total_ventas = len(ventas_db)
     ingresos_ventas = sum(float(v.total or 0) for v in ventas_db)
@@ -61,7 +79,7 @@ def vista_reportes():
     top_productos_lista = sorted(
         [{"nombre": k, "cantidad": v} for k, v in top_productos.items()],
         key=lambda x: x["cantidad"],
-        reverse=True
+        reverse=True,
     )[:5]
 
     # Pedidos tienda
@@ -115,4 +133,40 @@ def vista_reportes():
         merma_recuperable=merma_recuperable,
         merma_no_recuperable=merma_no_recuperable,
         valor_merma=money(valor_merma),
+
+        snapshot_date=snapshot_date,
+        sales_snapshot=sales_snapshot,
+        sales_snapshot_exists=sales_snapshot_exists,
+        sales_snapshot_message=sales_snapshot_message,
+        sales_snapshot_status=sales_snapshot_status,
+    )
+
+
+@reportes.route("/private/reportes/generar-snapshot", methods=["POST"])
+@login_required("ADMIN")
+def generar_snapshot_desde_vista():
+    snapshot_date = request.form.get("snapshot_date", "").strip()
+
+    if not snapshot_date:
+        flash("Debes seleccionar una fecha para generar el snapshot.", "warning")
+        return redirect(url_for("reportes.vista_reportes"))
+
+    result = generate_daily_snapshot(snapshot_date)
+    reason = result.get("reason", "")
+
+    if reason == "created":
+        flash("Snapshot creado correctamente.", "success")
+    elif reason == "hash_changed":
+        flash("El snapshot fue actualizado porque hubo cambios.", "success")
+    elif reason == "no_changes":
+        flash("No hubo cambios. Se conserva el snapshot existente.", "info")
+    else:
+        flash("El snapshot se procesó correctamente.", "info")
+
+    return redirect(
+        url_for(
+            "reportes.vista_reportes",
+            snapshot_date=snapshot_date,
+            snapshot_status=reason,
+        )
     )

@@ -30,6 +30,7 @@ def listado_usuarios():
             db.or_(
                 Usuario.nombre.ilike(like_term),
                 Usuario.email.ilike(like_term),
+                Usuario.telefono.ilike(like_term),
                 Rol.descripcion.ilike(like_term),
                 Rol.codigo.ilike(like_term),
             )
@@ -71,10 +72,16 @@ def crear_usuario():
 
     if request.method == "POST" and create_form.validate():
         email = create_form.email.data.strip().lower()
-        existe = Usuario.query.filter(db.func.lower(Usuario.email) == email).first()
+        telefono = create_form.telefono.data.strip()
 
+        existe = Usuario.query.filter(db.func.lower(Usuario.email) == email).first()
         if existe:
             flash("Ese correo ya está registrado.", "warning")
+            return render_template("private/usuarios/usuarios_create.html", form=create_form)
+
+        existe_telefono = Usuario.query.filter(Usuario.telefono == telefono).first()
+        if existe_telefono:
+            flash("Ese teléfono ya está registrado.", "warning")
             return render_template("private/usuarios/usuarios_create.html", form=create_form)
 
         if not create_form.password.data or not create_form.password.data.strip():
@@ -85,6 +92,7 @@ def crear_usuario():
             id_rol=create_form.rol.data,
             nombre=create_form.nombre.data.strip(),
             email=email,
+            telefono=telefono,
             password_hash=generate_password_hash(create_form.password.data.strip()),
             activo=create_form.activo.data,
         )
@@ -94,7 +102,7 @@ def crear_usuario():
         log_event(
             modulo="Usuarios",
             accion="Usuario creado",
-            detalle=f"Usuario '{usuario.email}' creado con estado {'Activo' if usuario.activo == 1 else 'Inactivo'}",
+            detalle=f"Usuario '{usuario.email}' creado con teléfono '{usuario.telefono}' y estado {'Activo' if usuario.activo == 1 else 'Inactivo'}",
             severidad="INFO",
         )
         flash("Usuario creado correctamente.", "success")
@@ -118,6 +126,7 @@ def actualizar_usuario():
     if request.method == "GET":
         create_form.nombre.data = usuario_db.nombre
         create_form.email.data = usuario_db.email
+        create_form.telefono.data = usuario_db.telefono
         create_form.rol.data = usuario_db.id_rol
         create_form.activo.data = usuario_db.activo
         return render_template(
@@ -128,11 +137,12 @@ def actualizar_usuario():
 
     if create_form.validate():
         email = create_form.email.data.strip().lower()
+        telefono = create_form.telefono.data.strip()
+
         existe = Usuario.query.filter(
             db.func.lower(Usuario.email) == email,
             Usuario.id_usuario != usuario_db.id_usuario,
         ).first()
-
         if existe:
             flash("Ya existe otro usuario con ese correo.", "warning")
             return render_template(
@@ -141,8 +151,21 @@ def actualizar_usuario():
                 usuario_db=usuario_db,
             )
 
+        existe_telefono = Usuario.query.filter(
+            Usuario.telefono == telefono,
+            Usuario.id_usuario != usuario_db.id_usuario,
+        ).first()
+        if existe_telefono:
+            flash("Ya existe otro usuario con ese teléfono.", "warning")
+            return render_template(
+                "private/usuarios/usuarios_update.html",
+                form=create_form,
+                usuario_db=usuario_db,
+            )
+
         usuario_db.nombre = create_form.nombre.data.strip()
         usuario_db.email = email
+        usuario_db.telefono = telefono
         usuario_db.id_rol = create_form.rol.data
         usuario_db.activo = create_form.activo.data
 
@@ -155,7 +178,7 @@ def actualizar_usuario():
         log_event(
             modulo="Usuarios",
             accion="Usuario actualizado",
-            detalle=f"Usuario '{usuario_db.email}' actualizado. Estado: {'Activo' if usuario_db.activo == 1 else 'Inactivo'}",
+            detalle=f"Usuario '{usuario_db.email}' actualizado. Teléfono: '{usuario_db.telefono}'. Estado: {'Activo' if usuario_db.activo == 1 else 'Inactivo'}",
             severidad="INFO",
         )
         flash("Usuario actualizado correctamente.", "success")
@@ -187,6 +210,7 @@ def eliminar_usuario():
     if request.method == "GET":
         create_form.nombre.data = usuario_db.nombre
         create_form.email.data = usuario_db.email
+        create_form.telefono.data = usuario_db.telefono
         create_form.rol.data = usuario_db.id_rol
         create_form.activo.data = usuario_db.activo
         return render_template(
