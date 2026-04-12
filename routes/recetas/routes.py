@@ -1,6 +1,5 @@
 from decimal import Decimal, InvalidOperation
 from flask import render_template, request, redirect, url_for, flash
-from sqlalchemy import or_
 import forms
 from models import db, MateriaPrima, Receta, RecetaDetalle
 from utils.auth import login_required
@@ -28,6 +27,51 @@ def calcular_costo_receta(receta_db):
         total += cantidad_real * costo_unit
 
     receta_db.costo_estimado = total.quantize(Decimal("0.0001"))
+
+
+def construir_detalles_desde_request():
+    ids_materia = request.form.getlist("id_materia_prima[]")
+    cantidades = request.form.getlist("cantidad[]")
+
+    detalles = []
+
+    total_filas = max(len(ids_materia), len(cantidades), 1)
+
+    for i in range(total_filas):
+        id_mp = ids_materia[i].strip() if i < len(ids_materia) and ids_materia[i] else ""
+        cantidad_raw = cantidades[i].strip() if i < len(cantidades) and cantidades[i] else ""
+
+        unidad_medida = ""
+        materia_nombre = ""
+
+        if id_mp.isdigit():
+            materia = MateriaPrima.query.filter_by(
+                id_materia_prima=int(id_mp),
+                activo=1
+            ).first()
+            if materia:
+                materia_nombre = materia.nombre
+                unidad_medida = (
+                    materia.unidad_medida_rel.nombre
+                    if materia.unidad_medida_rel else ""
+                )
+
+        detalles.append({
+            "id_materia_prima": id_mp,
+            "cantidad": cantidad_raw,
+            "materia_nombre": materia_nombre,
+            "unidad_medida": unidad_medida,
+        })
+
+    if not detalles:
+        detalles.append({
+            "id_materia_prima": "",
+            "cantidad": "",
+            "materia_nombre": "",
+            "unidad_medida": "",
+        })
+
+    return detalles
 
 
 def extraer_detalles_receta_desde_form():
@@ -104,9 +148,7 @@ def recetas_view():
 
     if search:
         like_term = f"%{search}%"
-        query = query.filter(
-            Receta.nombre.ilike(like_term)
-        )
+        query = query.filter(Receta.nombre.ilike(like_term))
 
     recetas_db = query.order_by(Receta.nombre.asc()).all()
     total_recetas = Receta.query.count()
@@ -131,46 +173,93 @@ def recetas_view():
 def crear_receta():
     create_form = forms.RecetaForm()
     materias_primas = obtener_materias_primas_activas()
-    detalles_form = []
 
-    if request.method == "POST":
-        detalles_form, errores_detalle = extraer_detalles_receta_desde_form()
+    if request.method == "GET":
+        detalles_form = [{
+            "id_materia_prima": "",
+            "cantidad": "",
+            "materia_nombre": "",
+            "unidad_medida": "",
+        }]
+        return render_template(
+            "private/recetas/recetas_create.html",
+            form=create_form,
+            materias_primas=materias_primas,
+            detalles_form=detalles_form,
+        )
 
-        if create_form.validate() and not errores_detalle:
-            nombre = create_form.nombre.data.strip()
+    accion = request.form.get("accion", "guardar")
+    detalles_form = construir_detalles_desde_request()
 
-            receta_db = Receta(
-                nombre=nombre,
-                rendimiento=Decimal(str(create_form.rendimiento.data)),
-                costo_estimado=0,
-                activo=create_form.activo.data,
+    if accion == "agregar_insumo":
+        detalles_form.append({
+            "id_materia_prima": "",
+            "cantidad": "",
+            "materia_nombre": "",
+            "unidad_medida": "",
+        })
+        return render_template(
+            "private/recetas/recetas_create.html",
+            form=create_form,
+            materias_primas=materias_primas,
+            detalles_form=detalles_form,
+        )
+
+    if accion.startswith("quitar_insumo_"):
+        try:
+            index = int(accion.split("_")[-1])
+        except ValueError:
+            index = -1
+
+        if len(detalles_form) > 1 and 0 <= index < len(detalles_form):
+            detalles_form.pop(index)
+        else:
+            flash("La receta debe tener al menos un insumo.", "warning")
+
+        return render_template(
+            "private/recetas/recetas_create.html",
+            form=create_form,
+            materias_primas=materias_primas,
+            detalles_form=detalles_form,
+        )
+
+    detalles_validos, errores_detalle = extraer_detalles_receta_desde_form()
+
+    if create_form.validate() and not errores_detalle:
+        nombre = create_form.nombre.data.strip()
+
+        receta_db = Receta(
+            nombre=nombre,
+            rendimiento=Decimal(str(create_form.rendimiento.data)),
+            costo_estimado=0,
+            activo=create_form.activo.data,
+        )
+        db.session.add(receta_db)
+        db.session.flush()
+
+        for detalle in detalles_validos:
+            nuevo_detalle = RecetaDetalle(
+                id_receta=receta_db.id_receta,
+                id_materia_prima=detalle["id_materia_prima"],
+                cantidad=detalle["cantidad"],
             )
-            db.session.add(receta_db)
-            db.session.flush()
+            db.session.add(nuevo_detalle)
 
-            for detalle in detalles_form:
-                nuevo_detalle = RecetaDetalle(
-                    id_receta=receta_db.id_receta,
-                    id_materia_prima=detalle["id_materia_prima"],
-                    cantidad=detalle["cantidad"],
-                )
-                db.session.add(nuevo_detalle)
+        db.session.flush()
+        calcular_costo_receta(receta_db)
+        db.session.commit()
 
-            db.session.flush()
-            calcular_costo_receta(receta_db)
-            db.session.commit()
+        log_event(
+            modulo="Recetas",
+            accion="Receta creada",
+            detalle=f"Receta '{receta_db.nombre}' creada con {len(detalles_validos)} insumo(s)",
+            severidad="INFO",
+        )
+        flash("Receta creada correctamente.", "success")
+        return redirect(url_for("recetas.recetas_view"))
 
-            log_event(
-                modulo="Recetas",
-                accion="Receta creada",
-                detalle=f"Receta '{receta_db.nombre}' creada con {len(detalles_form)} insumo(s)",
-                severidad="INFO",
-            )
-            flash("Receta creada correctamente.", "success")
-            return redirect(url_for("recetas.recetas_view"))
-
-        for error in errores_detalle:
-            flash(error, "warning")
+    for error in errores_detalle:
+        flash(error, "warning")
 
     return render_template(
         "private/recetas/recetas_create.html",
@@ -199,14 +288,22 @@ def actualizar_receta():
 
         detalles_form = [
             {
-                "id_materia_prima": detalle.id_materia_prima,
-                "cantidad": detalle.cantidad,
+                "id_materia_prima": str(detalle.id_materia_prima),
+                "cantidad": f"{Decimal(str(detalle.cantidad or 0))}",
                 "materia_nombre": detalle.materia_prima.nombre if detalle.materia_prima else "",
                 "unidad_medida": detalle.materia_prima.unidad_medida_rel.nombre
                 if detalle.materia_prima and detalle.materia_prima.unidad_medida_rel else "",
             }
             for detalle in receta_db.detalles
         ]
+
+        if not detalles_form:
+            detalles_form = [{
+                "id_materia_prima": "",
+                "cantidad": "",
+                "materia_nombre": "",
+                "unidad_medida": "",
+            }]
 
         return render_template(
             "private/recetas/recetas_update.html",
@@ -216,7 +313,44 @@ def actualizar_receta():
             detalles_form=detalles_form,
         )
 
-    detalles_form, errores_detalle = extraer_detalles_receta_desde_form()
+    accion = request.form.get("accion", "guardar")
+    detalles_form = construir_detalles_desde_request()
+
+    if accion == "agregar_insumo":
+        detalles_form.append({
+            "id_materia_prima": "",
+            "cantidad": "",
+            "materia_nombre": "",
+            "unidad_medida": "",
+        })
+        return render_template(
+            "private/recetas/recetas_update.html",
+            form=create_form,
+            receta_db=receta_db,
+            materias_primas=materias_primas,
+            detalles_form=detalles_form,
+        )
+
+    if accion.startswith("quitar_insumo_"):
+        try:
+            index = int(accion.split("_")[-1])
+        except ValueError:
+            index = -1
+
+        if len(detalles_form) > 1 and 0 <= index < len(detalles_form):
+            detalles_form.pop(index)
+        else:
+            flash("La receta debe tener al menos un insumo.", "warning")
+
+        return render_template(
+            "private/recetas/recetas_update.html",
+            form=create_form,
+            receta_db=receta_db,
+            materias_primas=materias_primas,
+            detalles_form=detalles_form,
+        )
+
+    detalles_validos, errores_detalle = extraer_detalles_receta_desde_form()
 
     if create_form.validate() and not errores_detalle:
         receta_db.nombre = create_form.nombre.data.strip()
@@ -225,7 +359,7 @@ def actualizar_receta():
 
         RecetaDetalle.query.filter_by(id_receta=receta_db.id_receta).delete()
 
-        for detalle in detalles_form:
+        for detalle in detalles_validos:
             nuevo_detalle = RecetaDetalle(
                 id_receta=receta_db.id_receta,
                 id_materia_prima=detalle["id_materia_prima"],
@@ -240,7 +374,7 @@ def actualizar_receta():
         log_event(
             modulo="Recetas",
             accion="Receta actualizada",
-            detalle=f"Receta '{receta_db.nombre}' actualizada con {len(detalles_form)} insumo(s)",
+            detalle=f"Receta '{receta_db.nombre}' actualizada con {len(detalles_validos)} insumo(s)",
             severidad="INFO",
         )
         flash("Receta actualizada correctamente.", "success")

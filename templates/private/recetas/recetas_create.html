@@ -11,10 +11,32 @@
       <p class="text-gray-500">Registra la estructura de materiales para fabricar un producto</p>
     </div>
     <a href="{{ url_for('recetas.recetas_view') }}"
-       class="px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
+      class="px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
       Volver
     </a>
   </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="space-y-3">
+    {% for category, message in messages %}
+    <div class="px-4 py-3 rounded-xl border
+    {% if category == 'success' %}
+      bg-green-50 border-green-200 text-green-700
+    {% elif category == 'warning' %}
+      bg-yellow-50 border-yellow-200 text-yellow-700
+    {% elif category == 'danger' %}
+      bg-red-50 border-red-200 text-red-700
+    {% else %}
+      bg-blue-50 border-blue-200 text-blue-700
+    {% endif %}
+  ">
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endwith %}
 
   <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
     <form method="POST" action="{{ url_for('recetas.crear_receta') }}" class="space-y-6">
@@ -36,119 +58,63 @@
       </div>
 
       <div>
-        <div class="flex items-center justify-between gap-4 mb-4">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
           <div>
             <h2 class="text-lg font-semibold text-gray-800">Insumos de la receta</h2>
             <p class="text-sm text-gray-500">Agrega las materias primas y la cantidad base por receta.</p>
           </div>
 
-          <button
-            type="button"
-            id="agregar-insumo"
-            class="px-4 py-2 bg-emerald-600 text-white rounded-xl hover:shadow-lg transition-all"
-          >
+          <button type="submit" name="accion" value="agregar_insumo"
+            class="px-4 py-2 bg-emerald-600 text-white rounded-xl hover:shadow-lg transition-all">
             + Agregar insumo
           </button>
         </div>
 
         <div class="rounded-2xl border border-gray-200 overflow-hidden">
-          <div class="hidden md:grid md:grid-cols-12 gap-3 px-4 py-3 bg-gray-50 border-b border-gray-200 text-sm font-medium text-gray-700">
+          <div
+            class="hidden md:grid md:grid-cols-12 gap-3 px-4 py-3 bg-gray-50 border-b border-gray-200 text-sm font-medium text-gray-700">
             <div class="md:col-span-6">Materia prima</div>
             <div class="md:col-span-4">Cantidad base</div>
             <div class="md:col-span-2 text-center">Acción</div>
           </div>
 
           <div id="contenedor-insumos" class="divide-y divide-gray-200">
-            {% if detalles_form %}
-              {% for detalle in detalles_form %}
-                <div class="insumo-row grid grid-cols-1 md:grid-cols-12 gap-3 p-4">
-                  <div class="md:col-span-6">
-                    <label class="block mb-2 text-sm font-medium text-gray-900 md:hidden">Materia prima</label>
-                    <select
-                      name="id_materia_prima[]"
-                      class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-2 focus:ring-emerald-300 focus:border-emerald-300 block w-full p-3"
-                      required
-                    >
-                      <option value="">Selecciona una materia prima</option>
-                      {% for materia in materias_primas %}
-                        <option
-                          value="{{ materia.id_materia_prima }}"
-                          {% if detalle.id_materia_prima|string == materia.id_materia_prima|string %}selected{% endif %}
-                        >
-                          {{ materia.nombre }} ({{ materia.unidad_medida_rel.nombre }})
-                        </option>
-                      {% endfor %}
-                    </select>
-                  </div>
-
-                  <div class="md:col-span-4">
-                    <label class="block mb-2 text-sm font-medium text-gray-900 md:hidden">Cantidad base</label>
-                    <input
-                      type="number"
-                      step="0.0001"
-                      min="0.0001"
-                      name="cantidad[]"
-                      value="{{ detalle.cantidad }}"
-                      placeholder="Cantidad"
-                      class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-2 focus:ring-emerald-300 focus:border-emerald-300 block w-full p-3"
-                      required
-                    />
-                    {% if detalle.unidad_medida %}
-                    <p class="mt-2 text-xs text-gray-500">Unidad: {{ detalle.unidad_medida }}</p>
-                    {% endif %}
-                  </div>
-
-                  <div class="md:col-span-2 flex items-end">
-                    <button
-                      type="button"
-                      class="eliminar-insumo w-full px-4 py-3 bg-red-600 text-white rounded-xl hover:shadow-lg transition-all"
-                    >
-                      Quitar
-                    </button>
-                  </div>
-                </div>
-              {% endfor %}
-            {% else %}
-              <div class="insumo-row grid grid-cols-1 md:grid-cols-12 gap-3 p-4">
-                <div class="md:col-span-6">
-                  <label class="block mb-2 text-sm font-medium text-gray-900 md:hidden">Materia prima</label>
-                  <select
-                    name="id_materia_prima[]"
-                    class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-2 focus:ring-emerald-300 focus:border-emerald-300 block w-full p-3"
-                    required
-                  >
-                    <option value="">Selecciona una materia prima</option>
-                    {% for materia in materias_primas %}
-                      <option value="{{ materia.id_materia_prima }}">
-                        {{ materia.nombre }} ({{ materia.unidad_medida_rel.nombre }})
-                      </option>
-                    {% endfor %}
-                  </select>
-                </div>
-
-                <div class="md:col-span-4">
-                  <label class="block mb-2 text-sm font-medium text-gray-900 md:hidden">Cantidad base</label>
-                  <input
-                    type="number"
-                    step="0.0001"
-                    min="0.0001"
-                    name="cantidad[]"
-                    placeholder="Cantidad"
-                    class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-2 focus:ring-emerald-300 focus:border-emerald-300 block w-full p-3"
-                    required
-                  />
-                </div>
-
-                <div class="md:col-span-2 flex items-end">
-                  <button
-                    type="button"
-                    class="eliminar-insumo w-full px-4 py-3 bg-red-600 text-white rounded-xl hover:shadow-lg transition-all"
-                  >
-                    Quitar
-                  </button>
-                </div>
+            {% for detalle in detalles_form %}
+            <div class="insumo-row grid grid-cols-1 md:grid-cols-12 gap-3 p-4">
+              <div class="md:col-span-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900 md:hidden">Materia prima</label>
+                <select name="id_materia_prima[]"
+                  class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-2 focus:ring-emerald-300 focus:border-emerald-300 block w-full p-3"
+                  required>
+                  <option value="">Selecciona una materia prima</option>
+                  {% for materia in materias_primas %}
+                  <option value="{{ materia.id_materia_prima }}" {% if
+                    detalle.id_materia_prima|string==materia.id_materia_prima|string %}selected{% endif %}>
+                    {{ materia.nombre }} ({{ materia.unidad_medida_rel.nombre }})
+                  </option>
+                  {% endfor %}
+                </select>
               </div>
-            {% endif %}
+
+              <div class="md:col-span-4">
+                <label class="block mb-2 text-sm font-medium text-gray-900 md:hidden">Cantidad base</label>
+                <input type="number" step="0.0001" min="0.0001" name="cantidad[]" value="{{ detalle.cantidad }}"
+                  placeholder="Cantidad"
+                  class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-2 focus:ring-emerald-300 focus:border-emerald-300 block w-full p-3"
+                  required />
+                {% if detalle.unidad_medida %}
+                <p class="mt-2 text-xs text-gray-500">Unidad: {{ detalle.unidad_medida }}</p>
+                {% endif %}
+              </div>
+
+              <div class="md:col-span-2 flex items-end">
+                <button type="submit" name="accion" value="quitar_insumo_{{ loop.index0 }}" formnovalidate
+                  class="w-full px-4 py-3 bg-red-600 text-white rounded-xl hover:shadow-lg transition-all">
+                  Quitar
+                </button>
+              </div>
+            </div>
+            {% endfor %}
           </div>
         </div>
 
@@ -159,125 +125,15 @@
 
       <div class="flex flex-col sm:flex-row gap-3 pt-2">
         <a href="{{ url_for('recetas.recetas_view') }}"
-           class="flex-1 px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
+          class="flex-1 px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
           Cancelar
         </a>
-        <button type="submit"
-                class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all">
+        <button type="submit" name="accion" value="guardar"
+          class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all">
           Crear Receta
         </button>
       </div>
     </form>
   </div>
 </div>
-
-<template id="template-insumo">
-  <div class="insumo-row grid grid-cols-1 md:grid-cols-12 gap-3 p-4">
-    <div class="md:col-span-6">
-      <label class="block mb-2 text-sm font-medium text-gray-900 md:hidden">Materia prima</label>
-      <select
-        name="id_materia_prima[]"
-        class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-2 focus:ring-emerald-300 focus:border-emerald-300 block w-full p-3"
-        required
-      >
-        <option value="">Selecciona una materia prima</option>
-        {% for materia in materias_primas %}
-          <option value="{{ materia.id_materia_prima }}">
-            {{ materia.nombre }} ({{ materia.unidad_medida_rel.nombre }})
-          </option>
-        {% endfor %}
-      </select>
-    </div>
-
-    <div class="md:col-span-4">
-      <label class="block mb-2 text-sm font-medium text-gray-900 md:hidden">Cantidad base</label>
-      <input
-        type="number"
-        step="0.0001"
-        min="0.0001"
-        name="cantidad[]"
-        placeholder="Cantidad"
-        class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-2 focus:ring-emerald-300 focus:border-emerald-300 block w-full p-3"
-        required
-      />
-    </div>
-
-    <div class="md:col-span-2 flex items-end">
-      <button
-        type="button"
-        class="eliminar-insumo w-full px-4 py-3 bg-red-600 text-white rounded-xl hover:shadow-lg transition-all"
-      >
-        Quitar
-      </button>
-    </div>
-  </div>
-</template>
-
-<script>
-  const contenedorInsumos = document.getElementById("contenedor-insumos");
-  const btnAgregarInsumo = document.getElementById("agregar-insumo");
-  const templateInsumo = document.getElementById("template-insumo");
-
-  function obtenerValoresSeleccionados() {
-    const selects = document.querySelectorAll('select[name="id_materia_prima[]"]');
-    return Array.from(selects).map(select => select.value).filter(value => value !== "");
-  }
-
-  function actualizarOpcionesDisponibles() {
-    const selects = document.querySelectorAll('select[name="id_materia_prima[]"]');
-    const seleccionados = obtenerValoresSeleccionados();
-
-    selects.forEach((selectActual) => {
-      const valorActual = selectActual.value;
-
-      Array.from(selectActual.options).forEach((option) => {
-        if (option.value === "") {
-          option.disabled = false;
-          return;
-        }
-        if (option.value === valorActual) {
-          option.disabled = false;
-          return;
-        }
-        option.disabled = seleccionados.includes(option.value);
-      });
-    });
-  }
-
-  function bindSelectEvents() {
-    const selects = document.querySelectorAll('select[name="id_materia_prima[]"]');
-    selects.forEach((select) => {
-      select.onchange = function () {
-        actualizarOpcionesDisponibles();
-      };
-    });
-  }
-
-  function bindEliminarButtons() {
-    const botones = document.querySelectorAll(".eliminar-insumo");
-    botones.forEach((btn) => {
-      btn.onclick = function () {
-        const filas = document.querySelectorAll(".insumo-row");
-        if (filas.length === 1) {
-          alert("La receta debe tener al menos un insumo.");
-          return;
-        }
-        this.closest(".insumo-row").remove();
-        actualizarOpcionesDisponibles();
-      };
-    });
-  }
-
-  btnAgregarInsumo.addEventListener("click", function () {
-    const clon = templateInsumo.content.cloneNode(true);
-    contenedorInsumos.appendChild(clon);
-    bindEliminarButtons();
-    bindSelectEvents();
-    actualizarOpcionesDisponibles();
-  });
-
-  bindEliminarButtons();
-  bindSelectEvents();
-  actualizarOpcionesDisponibles();
-</script>
 {% endblock %}

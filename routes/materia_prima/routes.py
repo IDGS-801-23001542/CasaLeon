@@ -19,33 +19,22 @@ from . import materia_prima
 
 def cargar_catalogos_materia_prima(form):
     categorias = (
-        CategoriaMateriaPrima.query
-        .filter_by(activo=1)
+        CategoriaMateriaPrima.query.filter_by(activo=1)
         .order_by(CategoriaMateriaPrima.nombre.asc())
         .all()
     )
     unidades = (
-        UnidadMedida.query
-        .filter_by(activo=1)
-        .order_by(UnidadMedida.nombre.asc())
-        .all()
+        UnidadMedida.query.filter_by(activo=1).order_by(UnidadMedida.nombre.asc()).all()
     )
 
     form.id_categoria_materia_prima.choices = [
         (c.id_categoria_materia_prima, c.nombre) for c in categorias
     ]
-    form.id_unidad_medida.choices = [
-        (u.id_unidad_medida, u.nombre) for u in unidades
-    ]
+    form.id_unidad_medida.choices = [(u.id_unidad_medida, u.nombre) for u in unidades]
 
 
 def obtener_proveedores_activos():
-    return (
-        Proveedor.query
-        .filter_by(activo=1)
-        .order_by(Proveedor.nombre.asc())
-        .all()
-    )
+    return Proveedor.query.filter_by(activo=1).order_by(Proveedor.nombre.asc()).all()
 
 
 @materia_prima.route("/private/materia-prima")
@@ -84,9 +73,7 @@ def materia_prima_view():
     )
 
     sin_stock = sum(
-        1
-        for materia in todas_materias
-        if float(materia.stock_actual or 0) == 0
+        1 for materia in todas_materias if float(materia.stock_actual or 0) == 0
     )
 
     valor_inventario = sum(
@@ -95,8 +82,7 @@ def materia_prima_view():
     )
 
     categorias_db = (
-        CategoriaMateriaPrima.query
-        .filter_by(activo=1)
+        CategoriaMateriaPrima.query.filter_by(activo=1)
         .order_by(CategoriaMateriaPrima.nombre.asc())
         .all()
     )
@@ -191,7 +177,9 @@ def actualizar_materia_prima():
 
     if request.method == "GET":
         create_form.nombre.data = materia_db.nombre
-        create_form.id_categoria_materia_prima.data = materia_db.id_categoria_materia_prima
+        create_form.id_categoria_materia_prima.data = (
+            materia_db.id_categoria_materia_prima
+        )
         create_form.id_unidad_medida.data = materia_db.id_unidad_medida
         create_form.stock_actual.data = materia_db.stock_actual
         create_form.stock_minimo.data = materia_db.stock_minimo
@@ -220,7 +208,9 @@ def actualizar_materia_prima():
             )
 
         materia_db.nombre = nombre
-        materia_db.id_categoria_materia_prima = create_form.id_categoria_materia_prima.data
+        materia_db.id_categoria_materia_prima = (
+            create_form.id_categoria_materia_prima.data
+        )
         materia_db.id_unidad_medida = create_form.id_unidad_medida.data
         materia_db.stock_actual = create_form.stock_actual.data
         materia_db.stock_minimo = create_form.stock_minimo.data
@@ -265,7 +255,9 @@ def eliminar_materia_prima():
 
     if request.method == "GET":
         create_form.nombre.data = materia_db.nombre
-        create_form.id_categoria_materia_prima.data = materia_db.id_categoria_materia_prima
+        create_form.id_categoria_materia_prima.data = (
+            materia_db.id_categoria_materia_prima
+        )
         create_form.id_unidad_medida.data = materia_db.id_unidad_medida
         create_form.stock_actual.data = materia_db.stock_actual
         create_form.stock_minimo.data = materia_db.stock_minimo
@@ -292,13 +284,12 @@ def eliminar_materia_prima():
     return redirect(url_for("materia_prima.materia_prima_view"))
 
 
-@materia_prima.route("/private/materia-prima/movimiento", methods=["POST"])
+@materia_prima.route("/private/materia-prima/movimiento", methods=["GET", "POST"])
 @login_required(["ADMIN", "EMPLEADO"])
 def movimiento_materia_prima():
-    id_materia = request.form.get("id")
-    tipo = (request.form.get("tipo") or "").strip().upper()
-    motivo = (request.form.get("motivo") or "").strip()
-    id_proveedor = request.form.get("id_proveedor")
+    id_materia = (
+        request.args.get("id") if request.method == "GET" else request.form.get("id")
+    )
 
     materia_db = (
         db.session.query(MateriaPrima)
@@ -310,38 +301,66 @@ def movimiento_materia_prima():
         flash("Materia prima no encontrada.", "danger")
         return redirect(url_for("materia_prima.materia_prima_view"))
 
+    proveedores_db = obtener_proveedores_activos()
+
+    if request.method == "GET":
+        return render_template(
+            "private/materia_prima/movimiento_materia_prima_create.html",
+            materia_db=materia_db,
+            proveedores_db=proveedores_db,
+        )
+
+    tipo = (request.form.get("tipo") or "").strip().upper()
+    motivo = (request.form.get("motivo") or "").strip()
+    id_proveedor = request.form.get("id_proveedor")
+
     try:
         cantidad = Decimal(request.form.get("cantidad", "0"))
     except (InvalidOperation, TypeError):
         flash("La cantidad ingresada no es válida.", "danger")
-        return redirect(url_for("materia_prima.materia_prima_view"))
+        return render_template(
+            "private/materia_prima/movimiento_materia_prima_create.html",
+            materia_db=materia_db,
+            proveedores_db=proveedores_db,
+        )
 
     if cantidad <= 0:
         flash("La cantidad debe ser mayor a 0.", "warning")
-        return redirect(url_for("materia_prima.materia_prima_view"))
+        return render_template(
+            "private/materia_prima/movimiento_materia_prima_create.html",
+            materia_db=materia_db,
+            proveedores_db=proveedores_db,
+        )
 
     stock_actual = Decimal(str(materia_db.stock_actual or 0))
     unidad_nombre = (
-        materia_db.unidad_medida_rel.nombre
-        if materia_db.unidad_medida_rel else ""
+        materia_db.unidad_medida_rel.nombre if materia_db.unidad_medida_rel else ""
     )
 
     proveedor_db = None
 
     if tipo == "ENTRADA":
         if not id_proveedor:
-            flash("Debes seleccionar un proveedor para registrar una entrada.", "warning")
-            return redirect(url_for("materia_prima.materia_prima_view"))
+            flash(
+                "Debes seleccionar un proveedor para registrar una entrada.", "warning"
+            )
+            return render_template(
+                "private/materia_prima/movimiento_materia_prima_create.html",
+                materia_db=materia_db,
+                proveedores_db=proveedores_db,
+            )
 
-        proveedor_db = (
-            Proveedor.query
-            .filter_by(id_proveedor=id_proveedor, activo=1)
-            .first()
-        )
+        proveedor_db = Proveedor.query.filter_by(
+            id_proveedor=id_proveedor, activo=1
+        ).first()
 
         if not proveedor_db:
             flash("El proveedor seleccionado no es válido.", "danger")
-            return redirect(url_for("materia_prima.materia_prima_view"))
+            return render_template(
+                "private/materia_prima/movimiento_materia_prima_create.html",
+                materia_db=materia_db,
+                proveedores_db=proveedores_db,
+            )
 
         materia_db.stock_actual = stock_actual + cantidad
 
@@ -368,7 +387,11 @@ def movimiento_materia_prima():
     elif tipo == "SALIDA":
         if stock_actual < cantidad:
             flash("No se permite stock negativo.", "danger")
-            return redirect(url_for("materia_prima.materia_prima_view"))
+            return render_template(
+                "private/materia_prima/movimiento_materia_prima_create.html",
+                materia_db=materia_db,
+                proveedores_db=proveedores_db,
+            )
 
         materia_db.stock_actual = stock_actual - cantidad
 
@@ -392,7 +415,11 @@ def movimiento_materia_prima():
         )
     else:
         flash("Tipo de movimiento inválido.", "danger")
-        return redirect(url_for("materia_prima.materia_prima_view"))
+        return render_template(
+            "private/materia_prima/movimiento_materia_prima_create.html",
+            materia_db=materia_db,
+            proveedores_db=proveedores_db,
+        )
 
     db.session.add(materia_db)
     db.session.commit()
@@ -404,6 +431,7 @@ def movimiento_materia_prima():
 # =========================
 # CATEGORÍAS DE MATERIA PRIMA
 # =========================
+
 
 @materia_prima.route("/private/materia-prima/categorias", methods=["GET"])
 @login_required(["ADMIN", "EMPLEADO"])
@@ -426,7 +454,9 @@ def listado_categorias_materia_prima():
     )
 
 
-@materia_prima.route("/private/materia-prima/categorias/create", methods=["GET", "POST"])
+@materia_prima.route(
+    "/private/materia-prima/categorias/create", methods=["GET", "POST"]
+)
 @login_required(["ADMIN", "EMPLEADO"])
 def crear_categoria_materia_prima():
     create_form = forms.CategoriaMateriaPrimaForm()
@@ -467,7 +497,9 @@ def crear_categoria_materia_prima():
     )
 
 
-@materia_prima.route("/private/materia-prima/categorias/update", methods=["GET", "POST"])
+@materia_prima.route(
+    "/private/materia-prima/categorias/update", methods=["GET", "POST"]
+)
 @login_required(["ADMIN", "EMPLEADO"])
 def actualizar_categoria_materia_prima():
     create_form = forms.CategoriaMateriaPrimaForm()
@@ -495,7 +527,8 @@ def actualizar_categoria_materia_prima():
 
         existe = CategoriaMateriaPrima.query.filter(
             db.func.lower(CategoriaMateriaPrima.nombre) == nombre.lower(),
-            CategoriaMateriaPrima.id_categoria_materia_prima != categoria_db.id_categoria_materia_prima,
+            CategoriaMateriaPrima.id_categoria_materia_prima
+            != categoria_db.id_categoria_materia_prima,
         ).first()
 
         if existe:
@@ -527,7 +560,9 @@ def actualizar_categoria_materia_prima():
     )
 
 
-@materia_prima.route("/private/materia-prima/categorias/delete", methods=["GET", "POST"])
+@materia_prima.route(
+    "/private/materia-prima/categorias/delete", methods=["GET", "POST"]
+)
 @login_required(["ADMIN"])
 def eliminar_categoria_materia_prima():
     id_categoria = request.args.get("id")
@@ -540,7 +575,8 @@ def eliminar_categoria_materia_prima():
         return redirect(url_for("materia_prima.listado_categorias_materia_prima"))
 
     materias_asociadas = MateriaPrima.query.filter(
-        MateriaPrima.id_categoria_materia_prima == categoria_db.id_categoria_materia_prima
+        MateriaPrima.id_categoria_materia_prima
+        == categoria_db.id_categoria_materia_prima
     ).count()
 
     if request.method == "GET":

@@ -7,23 +7,15 @@
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
     <div>
       <h1 class="text-3xl font-bold mb-2">Ventas y Pedidos</h1>
-      <p class="text-gray-500">Consulta ventas internas y compras realizadas desde la tienda en línea</p>
+      <p class="text-gray-500">Consulta compras realizadas desde la tienda en línea y registros del módulo de ventas</p>
     </div>
-
-    <a
-      href="{{ url_for('ventas.crear_venta') }}"
-      class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all"
-    >
-      <span class="text-xl">+</span>
-      Nueva Venta
-    </a>
   </div>
 
   {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <div class="space-y-3">
-        {% for category, message in messages %}
-          <div class="px-4 py-3 rounded-xl border
+  {% if messages %}
+  <div class="space-y-3">
+    {% for category, message in messages %}
+    <div class="px-4 py-3 rounded-xl border
             {% if category == 'success' %}
               bg-green-50 border-green-200 text-green-700
             {% elif category == 'warning' %}
@@ -34,152 +26,138 @@
               bg-blue-50 border-blue-200 text-blue-700
             {% endif %}
           ">
-            {{ message }}
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
   {% endwith %}
 
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
-    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
-      <p class="text-sm text-gray-500">Registros mostrados</p>
+    <div class="bg-white rounded-xl px-4 py-4 border border-gray-200">
+      <p class="text-xs text-gray-500">Registros mostrados</p>
       <p class="text-2xl font-bold mt-3">{{ total_ventas }}</p>
     </div>
-    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
-      <p class="text-sm text-gray-500">Ingresos mostrados</p>
+    <div class="bg-white rounded-xl px-4 py-4 border border-gray-200">
+      <p class="text-xs text-gray-500">Ingresos mostrados</p>
       <p class="text-2xl font-bold mt-3">${{ total_ingresos }}</p>
     </div>
-    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
-      <p class="text-sm text-gray-500">Ventas/Pedidos de hoy</p>
+    <div class="bg-white rounded-xl px-4 py-4 border border-gray-200">
+      <p class="text-xs text-gray-500">Ventas/Pedidos de hoy</p>
       <p class="text-2xl font-bold mt-3">{{ total_ventas_hoy }}</p>
     </div>
-    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
-      <p class="text-sm text-gray-500">Ingresos de hoy</p>
+    <div class="bg-white rounded-xl px-4 py-4 border border-gray-200">
+      <p class="text-xs text-gray-500">Ingresos de hoy</p>
       <p class="text-2xl font-bold mt-3">${{ ingresos_hoy }}</p>
     </div>
-    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
-      <p class="text-sm text-gray-500">Ventas internas</p>
+    <div class="bg-white rounded-xl px-4 py-4 border border-gray-200">
+      <p class="text-xs text-gray-500">Ventas internas</p>
       <p class="text-2xl font-bold mt-3">{{ total_internas }}</p>
     </div>
-    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
-      <p class="text-sm text-gray-500">Pedidos tienda</p>
+    <div class="bg-white rounded-xl px-4 py-4 border border-gray-200">
+      <p class="text-xs text-gray-500">Pedidos tienda</p>
       <p class="text-2xl font-bold mt-3">{{ total_tienda }}</p>
     </div>
   </div>
 
   <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
-    <form method="GET" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <input
-        type="text"
-        name="q"
-        value="{{ q }}"
+    <form method="GET" class="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4">
+      <input type="text" name="q" value="{{ q }}"
         placeholder="Buscar por folio, producto, estado, cliente o método de pago..."
-        class="w-full px-4 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
+        class="w-full px-4 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500" />
       <button class="px-5 py-3 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all">
         Filtrar
       </button>
     </form>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-    {% for registro in registros %}
-      <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all">
-        <div class="flex items-start justify-between gap-3 mb-4">
-          <div>
-            <div class="flex items-center gap-2 mb-1">
-              <h3 class="font-bold text-lg">{{ registro.folio }}</h3>
+  <div class="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden">
+    <table class="w-full table-fixed">
+      <thead class="bg-gray-50 border-b border-gray-200">
+        <tr class="text-left text-sm text-gray-600">
+          <th class="px-4 py-4 font-semibold w-[11%]">Folio</th>
+          <th class="px-4 py-4 font-semibold w-[9%]">Tipo</th>
+          <th class="px-4 py-4 font-semibold w-[14%]">Responsable</th>
+          <th class="px-4 py-4 font-semibold w-[11%]">Método</th>
+          <th class="px-4 py-4 font-semibold w-[9%]">Estado</th>
+          <th class="px-4 py-4 font-semibold w-[10%]">Total</th>
+          <th class="px-4 py-4 font-semibold w-[8%]">Productos</th>
+          <th class="px-4 py-4 font-semibold w-[14%]">Observaciones</th>
+          <th class="px-4 py-4 font-semibold w-[12%]">Fecha</th>
+          <th class="px-4 py-4 font-semibold w-[8%] text-center">Detalle</th>
+        </tr>
+      </thead>
 
-              {% if registro.tipo == "INTERNA" %}
-                <span class="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-700">
-                  INTERNA
-                </span>
-              {% else %}
-                <span class="px-2 py-1 rounded-full text-xs bg-emerald-100 text-emerald-700">
-                  TIENDA
-                </span>
-              {% endif %}
-            </div>
+      <tbody>
+        {% for registro in registros %}
+        <tr class="border-b border-gray-100 hover:bg-gray-50 align-top">
 
-            <p class="text-sm text-gray-500">
-              {{ registro.responsable }}
-            </p>
-          </div>
+          <td class="px-4 py-4">
+            <p class="font-semibold text-gray-900">{{ registro.folio }}</p>
+          </td>
 
-          <span class="px-3 py-1 rounded-full text-xs
-            {% if registro.tipo == 'INTERNA' %}
-              bg-green-100 text-green-700
-            {% else %}
-              bg-amber-100 text-amber-700
-            {% endif %}
-          ">
-            {{ registro.metodo_pago }}
-          </span>
-        </div>
-
-        <div class="space-y-3 mb-4">
-          <div class="flex justify-between text-sm gap-3">
-            <span class="text-gray-500">Total:</span>
-            <span class="font-medium text-right">${{ registro.total|money }}</span>
-          </div>
-          <div class="flex justify-between text-sm gap-3">
-            <span class="text-gray-500">Productos:</span>
-            <span class="font-medium text-right">{{ registro.detalles|length }}</span>
-          </div>
-          <div class="flex justify-between text-sm gap-3">
-            <span class="text-gray-500">Estado:</span>
-            <span class="font-medium text-right">{{ registro.estado }}</span>
-          </div>
-          <div class="flex justify-between text-sm gap-3">
-            <span class="text-gray-500">Fecha:</span>
-            <span class="font-medium text-right">
-              {{ registro.creado_en.strftime('%d/%m/%Y %H:%M') if registro.creado_en else 'Sin fecha' }}
+          <td class="px-4 py-4">
+            {% if registro.tipo == "INTERNA" %}
+            <span class="px-2.5 py-1 rounded-full text-xs bg-blue-100 text-blue-700">
+              INTERNA
             </span>
-          </div>
-        </div>
+            {% else %}
+            <span class="px-2.5 py-1 rounded-full text-xs bg-emerald-100 text-emerald-700">
+              TIENDA
+            </span>
+            {% endif %}
+          </td>
 
-        <div class="pt-2 border-t border-gray-200">
-          <p class="text-sm text-gray-500 mb-2">Detalle:</p>
-          <div class="space-y-2 max-h-40 overflow-y-auto pr-1">
-            {% for detalle in registro.detalles %}
-              <div class="rounded-xl bg-gray-50 border border-gray-200 p-3">
-                <div class="flex justify-between gap-3">
-                  <p class="text-sm font-medium text-gray-800">{{ detalle.producto_nombre }}</p>
-                  <p class="text-sm font-semibold text-blue-600 text-right">
-                    {{ detalle.cantidad|num(4) }}
-                  </p>
-                </div>
-                <p class="text-xs text-gray-500 mt-1">
-                  ${{ detalle.precio_unitario|money }} · Subtotal: ${{ detalle.subtotal|money }}
-                </p>
-              </div>
-            {% endfor %}
-          </div>
-        </div>
+          <td class="px-4 py-4">
+            <p class="text-sm text-gray-800 truncate">{{ registro.responsable }}</p>
+          </td>
 
-        {% if registro.observaciones %}
-          <div class="pt-3 mt-3 border-t border-gray-200">
-            <p class="text-sm text-gray-500 mb-1">Observaciones:</p>
-            <p class="text-sm text-gray-700">{{ registro.observaciones }}</p>
-          </div>
-        {% endif %}
+          <td class="px-4 py-4">
+            <p class="text-sm text-gray-700">{{ registro.metodo_pago }}</p>
+          </td>
 
-        <div class="pt-4">
-          <a
-            href="{{ url_for('ventas.detalle_venta', tipo=registro.tipo, registro_id=registro.id) }}"
-            class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all"
-          >
-            Ver detalle
-          </a>
-        </div>
-      </div>
-    {% else %}
-      <div class="md:col-span-2 lg:col-span-3 bg-white rounded-2xl p-8 border border-gray-200 shadow-md text-center">
-        <p class="text-lg font-semibold text-gray-700 mb-2">No hay ventas ni pedidos registrados</p>
-        <p class="text-gray-500">Cuando registres una venta o un cliente compre en la tienda, aparecerá aquí.</p>
-      </div>
-    {% endfor %}
+          <td class="px-4 py-4">
+            <p class="text-sm text-gray-700">{{ registro.estado }}</p>
+          </td>
+
+          <td class="px-4 py-4">
+            <p class="text-sm font-semibold text-gray-900">${{ registro.total|money }}</p>
+          </td>
+
+          <td class="px-4 py-4">
+            <p class="text-sm text-gray-700">{{ registro.detalles|length }}</p>
+          </td>
+
+          <td class="px-4 py-4">
+            <p class="text-sm text-gray-700 truncate">
+              {{ registro.observaciones or '—' }}
+            </p>
+          </td>
+
+          <td class="px-4 py-4">
+            <p class="text-sm text-gray-700">
+              {{ registro.creado_en.strftime('%d/%m/%Y %H:%M') if registro.creado_en else 'Sin fecha' }}
+            </p>
+          </td>
+
+          <td class="px-4 py-4 text-center">
+            <a href="{{ url_for('ventas.detalle_venta', tipo=registro.tipo, registro_id=registro.id) }}"
+              class="inline-flex items-center justify-center px-3 py-2 bg-blue-100 text-blue-700 rounded-xl hover:bg-blue-200 transition-colors text-sm">
+              Ver
+            </a>
+          </td>
+
+        </tr>
+
+        {% else %}
+        <tr>
+          <td colspan="10" class="px-6 py-10 text-center text-gray-500">
+            No hay ventas ni pedidos registrados.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 
 </div>

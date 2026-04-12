@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Registrar Movimiento | Casa León{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold mb-2">Registrar movimiento</h1>
+      <p class="text-gray-500">Registra una entrada o salida para la materia prima seleccionada</p>
+    </div>
+
+    <a href="{{ url_for('materia_prima.materia_prima_view') }}"
+      class="px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
+      Volver
+    </a>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="space-y-3">
+    {% for category, message in messages %}
+    <div class="px-4 py-3 rounded-xl border
+      {% if category == 'success' %}
+        bg-green-50 border-green-200 text-green-700
+      {% elif category == 'warning' %}
+        bg-yellow-50 border-yellow-200 text-yellow-700
+      {% elif category == 'danger' %}
+        bg-red-50 border-red-200 text-red-700
+      {% else %}
+        bg-blue-50 border-blue-200 text-blue-700
+      {% endif %}
+    ">
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endwith %}
+
+  <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 space-y-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+        <p class="text-sm text-gray-500">Materia prima</p>
+        <p class="text-lg font-bold mt-2 text-gray-900">{{ materia_db.nombre }}</p>
+      </div>
+
+      <div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+        <p class="text-sm text-gray-500">Stock actual</p>
+        <p class="text-lg font-bold mt-2 text-gray-900">
+          {{ materia_db.stock_actual|num(4) }}
+          {% if materia_db.unidad_medida_rel %}{{ materia_db.unidad_medida_rel.nombre }}{% endif %}
+        </p>
+      </div>
+
+      <div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+        <p class="text-sm text-gray-500">Categoría</p>
+        <p class="text-lg font-bold mt-2 text-gray-900">
+          {{ materia_db.categoria_mp.nombre if materia_db.categoria_mp else 'Sin categoría' }}
+        </p>
+      </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('materia_prima.movimiento_materia_prima') }}" class="space-y-6">
+      <input type="hidden" name="id" value="{{ materia_db.id_materia_prima }}">
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Tipo de movimiento</label>
+          <select
+            name="tipo"
+            class="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm"
+            required
+          >
+            <option value="">Selecciona una opción</option>
+            <option value="ENTRADA">Entrada</option>
+            <option value="SALIDA">Salida</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Proveedor</label>
+          <select
+            name="id_proveedor"
+            class="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm"
+          >
+            <option value="">Selecciona un proveedor</option>
+            {% for proveedor in proveedores_db %}
+            <option value="{{ proveedor.id_proveedor }}">{{ proveedor.nombre }}</option>
+            {% endfor %}
+          </select>
+          <p class="mt-1 text-xs text-gray-500">
+            Obligatorio para entradas. En salidas puede dejarse vacío.
+          </p>
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Cantidad</label>
+          <input
+            type="number"
+            step="0.0001"
+            min="0.0001"
+            name="cantidad"
+            class="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm"
+            placeholder="Cantidad"
+            required
+          >
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900">Motivo</label>
+          <input
+            type="text"
+            name="motivo"
+            class="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm"
+            placeholder="Motivo del movimiento"
+          >
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3">
+        <p class="text-sm text-blue-700">
+          Para registrar una entrada debes seleccionar proveedor. Para salidas, el sistema validará que no se genere stock negativo.
+        </p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 pt-2">
+        <a href="{{ url_for('materia_prima.materia_prima_view') }}"
+          class="flex-1 px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
+          Cancelar
+        </a>
+
+        <button
+          type="submit"
+          class="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-xl hover:shadow-lg transition-all"
+        >
+          Guardar movimiento
+        </button>
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}
