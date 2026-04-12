@@ -111,6 +111,9 @@ def listado_productos():
         for producto in Producto.query.all()
     )
 
+    categorias_db = CategoriaProducto.query.order_by(CategoriaProducto.nombre.asc()).all()
+    total_categorias_producto = len(categorias_db)
+
     return render_template(
         "private/productos/productos.html",
         form=create_form,
@@ -121,6 +124,8 @@ def listado_productos():
         productos_inactivos=productos_inactivos,
         valor_inventario=f"{valor_inventario:,.2f}",
         search=search,
+        categorias_db=categorias_db,
+        total_categorias_producto=total_categorias_producto,
     )
 
 
@@ -340,8 +345,6 @@ def actualizar_producto():
         producto_db.costo_unit_prom = (
             receta_nueva.costo_estimado or producto_db.costo_unit_prom
         )
-        # stock_actual NO se modifica aquí
-        # sku NO se modifica aquí
 
         db.session.add(receta_nueva)
         db.session.add(producto_db)
@@ -409,3 +412,168 @@ def eliminar_producto():
     )
     flash("Producto desactivado correctamente.", "info")
     return redirect(url_for("productos.listado_productos"))
+
+
+# =========================
+# CATEGORÍAS DE PRODUCTO
+# =========================
+
+@productos.route("/private/productos/categorias", methods=["GET"])
+@login_required(["ADMIN", "EMPLEADO"])
+def listado_categorias_producto():
+    search = request.args.get("search", "").strip()
+
+    query = CategoriaProducto.query
+
+    if search:
+        like_term = f"%{search}%"
+        query = query.filter(CategoriaProducto.nombre.ilike(like_term))
+
+    categorias_db = query.order_by(CategoriaProducto.nombre.asc()).all()
+
+    return render_template(
+        "private/productos/categorias_producto.html",
+        categorias_db=categorias_db,
+        total_categorias_producto=len(categorias_db),
+        search=search,
+    )
+
+
+@productos.route("/private/productos/categorias/create", methods=["GET", "POST"])
+@login_required(["ADMIN", "EMPLEADO"])
+def crear_categoria_producto():
+    create_form = forms.CategoriaProductoForm()
+
+    if request.method == "POST" and create_form.validate():
+        nombre = create_form.nombre.data.strip()
+
+        existe = CategoriaProducto.query.filter(
+            db.func.lower(CategoriaProducto.nombre) == nombre.lower()
+        ).first()
+
+        if existe:
+            flash("Ya existe una categoría con ese nombre.", "warning")
+            return render_template(
+                "private/productos/categorias_producto_create.html",
+                form=create_form,
+            )
+
+        categoria = CategoriaProducto(nombre=nombre)
+        db.session.add(categoria)
+        db.session.commit()
+
+        log_event(
+            modulo="Inventario",
+            accion="Categoría de producto creada",
+            detalle=f"Categoría '{categoria.nombre}' creada",
+            severidad="INFO",
+        )
+        flash("Categoría creada correctamente.", "success")
+        return redirect(url_for("productos.listado_categorias_producto"))
+
+    return render_template(
+        "private/productos/categorias_producto_create.html",
+        form=create_form,
+    )
+
+
+@productos.route("/private/productos/categorias/update", methods=["GET", "POST"])
+@login_required(["ADMIN", "EMPLEADO"])
+def actualizar_categoria_producto():
+    create_form = forms.CategoriaProductoForm()
+
+    id_categoria_producto = request.args.get("id")
+    categoria_db = CategoriaProducto.query.filter(
+        CategoriaProducto.id_categoria_producto == id_categoria_producto
+    ).first()
+
+    if not categoria_db:
+        flash("Categoría no encontrada.", "danger")
+        return redirect(url_for("productos.listado_categorias_producto"))
+
+    if request.method == "GET":
+        create_form.nombre.data = categoria_db.nombre
+        return render_template(
+            "private/productos/categorias_producto_update.html",
+            form=create_form,
+            categoria_db=categoria_db,
+        )
+
+    if create_form.validate():
+        nombre = create_form.nombre.data.strip()
+
+        existe = CategoriaProducto.query.filter(
+            db.func.lower(CategoriaProducto.nombre) == nombre.lower(),
+            CategoriaProducto.id_categoria_producto != categoria_db.id_categoria_producto,
+        ).first()
+
+        if existe:
+            flash("Ya existe otra categoría con ese nombre.", "warning")
+            return render_template(
+                "private/productos/categorias_producto_update.html",
+                form=create_form,
+                categoria_db=categoria_db,
+            )
+
+        categoria_db.nombre = nombre
+        db.session.add(categoria_db)
+        db.session.commit()
+
+        log_event(
+            modulo="Inventario",
+            accion="Categoría de producto actualizada",
+            detalle=f"Categoría actualizada a '{categoria_db.nombre}'",
+            severidad="INFO",
+        )
+        flash("Categoría actualizada correctamente.", "success")
+        return redirect(url_for("productos.listado_categorias_producto"))
+
+    return render_template(
+        "private/productos/categorias_producto_update.html",
+        form=create_form,
+        categoria_db=categoria_db,
+    )
+
+
+@productos.route("/private/productos/categorias/delete", methods=["GET", "POST"])
+@login_required(["ADMIN", "EMPLEADO"])
+def eliminar_categoria_producto():
+    id_categoria_producto = request.args.get("id")
+    categoria_db = CategoriaProducto.query.filter(
+        CategoriaProducto.id_categoria_producto == id_categoria_producto
+    ).first()
+
+    if not categoria_db:
+        flash("Categoría no encontrada.", "danger")
+        return redirect(url_for("productos.listado_categorias_producto"))
+
+    productos_asociados = Producto.query.filter(
+        Producto.id_categoria_producto == categoria_db.id_categoria_producto
+    ).count()
+
+    if request.method == "GET":
+        return render_template(
+            "private/productos/categorias_producto_delete.html",
+            categoria_db=categoria_db,
+            productos_asociados=productos_asociados,
+        )
+
+    if productos_asociados > 0:
+        flash(
+            "No se puede eliminar la categoría porque tiene productos asociados.",
+            "warning",
+        )
+        return redirect(url_for("productos.listado_categorias_producto"))
+
+    nombre_categoria = categoria_db.nombre
+    db.session.delete(categoria_db)
+    db.session.commit()
+
+    log_event(
+        modulo="Inventario",
+        accion="Categoría de producto eliminada",
+        detalle=f"Categoría '{nombre_categoria}' eliminada",
+        severidad="WARNING",
+    )
+    flash("Categoría eliminada correctamente.", "info")
+    return redirect(url_for("productos.listado_categorias_producto"))

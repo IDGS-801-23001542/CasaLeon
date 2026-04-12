@@ -94,6 +94,14 @@ def materia_prima_view():
         for materia in todas_materias
     )
 
+    categorias_db = (
+        CategoriaMateriaPrima.query
+        .filter_by(activo=1)
+        .order_by(CategoriaMateriaPrima.nombre.asc())
+        .all()
+    )
+    total_categorias_materia_prima = len(categorias_db)
+
     return render_template(
         "private/materia_prima/materia_prima.html",
         form=create_form,
@@ -105,6 +113,8 @@ def materia_prima_view():
         sin_stock=sin_stock,
         valor_inventario=f"{valor_inventario:,.2f}",
         search=search,
+        categorias_db=categorias_db,
+        total_categorias_materia_prima=total_categorias_materia_prima,
     )
 
 
@@ -389,3 +399,173 @@ def movimiento_materia_prima():
 
     flash("Movimiento registrado correctamente.", "success")
     return redirect(url_for("materia_prima.materia_prima_view"))
+
+
+# =========================
+# CATEGORÍAS DE MATERIA PRIMA
+# =========================
+
+@materia_prima.route("/private/materia-prima/categorias", methods=["GET"])
+@login_required(["ADMIN", "EMPLEADO"])
+def listado_categorias_materia_prima():
+    search = request.args.get("search", "").strip()
+
+    query = CategoriaMateriaPrima.query
+
+    if search:
+        like_term = f"%{search}%"
+        query = query.filter(CategoriaMateriaPrima.nombre.ilike(like_term))
+
+    categorias_db = query.order_by(CategoriaMateriaPrima.nombre.asc()).all()
+
+    return render_template(
+        "private/materia_prima/categorias_materia_prima.html",
+        categorias_db=categorias_db,
+        total_categorias_materia_prima=len(categorias_db),
+        search=search,
+    )
+
+
+@materia_prima.route("/private/materia-prima/categorias/create", methods=["GET", "POST"])
+@login_required(["ADMIN", "EMPLEADO"])
+def crear_categoria_materia_prima():
+    create_form = forms.CategoriaMateriaPrimaForm()
+
+    if request.method == "POST" and create_form.validate():
+        nombre = create_form.nombre.data.strip()
+
+        existe = CategoriaMateriaPrima.query.filter(
+            db.func.lower(CategoriaMateriaPrima.nombre) == nombre.lower()
+        ).first()
+
+        if existe:
+            flash("Ya existe una categoría con ese nombre.", "warning")
+            return render_template(
+                "private/materia_prima/categorias_materia_prima_create.html",
+                form=create_form,
+            )
+
+        categoria = CategoriaMateriaPrima(
+            nombre=nombre,
+            activo=create_form.activo.data,
+        )
+        db.session.add(categoria)
+        db.session.commit()
+
+        log_event(
+            modulo="Inventario",
+            accion="Categoría de materia prima creada",
+            detalle=f"Categoría '{categoria.nombre}' creada",
+            severidad="INFO",
+        )
+        flash("Categoría creada correctamente.", "success")
+        return redirect(url_for("materia_prima.listado_categorias_materia_prima"))
+
+    return render_template(
+        "private/materia_prima/categorias_materia_prima_create.html",
+        form=create_form,
+    )
+
+
+@materia_prima.route("/private/materia-prima/categorias/update", methods=["GET", "POST"])
+@login_required(["ADMIN", "EMPLEADO"])
+def actualizar_categoria_materia_prima():
+    create_form = forms.CategoriaMateriaPrimaForm()
+
+    id_categoria = request.args.get("id")
+    categoria_db = CategoriaMateriaPrima.query.filter(
+        CategoriaMateriaPrima.id_categoria_materia_prima == id_categoria
+    ).first()
+
+    if not categoria_db:
+        flash("Categoría no encontrada.", "danger")
+        return redirect(url_for("materia_prima.listado_categorias_materia_prima"))
+
+    if request.method == "GET":
+        create_form.nombre.data = categoria_db.nombre
+        create_form.activo.data = categoria_db.activo
+        return render_template(
+            "private/materia_prima/categorias_materia_prima_update.html",
+            form=create_form,
+            categoria_db=categoria_db,
+        )
+
+    if create_form.validate():
+        nombre = create_form.nombre.data.strip()
+
+        existe = CategoriaMateriaPrima.query.filter(
+            db.func.lower(CategoriaMateriaPrima.nombre) == nombre.lower(),
+            CategoriaMateriaPrima.id_categoria_materia_prima != categoria_db.id_categoria_materia_prima,
+        ).first()
+
+        if existe:
+            flash("Ya existe otra categoría con ese nombre.", "warning")
+            return render_template(
+                "private/materia_prima/categorias_materia_prima_update.html",
+                form=create_form,
+                categoria_db=categoria_db,
+            )
+
+        categoria_db.nombre = nombre
+        categoria_db.activo = create_form.activo.data
+        db.session.add(categoria_db)
+        db.session.commit()
+
+        log_event(
+            modulo="Inventario",
+            accion="Categoría de materia prima actualizada",
+            detalle=f"Categoría actualizada a '{categoria_db.nombre}'",
+            severidad="INFO",
+        )
+        flash("Categoría actualizada correctamente.", "success")
+        return redirect(url_for("materia_prima.listado_categorias_materia_prima"))
+
+    return render_template(
+        "private/materia_prima/categorias_materia_prima_update.html",
+        form=create_form,
+        categoria_db=categoria_db,
+    )
+
+
+@materia_prima.route("/private/materia-prima/categorias/delete", methods=["GET", "POST"])
+@login_required(["ADMIN"])
+def eliminar_categoria_materia_prima():
+    id_categoria = request.args.get("id")
+    categoria_db = CategoriaMateriaPrima.query.filter(
+        CategoriaMateriaPrima.id_categoria_materia_prima == id_categoria
+    ).first()
+
+    if not categoria_db:
+        flash("Categoría no encontrada.", "danger")
+        return redirect(url_for("materia_prima.listado_categorias_materia_prima"))
+
+    materias_asociadas = MateriaPrima.query.filter(
+        MateriaPrima.id_categoria_materia_prima == categoria_db.id_categoria_materia_prima
+    ).count()
+
+    if request.method == "GET":
+        return render_template(
+            "private/materia_prima/categorias_materia_prima_delete.html",
+            categoria_db=categoria_db,
+            materias_asociadas=materias_asociadas,
+        )
+
+    if materias_asociadas > 0:
+        flash(
+            "No se puede desactivar la categoría porque tiene materias primas asociadas.",
+            "warning",
+        )
+        return redirect(url_for("materia_prima.listado_categorias_materia_prima"))
+
+    categoria_db.activo = 0
+    db.session.add(categoria_db)
+    db.session.commit()
+
+    log_event(
+        modulo="Inventario",
+        accion="Categoría de materia prima desactivada",
+        detalle=f"Categoría '{categoria_db.nombre}' marcada como inactiva",
+        severidad="WARNING",
+    )
+    flash("Categoría desactivada correctamente.", "info")
+    return redirect(url_for("materia_prima.listado_categorias_materia_prima"))

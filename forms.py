@@ -965,7 +965,7 @@ class ProduccionForm(FlaskForm):
         "Lote de producción",
         coerce=int,
         validators=[DataRequired(message="El lote es requerido")],
-        choices=[]
+        choices=[],
     )
     estado = SelectField(
         "Estado",
@@ -986,4 +986,44 @@ class ProduccionForm(FlaskForm):
                 max=255, message="Las observaciones no pueden exceder 255 caracteres."
             ),
         ],
+    )
+
+
+class CategoriaProductoForm(FlaskForm):
+    nombre = StringField(
+        "Nombre de la categoría",
+        validators=[
+            DataRequired(message="El nombre de la categoría es requerido"),
+            Length(
+                min=2,
+                max=60,
+                message="El nombre debe tener entre 2 y 60 caracteres",
+            ),
+            Regexp(
+                r"^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s\-]+$",
+                message="Solo se permiten letras, números, espacios y guiones",
+            ),
+        ],
+    )
+
+
+class CategoriaMateriaPrimaForm(FlaskForm):
+    nombre = StringField(
+        "Nombre de la categoría",
+        validators=[
+            DataRequired(message="El nombre de la categoría es requerido"),
+            Length(
+                min=2,
+                max=60,
+                message="El nombre debe tener entre 2 y 60 caracteres",
+            ),
+        ],
+    )
+
+    activo = SelectField(
+        "Estado",
+        coerce=int,
+        validators=[DataRequired(message="El estado es requerido")],
+        choices=[(1, "Activo"), (0, "Inactivo")],
+        default=1,
     )

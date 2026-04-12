@@ -80,89 +80,129 @@
     </div>
   </div>
 
-  <div class="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden">
-    <div class="overflow-x-auto">
-      <table class="w-full min-w-[1100px]">
-        <thead class="bg-gray-50 border-b border-gray-200">
-          <tr class="text-left text-sm text-gray-600">
-            <th class="px-4 py-4 font-semibold">Imagen</th>
-            <th class="px-4 py-4 font-semibold">Producto</th>
-            <th class="px-4 py-4 font-semibold">Categoría</th>
-            <th class="px-4 py-4 font-semibold">SKU</th>
-            <th class="px-4 py-4 font-semibold">Precio</th>
-            <th class="px-4 py-4 font-semibold">Stock</th>
-            <th class="px-4 py-4 font-semibold">Estado</th>
-            <th class="px-4 py-4 font-semibold text-center">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for producto in productos_db %}
-          <tr class="border-b border-gray-100 hover:bg-gray-50">
-            <td class="px-4 py-4">
-              <div class="w-20 h-20 rounded-xl overflow-hidden border border-gray-200 bg-stone-100">
-                {% if producto.imagen %}
-                <img src="{{ producto.imagen }}" alt="{{ producto.nombre }}" class="w-full h-full object-cover">
-                {% else %}
-                <div class="w-full h-full flex items-center justify-center text-xs text-gray-400 text-center px-2">
-                  Sin imagen
-                </div>
-                {% endif %}
-              </div>
-            </td>
+  <div class="bg-white rounded-2xl border border-gray-200 shadow-lg p-6 space-y-5">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-3 flex-wrap">
+          <h2 class="text-xl font-bold text-gray-900">Categorías de productos</h2>
+          <span class="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-sm font-medium border border-gray-200">
+            {{ total_categorias_producto }} categorías
+          </span>
+        </div>
+        <p class="text-sm text-gray-500 mt-1">
+          Administra las categorías disponibles para clasificar el catálogo.
+        </p>
+      </div>
 
-            <td class="px-4 py-4">
-              <div class="font-semibold text-gray-900">{{ producto.nombre }}</div>
-              <div class="text-sm text-gray-500 max-w-xs truncate">
-                {{ producto.descripcion or 'Sin descripción' }}
-              </div>
-            </td>
+      <div class="flex flex-col sm:flex-row gap-3">
+        <a href="{{ url_for('productos.crear_categoria_producto') }}"
+          class="px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all text-center">
+          Nueva categoría
+        </a>
 
-            <td class="px-4 py-4 text-gray-700">
-              {{ producto.categoria.nombre if producto.categoria else 'Sin categoría' }}
-            </td>
-
-            <td class="px-4 py-4 text-gray-700">
-              {{ producto.sku or '—' }}
-            </td>
-
-            <td class="px-4 py-4 text-gray-700">
-              ${{ producto.precio_venta|money }}
-            </td>
-
-            <td class="px-4 py-4 text-gray-700">
-              {{ producto.stock_actual|num(4) }}
-            </td>
-
-            <td class="px-4 py-4">
-              <span
-                class="px-3 py-1 rounded-full text-xs font-medium {% if producto.activo == 1 %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">
-                {{ 'Activo' if producto.activo == 1 else 'Inactivo' }}
-              </span>
-            </td>
-
-            <td class="px-4 py-4">
-              <div class="flex items-center justify-center gap-2">
-                <a href="{{ url_for('productos.actualizar_producto', id=producto.id_producto) }}"
-                  class="px-4 py-2 bg-blue-100 text-blue-700 rounded-xl hover:bg-blue-200 transition-colors">
-                  Editar
-                </a>
-                <a href="{{ url_for('productos.eliminar_producto', id=producto.id_producto) }}"
-                  class="px-4 py-2 bg-red-100 text-red-700 rounded-xl hover:bg-red-200 transition-colors">
-                  Desactivar
-                </a>
-              </div>
-            </td>
-          </tr>
-          {% else %}
-          <tr>
-            <td colspan="8" class="px-6 py-10 text-center text-gray-500">
-              No hay productos registrados.
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+        <a href="{{ url_for('productos.listado_categorias_producto') }}"
+          class="px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
+          Gestionar categorías
+        </a>
+      </div>
     </div>
+
+    {% if categorias_db %}
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2">
+      {% for categoria in categorias_db %}
+      <div class="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+        <p class="text-sm font-medium text-gray-800 truncate">{{ categoria.nombre }}</p>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="rounded-xl bg-yellow-50 border border-yellow-200 p-4 text-yellow-700">
+      No hay categorías registradas.
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden">
+    <table class="w-full table-fixed">
+      <thead class="bg-gray-50 border-b border-gray-200">
+        <tr class="text-left text-sm text-gray-600">
+          <th class="px-3 py-3 font-semibold w-24">Imagen</th>
+          <th class="px-3 py-3 font-semibold w-[22%]">Producto</th>
+          <th class="px-3 py-3 font-semibold w-[14%]">Categoría</th>
+          <th class="px-3 py-3 font-semibold w-[12%]">SKU</th>
+          <th class="px-3 py-3 font-semibold w-[10%]">Precio</th>
+          <th class="px-3 py-3 font-semibold w-[10%]">Stock</th>
+          <th class="px-3 py-3 font-semibold w-[10%]">Estado</th>
+          <th class="px-3 py-3 font-semibold w-[22%] text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for producto in productos_db %}
+        <tr class="border-b border-gray-100 hover:bg-gray-50 align-top">
+          <td class="px-3 py-3">
+            <div class="w-16 h-16 rounded-lg overflow-hidden border border-gray-200 bg-stone-100">
+              {% if producto.imagen %}
+              <img src="{{ producto.imagen }}" alt="{{ producto.nombre }}" class="w-full h-full object-cover">
+              {% else %}
+              <div class="w-full h-full flex items-center justify-center text-[10px] text-gray-400 text-center px-1">
+                Sin imagen
+              </div>
+              {% endif %}
+            </div>
+          </td>
+
+          <td class="px-3 py-3">
+            <div class="font-semibold text-sm text-gray-900 truncate">{{ producto.nombre }}</div>
+            <div class="text-xs text-gray-500 line-clamp-2">
+              {{ producto.descripcion or 'Sin descripción' }}
+            </div>
+          </td>
+
+          <td class="px-3 py-3 text-sm text-gray-700 truncate">
+            {{ producto.categoria.nombre if producto.categoria else 'Sin categoría' }}
+          </td>
+
+          <td class="px-3 py-3 text-sm text-gray-700 truncate">
+            {{ producto.sku or '—' }}
+          </td>
+
+          <td class="px-3 py-3 text-sm text-gray-700">
+            ${{ producto.precio_venta|money }}
+          </td>
+
+          <td class="px-3 py-3 text-sm text-gray-700">
+            {{ producto.stock_actual|num(4) }}
+          </td>
+
+          <td class="px-3 py-3">
+            <span
+              class="px-2.5 py-1 rounded-full text-xs font-medium {% if producto.activo == 1 %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">
+              {{ 'Activo' if producto.activo == 1 else 'Inactivo' }}
+            </span>
+          </td>
+
+          <td class="px-3 py-3">
+            <div class="flex flex-col xl:flex-row items-stretch justify-center gap-2">
+              <a href="{{ url_for('productos.actualizar_producto', id=producto.id_producto) }}"
+                class="px-3 py-2 text-sm bg-blue-100 text-blue-700 rounded-xl hover:bg-blue-200 transition-colors text-center">
+                Editar
+              </a>
+              <a href="{{ url_for('productos.eliminar_producto', id=producto.id_producto) }}"
+                class="px-3 py-2 text-sm bg-red-100 text-red-700 rounded-xl hover:bg-red-200 transition-colors text-center">
+                Desactivar
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="8" class="px-6 py-10 text-center text-gray-500">
+            No hay productos registrados.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 
   {% if pagination and pagination.pages > 1 %}

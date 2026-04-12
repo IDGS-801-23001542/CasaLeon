@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Eliminar Categoría | Casa León{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold mb-2">Eliminar categoría</h1>
+      <p class="text-gray-500">Confirma la eliminación de la categoría</p>
+    </div>
+
+    <a href="{{ url_for('productos.listado_categorias_producto') }}"
+      class="px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
+      Volver
+    </a>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="space-y-3">
+    {% for category, message in messages %}
+    <div class="px-4 py-3 rounded-xl border
+      {% if category == 'success' %}
+        bg-green-50 border-green-200 text-green-700
+      {% elif category == 'warning' %}
+        bg-yellow-50 border-yellow-200 text-yellow-700
+      {% elif category == 'danger' %}
+        bg-red-50 border-red-200 text-red-700
+      {% else %}
+        bg-blue-50 border-blue-200 text-blue-700
+      {% endif %}
+    ">
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endwith %}
+
+  <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 space-y-6">
+    <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+      <p class="text-sm text-red-700">
+        Esta acción eliminará la categoría solo si no tiene productos asociados.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+        <p class="text-sm text-gray-500">Categoría</p>
+        <p class="text-lg font-bold mt-2 text-gray-900">{{ categoria_db.nombre }}</p>
+      </div>
+
+      <div class="rounded-xl bg-gray-50 border border-gray-200 p-4">
+        <p class="text-sm text-gray-500">Productos asociados</p>
+        <p class="text-lg font-bold mt-2 {% if productos_asociados > 0 %}text-red-700{% else %}text-gray-900{% endif %}">
+          {{ productos_asociados }}
+        </p>
+      </div>
+    </div>
+
+    {% if productos_asociados > 0 %}
+    <div class="rounded-xl bg-yellow-50 border border-yellow-200 p-4 text-yellow-700">
+      No puedes eliminar esta categoría porque actualmente tiene productos asociados.
+    </div>
+
+    <div class="flex">
+      <a href="{{ url_for('productos.listado_categorias_producto') }}"
+        class="w-full px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
+        Volver
+      </a>
+    </div>
+    {% else %}
+    <form method="POST" action="{{ url_for('productos.eliminar_categoria_producto', id=categoria_db.id_categoria_producto) }}">
+      <div class="flex flex-col sm:flex-row gap-3 pt-2">
+        <a href="{{ url_for('productos.listado_categorias_producto') }}"
+          class="flex-1 px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
+          Cancelar
+        </a>
+
+        <button type="submit"
+          class="flex-1 px-4 py-2 bg-red-600 text-white rounded-xl hover:shadow-lg transition-all">
+          Eliminar categoría
+        </button>
+      </div>
+    </form>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

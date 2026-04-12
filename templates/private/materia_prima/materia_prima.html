@@ -41,7 +41,7 @@
   {% endif %}
   {% endwith %}
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
     <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
       <div class="flex items-center gap-3 mb-2">
         <div class="p-2 bg-blue-100 rounded-lg">
@@ -93,6 +93,48 @@
     </div>
   </div>
 
+  <div class="bg-white rounded-2xl border border-gray-200 shadow-lg p-6 space-y-5">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-3 flex-wrap">
+          <h2 class="text-xl font-bold text-gray-900">Categorías de materia prima</h2>
+          <span class="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-sm font-medium border border-gray-200">
+            {{ total_categorias_materia_prima }} categorías
+          </span>
+        </div>
+        <p class="text-sm text-gray-500 mt-1">
+          Administra las categorías disponibles para clasificar la materia prima.
+        </p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3">
+        <a href="{{ url_for('materia_prima.crear_categoria_materia_prima') }}"
+          class="px-4 py-2 bg-blue-600 text-white rounded-xl hover:shadow-lg transition-all text-center">
+          Nueva categoría
+        </a>
+
+        <a href="{{ url_for('materia_prima.listado_categorias_materia_prima') }}"
+          class="px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-center">
+          Gestionar categorías
+        </a>
+      </div>
+    </div>
+
+    {% if categorias_db %}
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2">
+      {% for categoria in categorias_db %}
+      <div class="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+        <p class="text-sm font-medium text-gray-800 truncate">{{ categoria.nombre }}</p>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="rounded-xl bg-yellow-50 border border-yellow-200 p-4 text-yellow-700">
+      No hay categorías registradas.
+    </div>
+    {% endif %}
+  </div>
+
   <div class="flex flex-col md:flex-row gap-4">
     <form method="GET" action="{{ url_for('materia_prima.materia_prima_view') }}" class="contents">
       <div class="flex-1 relative">
@@ -116,110 +158,108 @@
   </div>
 
   <div class="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden">
-    <div class="overflow-x-auto">
-      <table class="w-full min-w-[1100px]">
-        <thead class="bg-gray-50 border-b border-gray-200">
-          <tr class="text-left text-sm text-gray-600">
-            <th class="px-4 py-4 font-semibold">Materia Prima</th>
-            <th class="px-4 py-4 font-semibold">Categoría</th>
-            <th class="px-4 py-4 font-semibold">Stock Actual</th>
-            <th class="px-4 py-4 font-semibold">Stock Mínimo</th>
-            <th class="px-4 py-4 font-semibold">Precio Unitario</th>
-            <th class="px-4 py-4 font-semibold">Estado</th>
-            <th class="px-4 py-4 font-semibold text-center">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for materia in materias_db %}
-            {% set stock_num = materia.stock_actual|float %}
-            {% set stock_min = materia.stock_minimo|float %}
+    <table class="w-full table-fixed">
+      <thead class="bg-gray-50 border-b border-gray-200">
+        <tr class="text-left text-sm text-gray-600">
+          <th class="px-3 py-3 font-semibold w-[24%]">Materia Prima</th>
+          <th class="px-3 py-3 font-semibold w-[14%]">Categoría</th>
+          <th class="px-3 py-3 font-semibold w-[14%]">Stock Actual</th>
+          <th class="px-3 py-3 font-semibold w-[14%]">Stock Mínimo</th>
+          <th class="px-3 py-3 font-semibold w-[12%]">Precio Unitario</th>
+          <th class="px-3 py-3 font-semibold w-[10%]">Estado</th>
+          <th class="px-3 py-3 font-semibold w-[22%] text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for materia in materias_db %}
+          {% set stock_num = materia.stock_actual|float %}
+          {% set stock_min = materia.stock_minimo|float %}
 
-            {% if stock_num == 0 %}
-              {% set stock_label = 'Sin stock' %}
-              {% set stock_bg = 'bg-red-100 text-red-700' %}
-            {% elif stock_num <= stock_min %}
-              {% set stock_label = 'Stock bajo' %}
-              {% set stock_bg = 'bg-yellow-100 text-yellow-700' %}
-            {% else %}
-              {% set stock_label = 'Disponible' %}
-              {% set stock_bg = 'bg-green-100 text-green-700' %}
-            {% endif %}
-
-          <tr class="border-b border-gray-100 hover:bg-gray-50">
-            <td class="px-4 py-4">
-              <div class="font-semibold text-gray-900">{{ materia.nombre }}</div>
-              <div class="mt-2">
-                <span class="px-3 py-1 rounded-full text-xs font-medium {{ stock_bg }}">
-                  {{ stock_label }}
-                </span>
-              </div>
-            </td>
-
-            <td class="px-4 py-4 text-gray-700">
-              {{ materia.categoria_mp.nombre if materia.categoria_mp else 'Sin categoría' }}
-            </td>
-
-            <td class="px-4 py-4 text-gray-700">
-              {{ materia.stock_actual|num(4) }}
-              {% if materia.unidad_medida_rel %}{{ materia.unidad_medida_rel.nombre }}{% endif %}
-            </td>
-
-            <td class="px-4 py-4 text-gray-700">
-              {{ materia.stock_minimo|num(4) }}
-              {% if materia.unidad_medida_rel %}{{ materia.unidad_medida_rel.nombre }}{% endif %}
-            </td>
-
-            <td class="px-4 py-4 text-gray-700">
-              ${{ materia.costo_unit_prom|money }}
-            </td>
-
-            <td class="px-4 py-4">
-              <span class="px-3 py-1 rounded-full text-xs font-medium {% if materia.activo == 1 %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">
-                {{ 'Activo' if materia.activo == 1 else 'Inactivo' }}
-              </span>
-            </td>
-
-            <td class="px-4 py-4">
-              <div class="flex items-center justify-center gap-2 flex-wrap">
-                <button
-                  type="button"
-                  class="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-xl hover:bg-emerald-200 transition-colors"
-                  onclick="abrirModalMovimiento(
-                    '{{ materia.id_materia_prima }}',
-                    '{{ materia.nombre|e }}'
-                  )"
-                >
-                  Mover
-                </button>
-
-                <a
-                  href="{{ url_for('materia_prima.actualizar_materia_prima', id=materia.id_materia_prima) }}"
-                  class="px-4 py-2 bg-blue-100 text-blue-700 rounded-xl hover:bg-blue-200 transition-colors"
-                >
-                  Editar
-                </a>
-
-                {% if g.role == 'ADMIN' %}
-                <a
-                  href="{{ url_for('materia_prima.eliminar_materia_prima', id=materia.id_materia_prima) }}"
-                  class="px-4 py-2 bg-red-100 text-red-700 rounded-xl hover:bg-red-200 transition-colors"
-                >
-                  Desactivar
-                </a>
-                {% endif %}
-              </div>
-            </td>
-          </tr>
+          {% if stock_num == 0 %}
+            {% set stock_label = 'Sin stock' %}
+            {% set stock_bg = 'bg-red-100 text-red-700' %}
+          {% elif stock_num <= stock_min %}
+            {% set stock_label = 'Stock bajo' %}
+            {% set stock_bg = 'bg-yellow-100 text-yellow-700' %}
           {% else %}
-          <tr>
-            <td colspan="7" class="px-6 py-10 text-center text-gray-500">
-              No hay materias primas registradas.
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+            {% set stock_label = 'Disponible' %}
+            {% set stock_bg = 'bg-green-100 text-green-700' %}
+          {% endif %}
+
+        <tr class="border-b border-gray-100 hover:bg-gray-50 align-top">
+          <td class="px-3 py-3">
+            <div class="font-semibold text-sm text-gray-900 truncate">{{ materia.nombre }}</div>
+            <div class="mt-2">
+              <span class="px-2.5 py-1 rounded-full text-xs font-medium {{ stock_bg }}">
+                {{ stock_label }}
+              </span>
+            </div>
+          </td>
+
+          <td class="px-3 py-3 text-sm text-gray-700 truncate">
+            {{ materia.categoria_mp.nombre if materia.categoria_mp else 'Sin categoría' }}
+          </td>
+
+          <td class="px-3 py-3 text-sm text-gray-700">
+            {{ materia.stock_actual|num(4) }}
+            {% if materia.unidad_medida_rel %}{{ materia.unidad_medida_rel.nombre }}{% endif %}
+          </td>
+
+          <td class="px-3 py-3 text-sm text-gray-700">
+            {{ materia.stock_minimo|num(4) }}
+            {% if materia.unidad_medida_rel %}{{ materia.unidad_medida_rel.nombre }}{% endif %}
+          </td>
+
+          <td class="px-3 py-3 text-sm text-gray-700">
+            ${{ materia.costo_unit_prom|money }}
+          </td>
+
+          <td class="px-3 py-3">
+            <span class="px-2.5 py-1 rounded-full text-xs font-medium {% if materia.activo == 1 %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">
+              {{ 'Activo' if materia.activo == 1 else 'Inactivo' }}
+            </span>
+          </td>
+
+          <td class="px-3 py-3">
+            <div class="flex flex-col xl:flex-row items-stretch justify-center gap-2">
+              <button
+                type="button"
+                class="px-3 py-2 text-sm bg-emerald-100 text-emerald-700 rounded-xl hover:bg-emerald-200 transition-colors"
+                onclick="abrirModalMovimiento(
+                  '{{ materia.id_materia_prima }}',
+                  '{{ materia.nombre|e }}'
+                )"
+              >
+                Mover
+              </button>
+
+              <a
+                href="{{ url_for('materia_prima.actualizar_materia_prima', id=materia.id_materia_prima) }}"
+                class="px-3 py-2 text-sm bg-blue-100 text-blue-700 rounded-xl hover:bg-blue-200 transition-colors text-center"
+              >
+                Editar
+              </a>
+
+              {% if g.role == 'ADMIN' %}
+              <a
+                href="{{ url_for('materia_prima.eliminar_materia_prima', id=materia.id_materia_prima) }}"
+                class="px-3 py-2 text-sm bg-red-100 text-red-700 rounded-xl hover:bg-red-200 transition-colors text-center"
+              >
+                Desactivar
+              </a>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7" class="px-6 py-10 text-center text-gray-500">
+            No hay materias primas registradas.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 
 </div>
