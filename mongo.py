@@ -60,5 +60,4 @@ def ensure_report_indexes():
 
 
 def close_mongo(exception=None):
-    # Si usas un cliente global en app.extensions, normalmente no lo cierres por request.
     pass

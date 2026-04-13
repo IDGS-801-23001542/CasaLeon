@@ -1,5 +1,6 @@
 from decimal import Decimal
 from werkzeug.security import generate_password_hash
+from datetime import datetime
 
 from app import create_app
 from models import (
@@ -1132,71 +1133,88 @@ def seed_pedidos():
     ]
     db.session.add_all(detalles_2)
 
+    pedido_3 = Pedido(
+        id_cliente=cliente_1.id_cliente,
+        folio="PED20260411-0003",
+        estado="Entregado",
+        total=Decimal("1088.00"),
+        nombre_envio=cliente_1.nombre,
+        telefono_envio=cliente_1.telefono,
+        calle_envio=cliente_1.calle,
+        numero_envio=cliente_1.numero,
+        colonia_envio=cliente_1.colonia,
+        ciudad_envio=cliente_1.ciudad,
+        estado_envio=cliente_1.estado,
+        pais_envio=cliente_1.pais,
+        cp_envio=cliente_1.cp,
+        notas="Entrega en recepción",
+        creado_en=datetime(2026, 4, 11, 14, 30),
+    )
+    db.session.add(pedido_3)
+    db.session.flush()
+
+    detalles_3 = [
+        PedidoDetalle(
+            id_pedido=pedido_3.id_pedido,
+            id_producto=cartera.id_producto,
+            producto_nombre=cartera.nombre,
+            precio_unitario=cartera.precio_venta,
+            cantidad=1,
+            subtotal=cartera.precio_venta,
+        ),
+            PedidoDetalle(
+            id_pedido=pedido_3.id_pedido,
+            id_producto=llavero.id_producto,
+            producto_nombre=llavero.nombre,
+            precio_unitario=llavero.precio_venta,
+            cantidad=1,
+            subtotal=llavero.precio_venta,
+        ),
+    ]
+    db.session.add_all(detalles_3)
+
+    pedido_4 = Pedido(
+        id_cliente=cliente_2.id_cliente,
+        folio="PED20260412-0004",
+        estado="Pendiente",
+        total=Decimal("2128.00"),
+        nombre_envio=cliente_2.nombre,
+        telefono_envio=cliente_2.telefono,
+        calle_envio=cliente_2.calle,
+        numero_envio=cliente_2.numero,
+        colonia_envio=cliente_2.colonia,
+        ciudad_envio=cliente_2.ciudad,
+        estado_envio=cliente_2.estado,
+        pais_envio=cliente_2.pais,
+        cp_envio=cliente_2.cp,
+        notas="Cliente solicita llamada previa",
+        creado_en=datetime(2026, 4, 12, 11, 15),
+    )
+    db.session.add(pedido_4)
+    db.session.flush()
+
+    detalles_4 = [
+        PedidoDetalle(
+            id_pedido=pedido_4.id_pedido,
+            id_producto=tote.id_producto,
+            producto_nombre=tote.nombre,
+            precio_unitario=tote.precio_venta,
+            cantidad=1,
+            subtotal=tote.precio_venta,
+        ),
+        PedidoDetalle(
+            id_pedido=pedido_4.id_pedido,
+            id_producto=monedero.id_producto,
+            producto_nombre=monedero.nombre,
+            precio_unitario=monedero.precio_venta,
+            cantidad=1,
+            subtotal=monedero.precio_venta,
+        ),
+    ]
+    db.session.add_all(detalles_4)
+
     db.session.commit()
     print("✔ Pedidos demo insertados")
-
-
-def seed_ventas():
-    usuario_ventas = Usuario.query.filter_by(email="ventas@casaleon.com").first()
-
-    tarjetero = Producto.query.filter_by(nombre="Tarjetero Ejecutivo Slim").first()
-    cinturon = Producto.query.filter_by(nombre="Cinturón Casual de Piel").first()
-    estuche = Producto.query.filter_by(nombre="Estuche para Lentes Soft Case").first()
-
-    venta_1 = Venta(
-        folio="VEN20260401-0001",
-        id_usuario=usuario_ventas.id_usuario,
-        total=Decimal("1367.00"),
-        metodo_pago="TARJETA",
-        observaciones="Venta en mostrador",
-    )
-    db.session.add(venta_1)
-    db.session.flush()
-
-    detalles_venta_1 = [
-        VentaDetalle(
-            id_venta=venta_1.id_venta,
-            id_producto=tarjetero.id_producto,
-            producto_nombre=tarjetero.nombre,
-            precio_unitario=tarjetero.precio_venta,
-            cantidad=Decimal("2.00"),
-            subtotal=Decimal("718.00"),
-        ),
-        VentaDetalle(
-            id_venta=venta_1.id_venta,
-            id_producto=cinturon.id_producto,
-            producto_nombre=cinturon.nombre,
-            precio_unitario=cinturon.precio_venta,
-            cantidad=Decimal("1.00"),
-            subtotal=Decimal("649.00"),
-        ),
-    ]
-    db.session.add_all(detalles_venta_1)
-
-    venta_2 = Venta(
-        folio="VEN20260402-0002",
-        id_usuario=usuario_ventas.id_usuario,
-        total=Decimal("798.00"),
-        metodo_pago="EFECTIVO",
-        observaciones="Venta directa en tienda",
-    )
-    db.session.add(venta_2)
-    db.session.flush()
-
-    detalles_venta_2 = [
-        VentaDetalle(
-            id_venta=venta_2.id_venta,
-            id_producto=estuche.id_producto,
-            producto_nombre=estuche.nombre,
-            precio_unitario=estuche.precio_venta,
-            cantidad=Decimal("2.00"),
-            subtotal=Decimal("798.00"),
-        ),
-    ]
-    db.session.add_all(detalles_venta_2)
-
-    db.session.commit()
-    print("✔ Ventas demo insertadas")
 
 
 def seed_auditoria():
@@ -1328,7 +1346,6 @@ def run_seed():
         seed_movimientos_materia_prima()
         seed_lotes()
         seed_pedidos()
-        seed_ventas()
         seed_auditoria()
 
         print("✅ Seed completado")
