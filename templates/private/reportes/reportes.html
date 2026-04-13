@@ -4,9 +4,18 @@
 {% block content %}
 <div class="space-y-6">
 
-  <div>
-    <h1 class="text-3xl font-bold mb-2">Reportes</h1>
-    <p class="text-gray-500">Consulta el desempeño del ecommerce mediante snapshots diarios y tendencias.</p>
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold mb-2">Reportes</h1>
+      <p class="text-gray-500">Consulta el desempeño del ecommerce por rango de fechas.</p>
+    </div>
+
+    <a
+      href="{{ url_for('reportes.exportar_respaldo_mysql') }}"
+      class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors"
+    >
+      Exportar BD MySQL
+    </a>
   </div>
 
   {% with messages = get_flashed_messages(with_categories=true) %}
@@ -31,40 +40,70 @@
   {% endif %}
   {% endwith %}
 
-  {% if sales_snapshot_exists and sales_snapshot %}
-  {% set top_product = sales_snapshot.top_products[0] if sales_snapshot.top_products else None %}
-  {% else %}
-  {% set top_product = None %}
-  {% endif %}
-
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-    <form method="GET" action="{{ url_for('reportes.vista_reportes') }}"
-      class="bg-white rounded-2xl border border-gray-200 shadow-lg p-5 space-y-4">
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-lg p-5 space-y-4">
       <div>
-        <p class="text-sm text-gray-500">Fecha del snapshot</p>
-        <input type="date" name="snapshot_date" value="{{ snapshot_date }}"
-          class="mt-3 bg-white border border-gray-200 text-gray-900 text-sm rounded-xl block w-full p-3" />
+        <h2 class="text-lg font-bold text-gray-900">Filtro principal</h2>
+        <p class="text-sm text-gray-500 mt-1">
+          Todos los indicadores y el top de productos se calculan con el rango seleccionado.
+        </p>
       </div>
 
-      <button type="submit"
-        class="w-full px-4 py-2 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-colors">
-        Consultar snapshot
-      </button>
+      <form method="GET" action="{{ url_for('reportes.vista_reportes') }}" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block mb-2 text-sm font-medium text-gray-900">Fecha inicial</label>
+            <input
+              type="date"
+              name="start_date"
+              value="{{ range_start_date }}"
+              class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl block w-full p-3"
+            />
+          </div>
 
-      <input type="hidden" name="start_date" value="{{ range_start_date }}">
-      <input type="hidden" name="end_date" value="{{ range_end_date }}">
-    </form>
+          <div>
+            <label class="block mb-2 text-sm font-medium text-gray-900">Fecha final</label>
+            <input
+              type="date"
+              name="end_date"
+              value="{{ range_end_date }}"
+              class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl block w-full p-3"
+            />
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full px-4 py-2 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-colors"
+        >
+          Consultar rango
+        </button>
+      </form>
+    </div>
 
     <form method="POST" action="{{ url_for('reportes.generar_snapshot_desde_vista') }}"
       class="bg-white rounded-2xl border border-gray-200 shadow-lg p-5 space-y-4">
       <div>
-        <p class="text-sm text-gray-500">Fecha para generar el snapshot</p>
-        <input type="date" name="snapshot_date" value="{{ snapshot_date }}"
-          class="mt-3 bg-white border border-gray-200 text-gray-900 text-sm rounded-xl block w-full p-3" />
+        <h2 class="text-lg font-bold text-gray-900">Generar snapshot</h2>
+        <p class="text-sm text-gray-500 mt-1">
+          Guarda o actualiza el snapshot diario de una fecha específica.
+        </p>
       </div>
 
-      <button type="submit"
-        class="w-full px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors">
+      <div>
+        <label class="block mb-2 text-sm font-medium text-gray-900">Fecha para generar el snapshot</label>
+        <input
+          type="date"
+          name="snapshot_date"
+          value="{{ snapshot_date }}"
+          class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl block w-full p-3"
+        />
+      </div>
+
+      <button
+        type="submit"
+        class="w-full px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
+      >
         Generar / actualizar
       </button>
     </form>
@@ -72,29 +111,19 @@
 
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
     <div class="bg-white rounded-2xl border border-gray-200 shadow-lg p-5">
-      <p class="text-sm text-gray-500">Ingresos del día</p>
-      {% if sales_snapshot_exists and sales_snapshot %}
+      <p class="text-sm text-gray-500">Ingresos del rango</p>
       <p class="text-3xl font-bold mt-3 text-gray-900">
-        ${{ sales_snapshot.summary.total_sales | money }}
+        ${{ total_sales }}
       </p>
-      <p class="text-sm text-gray-500 mt-2">Total vendido en la fecha consultada</p>
-      {% else %}
-      <p class="text-3xl font-bold mt-3 text-gray-900">$0.00</p>
-      <p class="text-sm text-gray-500 mt-2">No hay snapshot disponible</p>
-      {% endif %}
+      <p class="text-sm text-gray-500 mt-2">Total vendido en el rango seleccionado</p>
     </div>
 
     <div class="bg-white rounded-2xl border border-gray-200 shadow-lg p-5">
       <p class="text-sm text-gray-500">Pedidos entregados</p>
-      {% if sales_snapshot_exists and sales_snapshot %}
       <p class="text-3xl font-bold mt-3 text-gray-900">
-        {{ sales_snapshot.summary.total_orders }}
+        {{ total_orders }}
       </p>
-      <p class="text-sm text-gray-500 mt-2">Pedidos cerrados ese día</p>
-      {% else %}
-      <p class="text-3xl font-bold mt-3 text-gray-900">0</p>
-      <p class="text-sm text-gray-500 mt-2">No hay snapshot disponible</p>
-      {% endif %}
+      <p class="text-sm text-gray-500 mt-2">Pedidos cerrados dentro del rango</p>
     </div>
 
     <div class="bg-white rounded-2xl border border-gray-200 shadow-lg p-5">
@@ -106,7 +135,7 @@
       </p>
       {% else %}
       <p class="text-lg font-bold mt-3 text-gray-900">Sin ventas</p>
-      <p class="text-sm text-gray-500 mt-2">No hay producto líder para esta fecha</p>
+      <p class="text-sm text-gray-500 mt-2">No hay producto líder en el rango seleccionado</p>
       {% endif %}
     </div>
   </div>
@@ -115,7 +144,7 @@
     <div>
       <h2 class="text-xl font-bold mb-1">Tendencia de ventas</h2>
       <p class="text-sm text-gray-500">
-        Ventas diarias basadas en snapshots existentes dentro del rango seleccionado.
+        Ventas diarias dentro del rango seleccionado.
       </p>
     </div>
 
@@ -126,48 +155,45 @@
       </p>
     </div>
 
-    <form method="GET" action="{{ url_for('reportes.vista_reportes') }}" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div>
-        <label class="block mb-2 text-sm font-medium text-gray-900">Fecha inicial</label>
-        <input type="date" name="start_date" value="{{ range_start_date }}"
-          class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl block w-full p-3" />
-      </div>
-
-      <div>
-        <label class="block mb-2 text-sm font-medium text-gray-900">Fecha final</label>
-        <input type="date" name="end_date" value="{{ range_end_date }}"
-          class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl block w-full p-3" />
-      </div>
-
-      <div class="flex items-end">
-        <button type="submit"
-          class="w-full px-4 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-colors">
-          Consultar rango
-        </button>
-      </div>
-
-      <input type="hidden" name="snapshot_date" value="{{ snapshot_date }}">
-    </form>
-
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
       <div class="bg-gray-50 rounded-2xl border border-gray-200 p-5">
         <div class="mb-4">
           <h3 class="text-lg font-bold text-gray-900">Gráfica de ventas</h3>
-          <p class="text-sm text-gray-500 mt-1">Comportamiento diario de ventas dentro del rango seleccionado.</p>
+          <p class="text-sm text-gray-500 mt-1">Comportamiento diario dentro del rango seleccionado.</p>
         </div>
 
         {% if line_chart and line_chart.has_data and line_chart.points %}
         <div class="w-full">
-          <svg viewBox="0 0 {{ line_chart.width }} {{ line_chart.height }}" preserveAspectRatio="xMidYMid meet"
-            class="w-full h-[360px]">
-            <line x1="{{ line_chart.padding_x }}" y1="{{ line_chart.height - line_chart.padding_y }}"
-              x2="{{ line_chart.width - line_chart.padding_x }}" y2="{{ line_chart.height - line_chart.padding_y }}"
-              stroke="#d1d5db" stroke-width="1.5" />
-            <line x1="{{ line_chart.padding_x }}" y1="{{ line_chart.padding_y }}" x2="{{ line_chart.padding_x }}"
-              y2="{{ line_chart.height - line_chart.padding_y }}" stroke="#d1d5db" stroke-width="1.5" />
+          <svg
+            viewBox="0 0 {{ line_chart.width }} {{ line_chart.height }}"
+            preserveAspectRatio="xMidYMid meet"
+            class="w-full h-[360px]"
+          >
+            <line
+              x1="{{ line_chart.padding_x }}"
+              y1="{{ line_chart.height - line_chart.padding_y }}"
+              x2="{{ line_chart.width - line_chart.padding_x }}"
+              y2="{{ line_chart.height - line_chart.padding_y }}"
+              stroke="#d1d5db"
+              stroke-width="1.5"
+            />
+            <line
+              x1="{{ line_chart.padding_x }}"
+              y1="{{ line_chart.padding_y }}"
+              x2="{{ line_chart.padding_x }}"
+              y2="{{ line_chart.height - line_chart.padding_y }}"
+              stroke="#d1d5db"
+              stroke-width="1.5"
+            />
 
-            <polyline fill="none" stroke="#2563eb" stroke-width="4" points="{{ line_chart.polyline_points }}"
-              stroke-linecap="round" stroke-linejoin="round" />
+            <polyline
+              fill="none"
+              stroke="#2563eb"
+              stroke-width="4"
+              points="{{ line_chart.polyline_points }}"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
 
             {% for point in line_chart.points %}
             <circle cx="{{ point.x }}" cy="{{ point.y }}" r="5" fill="#2563eb" />
@@ -192,10 +218,9 @@
           </div>
           {% endfor %}
         </div>
-
         {% else %}
         <div class="rounded-xl bg-yellow-50 border border-yellow-200 p-4 text-yellow-700">
-          No hay snapshots suficientes en el rango seleccionado.
+          No hay ventas registradas en el rango seleccionado.
         </div>
         {% endif %}
       </div>
@@ -203,12 +228,12 @@
       <div class="bg-gray-50 rounded-2xl border border-gray-200 p-5">
         <div class="mb-4">
           <h3 class="text-lg font-bold text-gray-900">Top productos vendidos</h3>
-          <p class="text-sm text-gray-500 mt-1">Los 3 productos con mejor desempeño del snapshot seleccionado.</p>
+          <p class="text-sm text-gray-500 mt-1">Los 3 productos con mejor desempeño en el rango seleccionado.</p>
         </div>
 
-        {% if sales_snapshot_exists and sales_snapshot and sales_snapshot.top_products %}
+        {% if top_products %}
         <div class="space-y-3">
-          {% for item in sales_snapshot.top_products[:3] %}
+          {% for item in top_products[:3] %}
           <div class="rounded-xl border border-gray-200 bg-white px-4 py-4 flex flex-col gap-1">
             <p class="font-semibold text-gray-900">{{ item.nombre }}</p>
             <p class="text-sm text-gray-500">
@@ -222,20 +247,12 @@
         </div>
         {% else %}
         <div class="rounded-xl bg-yellow-50 border border-yellow-200 p-4 text-yellow-700">
-          No hay productos vendidos registrados para esta fecha.
+          No hay productos vendidos en el rango seleccionado.
         </div>
         {% endif %}
       </div>
     </div>
   </div>
-
-  {% if not sales_snapshot_exists or not sales_snapshot %}
-  <div class="bg-white rounded-2xl border border-gray-200 shadow-lg p-8">
-    <div class="rounded-xl bg-yellow-50 border border-yellow-200 p-4 text-yellow-700">
-      {{ sales_snapshot_message or "No hay snapshot generado para la fecha seleccionada." }}
-    </div>
-  </div>
-  {% endif %}
 
 </div>
 {% endblock %}

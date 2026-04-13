@@ -61,7 +61,7 @@
           </div>
 
           {{ ui.field(form.email, placeholder="correo@empresa.com", type="email") }}
-          {{ ui.field(form.telefono, placeholder="Teléfono") }}
+          {{ ui.field(form.telefono, placeholder="Teléfono", inputmode="numeric", maxlength="10", pattern="[0-9]*") }}
           {{ ui.select_field(form.activo) }}
         </div>
       </div>

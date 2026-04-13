@@ -187,3 +187,38 @@ def detalle_venta(tipo, registro_id):
     flash("Tipo de registro inválido.", "danger")
     return redirect(url_for("ventas.listado_ventas"))
 
+
+@ventas.route("/private/ventas/pedido/entregar", methods=["POST"])
+@login_required(["ADMIN", "EMPLEADO"])
+def marcar_pedido_entregado():
+    id_pedido = request.form.get("id_pedido", "").strip()
+
+    if not id_pedido:
+        flash("No se recibió el pedido a actualizar.", "warning")
+        return redirect(url_for("ventas.listado_ventas"))
+
+    pedido_db = Pedido.query.filter_by(id_pedido=id_pedido).first()
+
+    if not pedido_db:
+        flash("Pedido no encontrado.", "danger")
+        return redirect(url_for("ventas.listado_ventas"))
+
+    estado_actual = (pedido_db.estado or "").strip().lower()
+
+    if estado_actual == "entregado":
+        flash("El pedido ya estaba marcado como entregado.", "info")
+        return redirect(url_for("ventas.listado_ventas"))
+
+    pedido_db.estado = "Entregado"
+    db.session.add(pedido_db)
+    db.session.commit()
+
+    log_event(
+        modulo="Ventas",
+        accion="Pedido marcado como entregado",
+        detalle=f"Pedido '{pedido_db.folio}' marcado como Entregado",
+        severidad="INFO",
+    )
+
+    flash("Pedido marcado como entregado correctamente.", "success")
+    return redirect(url_for("ventas.listado_ventas"))

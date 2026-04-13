@@ -114,6 +114,8 @@
     </form>
   </div>
 
+ 
+
   <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
     {% for item in mermas_db %}
       {% set total_detalle = item.detalles|length %}
@@ -143,8 +145,12 @@
             <span class="px-3 py-1 rounded-full text-xs bg-emerald-100 text-emerald-700">
               {{ item.estado }}
             </span>
-          {% else %}
+          {% elif item.estado == "DESECHADA" %}
             <span class="px-3 py-1 rounded-full text-xs bg-red-100 text-red-700">
+              {{ item.estado }}
+            </span>
+          {% else %}
+            <span class="px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-700">
               {{ item.estado }}
             </span>
           {% endif %}

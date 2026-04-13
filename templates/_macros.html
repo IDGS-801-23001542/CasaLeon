@@ -1,99 +1,108 @@
-{% macro field(form_field, placeholder="", type="text", icon=None) %}
-  <div class="mb-4">
-    <label class="block mb-2 text-sm font-medium text-gray-900">
-      {{ form_field.label.text }}
-    </label>
+{% macro field(form_field, placeholder="", type="text", icon=None, inputmode=None, maxlength=None, pattern=None) %}
+<div class="mb-4">
+  <label class="block mb-2 text-sm font-medium text-gray-900">
+    {{ form_field.label.text }}
+  </label>
 
-    <div class="relative">
-      {% if icon %}
-        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-          {{ icon|safe }}
-        </div>
-      {% endif %}
-
-      {{ form_field(
-        class=(
-          "bg-white/80 border border-cl-line text-gray-900 text-sm rounded-xl "
-          "focus:ring-2 focus:ring-emerald-300 focus:border-emerald-300 block w-full "
-          "p-3 " ~ ("ps-10" if icon else "") ~
-          " placeholder:text-gray-400"
-        ),
-        placeholder=placeholder,
-        type=type
-      ) }}
+  <div class="relative">
+    {% if icon %}
+    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+      {{ icon|safe }}
     </div>
+    {% endif %}
 
-    {% if form_field.errors %}
-      <p class="mt-2 text-sm text-red-600">
-        {% for e in form_field.errors %}{{ e }}{% if not loop.last %}<br>{% endif %}{% endfor %}
-      </p>
+    {% if inputmode or maxlength or pattern %}
+    {{ form_field(
+    class=(
+    "bg-white/80 border border-cl-line text-gray-900 text-sm rounded-xl "
+    "focus:ring-2 focus:ring-emerald-300 focus:border-emerald-300 block w-full "
+    "p-3 " ~ ("ps-10" if icon else "") ~
+    " placeholder:text-gray-400"
+    ),
+    placeholder=placeholder,
+    type=type,
+    inputmode=inputmode if inputmode else none,
+    maxlength=maxlength if maxlength else none,
+    pattern=pattern if pattern else none
+    ) }}
+    {% else %}
+    {{ form_field(
+    class=(
+    "bg-white/80 border border-cl-line text-gray-900 text-sm rounded-xl "
+    "focus:ring-2 focus:ring-emerald-300 focus:border-emerald-300 block w-full "
+    "p-3 " ~ ("ps-10" if icon else "") ~
+    " placeholder:text-gray-400"
+    ),
+    placeholder=placeholder,
+    type=type
+    ) }}
     {% endif %}
   </div>
-{% endmacro %}
 
-{% macro checkbox(form_field, text="") %}
-  <div class="flex items-center gap-2 select-none">
-    {{ form_field(class="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 rounded focus:ring-emerald-300") }}
-    <label class="text-sm text-gray-700">{{ text or form_field.label.text }}</label>
-  </div>
+  {% if form_field.errors %}
+  <p class="mt-2 text-sm text-red-600">
+    {% for e in form_field.errors %}{{ e }}{% if not loop.last %}<br>{% endif %}{% endfor %}
+  </p>
+  {% endif %}
+</div>
 {% endmacro %}
 
 
 {% macro select_field(form_field, icon=None) %}
-  <div class="mb-4">
-    <label class="block mb-2 text-sm font-medium text-gray-900">
-      {{ form_field.label.text }}
-    </label>
+<div class="mb-4">
+  <label class="block mb-2 text-sm font-medium text-gray-900">
+    {{ form_field.label.text }}
+  </label>
 
-    <div class="relative">
-      {% if icon %}
-        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-          {{ icon|safe }}
-        </div>
-      {% endif %}
-
-      {{ form_field(
-        class=(
-          "bg-white/80 border border-cl-line text-gray-900 text-sm rounded-xl "
-          "focus:ring-2 focus:ring-emerald-300 focus:border-emerald-300 block w-full "
-          "p-3 " ~ ("ps-10" if icon else "")
-        )
-      ) }}
+  <div class="relative">
+    {% if icon %}
+    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+      {{ icon|safe }}
     </div>
-
-    {% if form_field.errors %}
-      <p class="mt-2 text-sm text-red-600">
-        {% for e in form_field.errors %}{{ e }}{% if not loop.last %}<br>{% endif %}{% endfor %}
-      </p>
     {% endif %}
+
+    {{ form_field(
+    class=(
+    "bg-white/80 border border-cl-line text-gray-900 text-sm rounded-xl "
+    "focus:ring-2 focus:ring-emerald-300 focus:border-emerald-300 block w-full "
+    "p-3 " ~ ("ps-10" if icon else "")
+    )
+    ) }}
   </div>
+
+  {% if form_field.errors %}
+  <p class="mt-2 text-sm text-red-600">
+    {% for e in form_field.errors %}{{ e }}{% if not loop.last %}<br>{% endif %}{% endfor %}
+  </p>
+  {% endif %}
+</div>
 {% endmacro %}
 
 
 {% macro form_errors(form) %}
-  {% if form.errors %}
-    <div class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
-      <p class="text-sm font-medium text-red-700 mb-1">Corrige los siguientes errores:</p>
-      <ul class="text-sm text-red-600 list-disc list-inside">
-        {% for field_name, errors in form.errors.items() %}
-          {% for error in errors %}
-            <li>{{ error }}</li>
-          {% endfor %}
-        {% endfor %}
-      </ul>
-    </div>
-  {% endif %}
+{% if form.errors %}
+<div class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+  <p class="text-sm font-medium text-red-700 mb-1">Corrige los siguientes errores:</p>
+  <ul class="text-sm text-red-600 list-disc list-inside">
+    {% for field_name, errors in form.errors.items() %}
+    {% for error in errors %}
+    <li>{{ error }}</li>
+    {% endfor %}
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
 {% endmacro %}
 
 
 {% macro estado_badge(activo) %}
-  {% if activo == 1 %}
-    <span class="px-3 py-1 rounded-full text-xs bg-green-100 text-green-700">
-      Activo
-    </span>
-  {% else %}
-    <span class="px-3 py-1 rounded-full text-xs bg-red-100 text-red-700">
-      Inactivo
-    </span>
-  {% endif %}
+{% if activo == 1 %}
+<span class="px-3 py-1 rounded-full text-xs bg-green-100 text-green-700">
+  Activo
+</span>
+{% else %}
+<span class="px-3 py-1 rounded-full text-xs bg-red-100 text-red-700">
+  Inactivo
+</span>
+{% endif %}
 {% endmacro %}

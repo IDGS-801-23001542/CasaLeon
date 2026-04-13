@@ -7,17 +7,15 @@
 
   <section class="relative overflow-hidden bg-stone-100">
     <div class="absolute inset-0">
-      <img
-        src="{{ url_for('static', filename='img/tienda/hero-home.jpg') }}"
-        alt="Casa León marroquinería"
-        class="h-full w-full object-cover"
-      >
+      <img src="{{ url_for('static', filename='img/tienda/hero-home.jpg') }}" alt="Casa León marroquinería"
+        class="h-full w-full object-cover">
       <div class="absolute inset-0 bg-gradient-to-r from-stone-950/75 via-stone-900/45 to-stone-900/10"></div>
     </div>
 
     <div class="relative mx-auto max-w-screen-2xl px-4 py-20 sm:px-6 sm:py-24 lg:py-32">
       <div class="max-w-3xl">
-        <span class="inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-medium uppercase tracking-[0.18em] text-white backdrop-blur-sm">
+        <span
+          class="inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-medium uppercase tracking-[0.18em] text-white backdrop-blur-sm">
           Hecho en León, Guanajuato
         </span>
 
@@ -26,20 +24,17 @@
         </h1>
 
         <p class="mt-6 max-w-2xl text-base leading-8 text-white/85 sm:text-lg">
-          Descubre bolsos, mochilas, carteras y accesorios inspirados en la tradición artesanal de León, reinterpretados para una experiencia contemporánea.
+          Descubre bolsos, mochilas, carteras y accesorios inspirados en la tradición artesanal de León, reinterpretados
+          para una experiencia contemporánea.
         </p>
 
         <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-          <a
-            href="{{ url_for('tienda.productos_publico') }}"
-            class="inline-flex items-center justify-center rounded-full bg-white px-7 py-4 text-sm font-medium text-stone-900 transition hover:bg-stone-100"
-          >
+          <a href="{{ url_for('tienda.productos_publico') }}"
+            class="inline-flex items-center justify-center rounded-full bg-white px-7 py-4 text-sm font-medium text-stone-900 transition hover:bg-stone-100">
             Comprar ahora
           </a>
-          <a
-            href="{{ url_for('tienda.nosotros') }}"
-            class="inline-flex items-center justify-center rounded-full border border-white/25 bg-white/10 px-7 py-4 text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/15"
-          >
+          <a href="{{ url_for('tienda.nosotros') }}"
+            class="inline-flex items-center justify-center rounded-full border border-white/25 bg-white/10 px-7 py-4 text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/15">
             Descubrir Casa León
           </a>
         </div>
@@ -53,58 +48,70 @@
         <p class="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">Categorías</p>
         <h2 class="mt-2 text-3xl font-semibold text-stone-900 sm:text-4xl">Descubre nuestras categorías</h2>
       </div>
-      <a href="{{ url_for('tienda.productos_publico') }}" class="hidden text-sm font-medium text-stone-700 hover:text-stone-900 sm:inline-block">
+      <a href="{{ url_for('tienda.productos_publico') }}"
+        class="hidden text-sm font-medium text-stone-700 hover:text-stone-900 sm:inline-block">
         Ver todo el catálogo
       </a>
     </div>
 
     <div class="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-6">
-      <a href="{{ url_for('tienda.productos_publico', q='bolsa') }}" class="group overflow-hidden rounded-[28px] border border-stone-200 bg-white">
+      <a href="{{ url_for('tienda.productos_publico', q='bolsa') }}"
+        class="group overflow-hidden rounded-[28px] border border-stone-200 bg-white">
         <div class="aspect-[4/5] overflow-hidden bg-stone-100">
-          <img src="{{ url_for('static', filename='img/tienda/categoria-bolsas.jpg') }}" alt="Bolsas" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+          <img src="{{ url_for('static', filename='img/tienda/categoria-bolsas.jpg') }}" alt="Bolsas"
+            class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
         </div>
         <div class="p-4">
           <h3 class="text-base font-medium text-stone-900">Bolsas</h3>
         </div>
       </a>
 
-      <a href="{{ url_for('tienda.productos_publico', q='mochila') }}" class="group overflow-hidden rounded-[28px] border border-stone-200 bg-white">
+      <a href="{{ url_for('tienda.productos_publico', q='mochila') }}"
+        class="group overflow-hidden rounded-[28px] border border-stone-200 bg-white">
         <div class="aspect-[4/5] overflow-hidden bg-stone-100">
-          <img src="{{ url_for('static', filename='img/tienda/categoria-mochilas.jpg') }}" alt="Mochilas" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+          <img src="{{ url_for('static', filename='img/tienda/categoria-mochilas.jpg') }}" alt="Mochilas"
+            class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
         </div>
         <div class="p-4">
           <h3 class="text-base font-medium text-stone-900">Mochilas</h3>
         </div>
       </a>
 
-      <a href="{{ url_for('tienda.productos_publico', q='cartera') }}" class="group overflow-hidden rounded-[28px] border border-stone-200 bg-white">
+      <a href="{{ url_for('tienda.productos_publico', q='cartera') }}"
+        class="group overflow-hidden rounded-[28px] border border-stone-200 bg-white">
         <div class="aspect-[4/5] overflow-hidden bg-stone-100">
-          <img src="{{ url_for('static', filename='img/tienda/categoria-carteras.jpg') }}" alt="Carteras" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+          <img src="{{ url_for('static', filename='img/tienda/categoria-carteras.jpg') }}" alt="Carteras"
+            class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
         </div>
         <div class="p-4">
           <h3 class="text-base font-medium text-stone-900">Carteras</h3>
         </div>
       </a>
 
-      <a href="{{ url_for('tienda.productos_publico', q='funda') }}" class="group overflow-hidden rounded-[28px] border border-stone-200 bg-white">
+      <a href="{{ url_for('tienda.productos_publico', q='funda') }}"
+        class="group overflow-hidden rounded-[28px] border border-stone-200 bg-white">
         <div class="aspect-[4/5] overflow-hidden bg-stone-100">
-          <img src="{{ url_for('static', filename='img/tienda/categoria-fundas.jpg') }}" alt="Fundas" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+          <img src="{{ url_for('static', filename='img/tienda/categoria-fundas.jpg') }}" alt="Fundas"
+            class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
         </div>
         <div class="p-4">
           <h3 class="text-base font-medium text-stone-900">Fundas</h3>
         </div>
       </a>
 
-      <a href="{{ url_for('tienda.productos_publico', q='cinturón') }}" class="group overflow-hidden rounded-[28px] border border-stone-200 bg-white">
+      <a href="{{ url_for('tienda.productos_publico', q='cinturón') }}"
+        class="group overflow-hidden rounded-[28px] border border-stone-200 bg-white">
         <div class="aspect-[4/5] overflow-hidden bg-stone-100">
-          <img src="{{ url_for('static', filename='img/tienda/categoria-cinturones.jpg') }}" alt="Cinturones" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+          <img src="{{ url_for('static', filename='img/tienda/categoria-cinturones.jpg') }}" alt="Cinturones"
+            class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
         </div>
         <div class="p-4">
           <h3 class="text-base font-medium text-stone-900">Cinturones</h3>
         </div>
       </a>
 
-      <a href="{{ url_for('tienda.productos_publico') }}" class="group overflow-hidden rounded-[28px] border border-stone-200 bg-stone-900">
+      <a href="{{ url_for('tienda.productos_publico') }}"
+        class="group overflow-hidden rounded-[28px] border border-stone-200 bg-stone-900">
         <div class="flex aspect-[4/5] items-center justify-center p-6 text-center">
           <div>
             <p class="text-xs uppercase tracking-[0.2em] text-stone-400">Explorar</p>
@@ -121,88 +128,85 @@
         <p class="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">Selección</p>
         <h2 class="mt-2 text-3xl font-semibold text-stone-900 sm:text-4xl">Piezas destacadas</h2>
       </div>
-      <a href="{{ url_for('tienda.productos_publico') }}" class="text-sm font-medium text-stone-700 hover:text-stone-900">
+      <a href="{{ url_for('tienda.productos_publico') }}"
+        class="text-sm font-medium text-stone-700 hover:text-stone-900">
         Ver todos los productos
       </a>
     </div>
 
     {% if productos %}
-      <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {% for p in productos %}
-          {% set stock_num = p.stock_actual|float %}
-          <article class="group overflow-hidden rounded-[32px] border border-stone-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
-            <div class="relative overflow-hidden bg-stone-50">
-              <div class="flex h-80 items-center justify-center p-8">
-                {% if p.imagen %}
-                  <img
-                    src="{{ url_for('static', filename=p.imagen) }}"
-                    alt="{{ p.nombre }}"
-                    class="max-h-full w-auto object-contain transition duration-500 group-hover:scale-105"
-                  >
-                {% else %}
-                  <div class="flex h-full w-full items-center justify-center rounded-3xl border border-dashed border-stone-300 text-stone-400">
-                    Sin imagen
-                  </div>
-                {% endif %}
-              </div>
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+      {% for p in productos %}
+      {% set stock_num = p.stock_actual|float %}
+      <article
+        class="group overflow-hidden rounded-[32px] border border-stone-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
+        <div class="relative overflow-hidden bg-stone-50">
+          <div class="flex h-80 items-center justify-center p-8">
+            {% if p.imagen %}
+            <img
+              src="{% if p.imagen.startswith('http://') or p.imagen.startswith('https://') %}{{ p.imagen }}{% else %}{{ url_for('static', filename=p.imagen) }}{% endif %}"
+              alt="{{ p.nombre }}"
+              class="max-h-full w-auto object-contain transition duration-500 group-hover:scale-105">
+            {% else %}
+            <div
+              class="flex h-full w-full items-center justify-center rounded-3xl border border-dashed border-stone-300 text-stone-400">
+              Sin imagen
+            </div>
+            {% endif %}
+          </div>
 
-              <div class="absolute left-5 top-5 flex gap-2">
-                <span class="rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-stone-700 backdrop-blur">
-                  {{ p.categoria }}
-                </span>
+          <div class="absolute left-5 top-5 flex gap-2">
+            <span class="rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-stone-700 backdrop-blur">
+              {{ p.categoria }}
+            </span>
 
-                {% if stock_num <= 0 %}
-                  <span class="rounded-full bg-stone-900 px-3 py-1 text-xs font-medium text-white">Agotado</span>
-                {% elif stock_num < 20 %}
-                  <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-800">Pocas piezas</span>
+            {% if stock_num <= 0 %} <span class="rounded-full bg-stone-900 px-3 py-1 text-xs font-medium text-white">
+              Agotado</span>
+              {% elif stock_num < 20 %} <span
+                class="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-800">Pocas piezas</span>
                 {% else %}
-                  <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-800">Disponible</span>
+                <span
+                  class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-800">Disponible</span>
                 {% endif %}
-              </div>
+          </div>
+        </div>
+
+        <div class="p-6">
+          <h3 class="text-2xl font-medium leading-tight text-stone-900">{{ p.nombre }}</h3>
+          <p class="mt-3 min-h-[72px] text-sm leading-7 text-stone-600">
+            {{ p.descripcion or "Producto de marroquinería con diseño funcional y acabados de calidad." }}
+          </p>
+
+          <div class="mt-6 flex items-end justify-between gap-4">
+            <div>
+              <p class="text-3xl font-semibold text-stone-900">${{ "{:,.0f}".format(p.precio_venta|float) }}</p>
+              <p class="mt-1 text-sm text-stone-500">{{ p.stock_actual }} disponibles</p>
             </div>
 
-            <div class="p-6">
-              <h3 class="text-2xl font-medium leading-tight text-stone-900">{{ p.nombre }}</h3>
-              <p class="mt-3 min-h-[72px] text-sm leading-7 text-stone-600">
-                {{ p.descripcion or "Producto de marroquinería con diseño funcional y acabados de calidad." }}
-              </p>
-
-              <div class="mt-6 flex items-end justify-between gap-4">
-                <div>
-                  <p class="text-3xl font-semibold text-stone-900">${{ "{:,.0f}".format(p.precio_venta|float) }}</p>
-                  <p class="mt-1 text-sm text-stone-500">{{ p.stock_actual }} disponibles</p>
-                </div>
-
-                <form method="POST" action="{{ url_for('tienda.agregar_carrito', id_producto=p.id_producto) }}">
-                  <button
-                    type="submit"
-                    class="inline-flex items-center justify-center rounded-full bg-stone-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-stone-800"
-                    {% if stock_num <= 0 %}disabled{% endif %}
-                  >
-                    {% if stock_num <= 0 %}No disponible{% else %}Agregar{% endif %}
-                  </button>
-                </form>
-              </div>
-            </div>
-          </article>
-        {% endfor %}
-      </div>
+            <form method="POST" action="{{ url_for('tienda.agregar_carrito', id_producto=p.id_producto) }}">
+              <button type="submit"
+                class="inline-flex items-center justify-center rounded-full bg-stone-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-stone-800"
+                {% if stock_num <=0 %}disabled{% endif %}>
+                {% if stock_num <= 0 %}No disponible{% else %}Agregar{% endif %} </button>
+            </form>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
     {% else %}
-      <div class="rounded-[32px] border border-stone-200 bg-white p-12 text-center">
-        <h3 class="text-2xl font-medium text-stone-900">No hay productos destacados</h3>
-        <p class="mt-3 text-stone-600">Agrega productos activos para mostrarlos aquí.</p>
-      </div>
+    <div class="rounded-[32px] border border-stone-200 bg-white p-12 text-center">
+      <h3 class="text-2xl font-medium text-stone-900">No hay productos destacados</h3>
+      <p class="mt-3 text-stone-600">Agrega productos activos para mostrarlos aquí.</p>
+    </div>
     {% endif %}
   </section>
 
   <section class="mx-auto max-w-screen-2xl px-4 py-16 sm:px-6 lg:py-20">
     <div class="grid gap-8 lg:grid-cols-[1.05fr_.95fr] lg:items-center">
       <div class="overflow-hidden rounded-[36px] bg-stone-100">
-        <img
-          src="{{ url_for('static', filename='img/tienda/bloque-historia.jpg') }}"
-          alt="Historia Casa León"
-          class="h-full w-full object-cover"
-        >
+        <img src="{{ url_for('static', filename='img/tienda/bloque-historia.jpg') }}" alt="Historia Casa León"
+          class="h-full w-full object-cover">
       </div>
 
       <div>
@@ -211,13 +215,16 @@
           Tradición artesanal con una mirada contemporánea.
         </h2>
         <p class="mt-5 text-base leading-8 text-stone-600">
-          Casa León toma como punto de partida la herencia marroquinera de León, Guanajuato, para crear piezas funcionales, elegantes y pensadas para acompañar el ritmo cotidiano con identidad propia.
+          Casa León toma como punto de partida la herencia marroquinera de León, Guanajuato, para crear piezas
+          funcionales, elegantes y pensadas para acompañar el ritmo cotidiano con identidad propia.
         </p>
         <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-          <a href="{{ url_for('tienda.nosotros') }}" class="inline-flex items-center justify-center rounded-full bg-stone-900 px-6 py-3.5 text-sm font-medium text-white hover:bg-stone-800">
+          <a href="{{ url_for('tienda.nosotros') }}"
+            class="inline-flex items-center justify-center rounded-full bg-stone-900 px-6 py-3.5 text-sm font-medium text-white hover:bg-stone-800">
             Conocer más
           </a>
-          <a href="{{ url_for('tienda.contacto') }}" class="inline-flex items-center justify-center rounded-full border border-stone-200 px-6 py-3.5 text-sm font-medium text-stone-700 hover:bg-stone-50">
+          <a href="{{ url_for('tienda.contacto') }}"
+            class="inline-flex items-center justify-center rounded-full border border-stone-200 px-6 py-3.5 text-sm font-medium text-stone-700 hover:bg-stone-50">
             Contacto
           </a>
         </div>
@@ -236,7 +243,8 @@
 
         <div class="hidden duration-700 ease-in-out" data-carousel-item="active">
           <div class="relative h-full w-full">
-            <img src="{{ url_for('static', filename='img/tienda/descubrir-origen.jpg') }}" class="absolute inset-0 h-full w-full object-cover" alt="Origen Casa León">
+            <img src="{{ url_for('static', filename='img/tienda/descubrir-origen.jpg') }}"
+              class="absolute inset-0 h-full w-full object-cover" alt="Origen Casa León">
             <div class="absolute inset-0 bg-gradient-to-r from-stone-950/70 to-transparent"></div>
             <div class="relative flex h-full max-w-xl flex-col justify-end p-8 text-white sm:p-12">
               <p class="text-xs uppercase tracking-[0.2em] text-white/70">Origen</p>
@@ -250,7 +258,8 @@
 
         <div class="hidden duration-700 ease-in-out" data-carousel-item>
           <div class="relative h-full w-full">
-            <img src="{{ url_for('static', filename='img/tienda/descubrir-materiales.jpg') }}" class="absolute inset-0 h-full w-full object-cover" alt="Materiales Casa León">
+            <img src="{{ url_for('static', filename='img/tienda/descubrir-materiales.jpg') }}"
+              class="absolute inset-0 h-full w-full object-cover" alt="Materiales Casa León">
             <div class="absolute inset-0 bg-gradient-to-r from-stone-950/70 to-transparent"></div>
             <div class="relative flex h-full max-w-xl flex-col justify-end p-8 text-white sm:p-12">
               <p class="text-xs uppercase tracking-[0.2em] text-white/70">Materiales</p>
@@ -264,7 +273,8 @@
 
         <div class="hidden duration-700 ease-in-out" data-carousel-item>
           <div class="relative h-full w-full">
-            <img src="{{ url_for('static', filename='img/tienda/descubrir-proceso.jpg') }}" class="absolute inset-0 h-full w-full object-cover" alt="Proceso Casa León">
+            <img src="{{ url_for('static', filename='img/tienda/descubrir-proceso.jpg') }}"
+              class="absolute inset-0 h-full w-full object-cover" alt="Proceso Casa León">
             <div class="absolute inset-0 bg-gradient-to-r from-stone-950/70 to-transparent"></div>
             <div class="relative flex h-full max-w-xl flex-col justify-end p-8 text-white sm:p-12">
               <p class="text-xs uppercase tracking-[0.2em] text-white/70">Proceso</p>
@@ -278,7 +288,8 @@
 
         <div class="hidden duration-700 ease-in-out" data-carousel-item>
           <div class="relative h-full w-full">
-            <img src="{{ url_for('static', filename='img/tienda/descubrir-estilo.jpg') }}" class="absolute inset-0 h-full w-full object-cover" alt="Estilo Casa León">
+            <img src="{{ url_for('static', filename='img/tienda/descubrir-estilo.jpg') }}"
+              class="absolute inset-0 h-full w-full object-cover" alt="Estilo Casa León">
             <div class="absolute inset-0 bg-gradient-to-r from-stone-950/70 to-transparent"></div>
             <div class="relative flex h-full max-w-xl flex-col justify-end p-8 text-white sm:p-12">
               <p class="text-xs uppercase tracking-[0.2em] text-white/70">Estilo</p>
@@ -291,15 +302,21 @@
         </div>
       </div>
 
-      <button type="button" class="group absolute left-4 top-1/2 z-30 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 text-stone-700 backdrop-blur hover:bg-white" data-carousel-prev>
+      <button type="button"
+        class="group absolute left-4 top-1/2 z-30 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 text-stone-700 backdrop-blur hover:bg-white"
+        data-carousel-prev>
         <svg class="h-4 w-4" viewBox="0 0 6 10" fill="none">
-          <path d="M5 1 1 5l4 4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+          <path d="M5 1 1 5l4 4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+            stroke-width="2" />
         </svg>
       </button>
 
-      <button type="button" class="group absolute right-4 top-1/2 z-30 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 text-stone-700 backdrop-blur hover:bg-white" data-carousel-next>
+      <button type="button"
+        class="group absolute right-4 top-1/2 z-30 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 text-stone-700 backdrop-blur hover:bg-white"
+        data-carousel-next>
         <svg class="h-4 w-4" viewBox="0 0 6 10" fill="none">
-          <path d="m1 9 4-4-4-4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+          <path d="m1 9 4-4-4-4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+            stroke-width="2" />
         </svg>
       </button>
     </div>

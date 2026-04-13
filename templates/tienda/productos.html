@@ -7,11 +7,8 @@
 
   <section class="relative overflow-hidden bg-stone-100">
     <div class="absolute inset-0">
-      <img
-        src="{{ url_for('static', filename='img/tienda/productos-hero.jpg') }}"
-        alt="Colección Casa León"
-        class="h-full w-full object-cover"
-      >
+      <img src="{{ url_for('static', filename='img/tienda/productos-hero.jpg') }}" alt="Colección Casa León"
+        class="h-full w-full object-cover">
       <div class="absolute inset-0 bg-gradient-to-r from-stone-950/75 via-stone-900/45 to-transparent"></div>
     </div>
 
@@ -22,20 +19,17 @@
           Explora nuestra colección
         </h1>
         <p class="mt-6 text-base leading-8 text-white/85 sm:text-lg">
-          Descubre bolsos, mochilas, carteras y accesorios pensados para acompañarte con funcionalidad, estilo y presencia.
+          Descubre bolsos, mochilas, carteras y accesorios pensados para acompañarte con funcionalidad, estilo y
+          presencia.
         </p>
 
         <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-          <a
-            href="#filtros-productos"
-            class="inline-flex items-center justify-center rounded-full bg-white px-7 py-4 text-sm font-medium text-stone-900 transition hover:bg-stone-100"
-          >
+          <a href="#filtros-productos"
+            class="inline-flex items-center justify-center rounded-full bg-white px-7 py-4 text-sm font-medium text-stone-900 transition hover:bg-stone-100">
             Explorar colección
           </a>
-          <a
-            href="{{ url_for('tienda.nosotros') }}#historia"
-            class="inline-flex items-center justify-center rounded-full border border-white/25 bg-white/10 px-7 py-4 text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/15"
-          >
+          <a href="{{ url_for('tienda.nosotros') }}#historia"
+            class="inline-flex items-center justify-center rounded-full border border-white/25 bg-white/10 px-7 py-4 text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/15">
             Nuestra historia
           </a>
         </div>
@@ -45,40 +39,32 @@
 
   <div class="mx-auto max-w-screen-2xl px-4 py-14 sm:px-6 lg:py-16">
     <div id="filtros-productos" class="rounded-[32px] border border-stone-200 bg-stone-50 p-4 sm:p-6">
-      <form method="GET" action="{{ url_for('tienda.productos_publico') }}" class="grid gap-4 lg:grid-cols-[1fr_280px_auto]">
+      <form method="GET" action="{{ url_for('tienda.productos_publico') }}"
+        class="grid gap-4 lg:grid-cols-[1fr_280px_auto]">
         <div>
           <label for="q" class="mb-2 block text-sm font-medium text-stone-700">Buscar</label>
-          <input
-            id="q"
-            type="text"
-            name="q"
-            value="{{ busqueda }}"
+          <input id="q" type="text" name="q" value="{{ busqueda }}"
             class="block w-full rounded-2xl border border-stone-200 bg-white px-4 py-3.5 text-sm text-stone-900 focus:border-stone-400 focus:ring-stone-300"
-            placeholder="Buscar bolsa, mochila, cartera..."
-          >
+            placeholder="Buscar bolsa, mochila, cartera...">
         </div>
 
         <div>
           <label for="categoria" class="mb-2 block text-sm font-medium text-stone-700">Categoría</label>
-          <select
-            id="categoria"
-            name="categoria"
-            class="block w-full rounded-2xl border border-stone-200 bg-white px-4 py-3.5 text-sm text-stone-900 focus:border-stone-400 focus:ring-stone-300"
-          >
+          <select id="categoria" name="categoria"
+            class="block w-full rounded-2xl border border-stone-200 bg-white px-4 py-3.5 text-sm text-stone-900 focus:border-stone-400 focus:ring-stone-300">
             <option value="">Todas las categorías</option>
             {% for cat in categorias %}
-              <option value="{{ cat.id_categoria_producto }}" {% if categoria_id == cat.id_categoria_producto|string %}selected{% endif %}>
-                {{ cat.nombre }}
-              </option>
+            <option value="{{ cat.id_categoria_producto }}" {% if categoria_id==cat.id_categoria_producto|string
+              %}selected{% endif %}>
+              {{ cat.nombre }}
+            </option>
             {% endfor %}
           </select>
         </div>
 
         <div class="flex items-end">
-          <button
-            type="submit"
-            class="w-full rounded-full bg-stone-900 px-6 py-3.5 text-sm font-medium text-white transition hover:bg-stone-800"
-          >
+          <button type="submit"
+            class="w-full rounded-full bg-stone-900 px-6 py-3.5 text-sm font-medium text-white transition hover:bg-stone-800">
             Aplicar filtros
           </button>
         </div>
@@ -86,80 +72,78 @@
     </div>
 
     {% if productos %}
-      <div class="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {% for p in productos %}
-          {% set stock_num = p.stock_actual|float %}
-          <article class="group overflow-hidden rounded-[32px] border border-stone-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
-            <div class="relative bg-stone-50">
-              <div class="flex h-80 items-center justify-center p-8">
-                {% if p.imagen %}
-                  <img
-                    src="{{ url_for('static', filename=p.imagen) }}"
-                    alt="{{ p.nombre }}"
-                    class="max-h-full w-auto object-contain transition duration-500 group-hover:scale-105"
-                  >
-                {% else %}
-                  <div class="flex h-full w-full items-center justify-center rounded-3xl border border-dashed border-stone-300 text-stone-400">
-                    Sin imagen
-                  </div>
-                {% endif %}
-              </div>
+    <div class="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+      {% for p in productos %}
+      {% set stock_num = p.stock_actual|float %}
+      <article
+        class="group overflow-hidden rounded-[32px] border border-stone-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
+        <div class="relative bg-stone-50">
+          <div class="flex h-80 items-center justify-center p-8">
+            {% if p.imagen %}
+            <img
+              src="{% if p.imagen.startswith('http://') or p.imagen.startswith('https://') %}{{ p.imagen }}{% else %}{{ url_for('static', filename=p.imagen) }}{% endif %}"
+              alt="{{ p.nombre }}"
+              class="max-h-full w-auto object-contain transition duration-500 group-hover:scale-105">
+            {% else %}
+            <div
+              class="flex h-full w-full items-center justify-center rounded-3xl border border-dashed border-stone-300 text-stone-400">
+              Sin imagen
+            </div>
+            {% endif %}
+          </div>
 
-              <div class="absolute left-5 top-5 flex flex-wrap gap-2">
-                <span class="rounded-full bg-white px-3 py-1 text-xs font-medium text-stone-700 shadow-sm">
-                  {{ p.categoria }}
+          <div class="absolute left-5 top-5 flex flex-wrap gap-2">
+            <span class="rounded-full bg-white px-3 py-1 text-xs font-medium text-stone-700 shadow-sm">
+              {{ p.categoria }}
+            </span>
+
+            {% if stock_num <= 0 %} <span class="rounded-full bg-stone-900 px-3 py-1 text-xs font-medium text-white">
+              Agotado
+              </span>
+              {% elif stock_num < 20 %} <span
+                class="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-800">
+                Pocas piezas
                 </span>
-
-                {% if stock_num <= 0 %}
-                  <span class="rounded-full bg-stone-900 px-3 py-1 text-xs font-medium text-white">
-                    Agotado
-                  </span>
-                {% elif stock_num < 20 %}
-                  <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-800">
-                    Pocas piezas
-                  </span>
                 {% else %}
-                  <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-800">
-                    Disponible
-                  </span>
+                <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-800">
+                  Disponible
+                </span>
                 {% endif %}
-              </div>
+          </div>
+        </div>
+
+        <div class="p-6">
+          <h3 class="text-2xl font-medium leading-tight text-stone-900">{{ p.nombre }}</h3>
+          <p class="mt-3 min-h-[72px] text-sm leading-7 text-stone-600">
+            {{ p.descripcion or "Producto de marroquinería con diseño funcional y acabados de calidad." }}
+          </p>
+
+          <div class="mt-6 flex items-end justify-between gap-4">
+            <div>
+              <p class="text-3xl font-semibold text-stone-900">${{ "{:,.0f}".format(p.precio_venta|float) }}</p>
+              <p class="mt-1 text-sm text-stone-500">{{ p.stock_actual|num(0) }} disponibles</p>
             </div>
 
-            <div class="p-6">
-              <h3 class="text-2xl font-medium leading-tight text-stone-900">{{ p.nombre }}</h3>
-              <p class="mt-3 min-h-[72px] text-sm leading-7 text-stone-600">
-                {{ p.descripcion or "Producto de marroquinería con diseño funcional y acabados de calidad." }}
-              </p>
-
-              <div class="mt-6 flex items-end justify-between gap-4">
-                <div>
-                  <p class="text-3xl font-semibold text-stone-900">${{ "{:,.0f}".format(p.precio_venta|float) }}</p>
-                  <p class="mt-1 text-sm text-stone-500">{{ p.stock_actual|num(0) }} disponibles</p>
-                </div>
-
-                <form method="POST" action="{{ url_for('tienda.agregar_carrito', id_producto=p.id_producto) }}">
-                  <button
-                    type="submit"
-                    class="inline-flex items-center justify-center rounded-full bg-stone-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-stone-800"
-                    {% if stock_num <= 0 %}disabled{% endif %}
-                  >
-                    {% if stock_num <= 0 %}No disponible{% else %}Agregar{% endif %}
-                  </button>
-                </form>
-              </div>
-            </div>
-          </article>
-        {% endfor %}
-      </div>
+            <form method="POST" action="{{ url_for('tienda.agregar_carrito', id_producto=p.id_producto) }}">
+              <button type="submit"
+                class="inline-flex items-center justify-center rounded-full bg-stone-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-stone-800"
+                {% if stock_num <=0 %}disabled{% endif %}>
+                {% if stock_num <= 0 %}No disponible{% else %}Agregar{% endif %} </button>
+            </form>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
     {% else %}
-      <div class="mt-10 rounded-[32px] border border-stone-200 bg-white p-12 text-center">
-        <h3 class="text-2xl font-medium text-stone-900">No se encontraron productos</h3>
-        <p class="mt-3 text-stone-600">Prueba con otra búsqueda o cambia el filtro aplicado.</p>
-        <a href="{{ url_for('tienda.productos_publico') }}" class="mt-6 inline-flex rounded-full bg-stone-900 px-6 py-3 text-sm font-medium text-white hover:bg-stone-800">
-          Limpiar filtros
-        </a>
-      </div>
+    <div class="mt-10 rounded-[32px] border border-stone-200 bg-white p-12 text-center">
+      <h3 class="text-2xl font-medium text-stone-900">No se encontraron productos</h3>
+      <p class="mt-3 text-stone-600">Prueba con otra búsqueda o cambia el filtro aplicado.</p>
+      <a href="{{ url_for('tienda.productos_publico') }}"
+        class="mt-6 inline-flex rounded-full bg-stone-900 px-6 py-3 text-sm font-medium text-white hover:bg-stone-800">
+        Limpiar filtros
+      </a>
+    </div>
     {% endif %}
   </div>
 </section>

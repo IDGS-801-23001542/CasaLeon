@@ -75,16 +75,16 @@
     <table class="w-full table-fixed">
       <thead class="bg-gray-50 border-b border-gray-200">
         <tr class="text-left text-sm text-gray-600">
-          <th class="px-4 py-4 font-semibold w-[11%]">Folio</th>
-          <th class="px-4 py-4 font-semibold w-[9%]">Tipo</th>
-          <th class="px-4 py-4 font-semibold w-[14%]">Responsable</th>
-          <th class="px-4 py-4 font-semibold w-[11%]">Método</th>
+          <th class="px-4 py-4 font-semibold w-[10%]">Folio</th>
+          <th class="px-4 py-4 font-semibold w-[8%]">Tipo</th>
+          <th class="px-4 py-4 font-semibold w-[13%]">Responsable</th>
+          <th class="px-4 py-4 font-semibold w-[10%]">Método</th>
           <th class="px-4 py-4 font-semibold w-[9%]">Estado</th>
-          <th class="px-4 py-4 font-semibold w-[10%]">Total</th>
-          <th class="px-4 py-4 font-semibold w-[8%]">Productos</th>
-          <th class="px-4 py-4 font-semibold w-[14%]">Observaciones</th>
+          <th class="px-4 py-4 font-semibold w-[9%]">Total</th>
+          <th class="px-4 py-4 font-semibold w-[7%]">Productos</th>
+          <th class="px-4 py-4 font-semibold w-[12%]">Observaciones</th>
           <th class="px-4 py-4 font-semibold w-[12%]">Fecha</th>
-          <th class="px-4 py-4 font-semibold w-[8%] text-center">Detalle</th>
+          <th class="px-4 py-4 font-semibold w-[10%] text-center">Acción</th>
         </tr>
       </thead>
 
@@ -140,11 +140,23 @@
             </p>
           </td>
 
-          <td class="px-4 py-4 text-center">
-            <a href="{{ url_for('ventas.detalle_venta', tipo=registro.tipo, registro_id=registro.id) }}"
-              class="inline-flex items-center justify-center px-3 py-2 bg-blue-100 text-blue-700 rounded-xl hover:bg-blue-200 transition-colors text-sm">
-              Ver
-            </a>
+          <td class="px-4 py-4">
+            <div class="flex flex-col gap-2 items-center">
+              <a href="{{ url_for('ventas.detalle_venta', tipo=registro.tipo, registro_id=registro.id) }}"
+                class="inline-flex items-center justify-center px-3 py-2 bg-blue-100 text-blue-700 rounded-xl hover:bg-blue-200 transition-colors text-sm w-full">
+                Ver
+              </a>
+
+              {% if registro.tipo == "TIENDA" and (registro.estado or '')|lower != 'entregado' %}
+              <form method="POST" action="{{ url_for('ventas.marcar_pedido_entregado') }}" class="w-full">
+                <input type="hidden" name="id_pedido" value="{{ registro.id }}">
+                <button type="submit"
+                  class="w-full px-3 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors text-sm">
+                  Entregar
+                </button>
+              </form>
+              {% endif %}
+            </div>
           </td>
 
         </tr>

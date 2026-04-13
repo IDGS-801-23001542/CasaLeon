@@ -8,6 +8,7 @@ class Config:
     SESSION_COOKIE_SAMESITE = "Lax"
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    MYSQLDUMP_PATH= r"C:\Program Files\MySQL\MySQL Server 8.0\bin\mysqldump.exe"
 
     MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
     MONGO_DB_NAME = os.getenv("MONGO_DB_NAME", "casaleon_mongo")

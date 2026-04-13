@@ -874,16 +874,25 @@ class MateriaPrimaForm(FlaskForm):
             ),
         ],
     )
+
     id_categoria_materia_prima = SelectField(
         "Categoría",
         coerce=int,
         validators=[DataRequired(message="La categoría es requerida")],
         choices=[],
     )
+
     id_unidad_medida = SelectField(
         "Unidad de Medida",
         coerce=int,
         validators=[DataRequired(message="La unidad de medida es requerida")],
+        choices=[],
+    )
+
+    id_proveedor = SelectField(
+        "Proveedor",
+        coerce=int,
+        validators=[DataRequired(message="El proveedor es requerido")],
         choices=[],
     )
 

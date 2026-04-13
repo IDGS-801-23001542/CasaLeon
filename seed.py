@@ -337,7 +337,7 @@ def seed_productos():
             "Cartera Bifold Clásica",
             Decimal("899.00"),
             Decimal("18.00"),
-            "img/Producto1.jfif",
+            "https://res.cloudinary.com/dazwaorxw/image/upload/v1776031768/cartera_tfstrs.jpg",
         ),
         (
             "Monederos",
@@ -345,7 +345,7 @@ def seed_productos():
             "Monedero Compacto con Cierre",
             Decimal("429.00"),
             Decimal("28.00"),
-            "img/Producto2.jpeg",
+            "https://res.cloudinary.com/dazwaorxw/image/upload/v1776031768/monedero_lcrize.jpg",
         ),
         (
             "Tarjeteros",
@@ -353,7 +353,7 @@ def seed_productos():
             "Tarjetero Ejecutivo Slim",
             Decimal("359.00"),
             Decimal("26.00"),
-            "img/Producto2.jpeg",
+            "https://res.cloudinary.com/dazwaorxw/image/upload/v1776031768/tarjetero_s2sdli.jpg",
         ),
         (
             "Cinturones",
@@ -361,15 +361,15 @@ def seed_productos():
             "Cinturón Casual de Piel",
             Decimal("649.00"),
             Decimal("20.00"),
-            "img/Producto3.jpeg",
+            "https://res.cloudinary.com/dazwaorxw/image/upload/v1776031772/cinturon_wt16ky.jpg",
         ),
         (
             "Bolsas tote",
             "CL-TOT-001",
             "Bolsa Tote Siena",
             Decimal("1699.00"),
-            Decimal("12.00"),
-            "img/Producto1.jfif",
+            Decimal("11.00"),
+            "https://res.cloudinary.com/dazwaorxw/image/upload/v1776031380/bolsaTote_oy10p0.jpg",
         ),
         (
             "Bolsos de mano",
@@ -377,7 +377,7 @@ def seed_productos():
             "Bolso de Mano Verona",
             Decimal("1499.00"),
             Decimal("10.00"),
-            "img/Producto4.jpeg",
+            "https://res.cloudinary.com/dazwaorxw/image/upload/v1776031772/bolsoMano_hjkdkd.jpg",
         ),
         (
             "Mochilas",
@@ -385,7 +385,7 @@ def seed_productos():
             "Mochila Urbana de Piel",
             Decimal("2199.00"),
             Decimal("8.00"),
-            "img/Producto5.jpeg",
+            "https://res.cloudinary.com/dazwaorxw/image/upload/v1776031768/mochila_r8f2b2.jpg",
         ),
         (
             "Mariconeras",
@@ -393,7 +393,7 @@ def seed_productos():
             "Mariconera Crossbody",
             Decimal("1099.00"),
             Decimal("14.00"),
-            "img/Producto4.jpeg",
+            "https://res.cloudinary.com/dazwaorxw/image/upload/v1776031768/mariconera_uh5yja.jpg",
         ),
         (
             "Portafolios",
@@ -401,7 +401,7 @@ def seed_productos():
             "Portafolio Ejecutivo Premium",
             Decimal("2699.00"),
             Decimal("6.00"),
-            "img/Producto1.jfif",
+            "https://res.cloudinary.com/dazwaorxw/image/upload/v1776031768/portafolio_cav9al.jpg",
         ),
         (
             "Neceseres",
@@ -409,7 +409,7 @@ def seed_productos():
             "Neceser de Viaje",
             Decimal("649.00"),
             Decimal("22.00"),
-            "img/Producto5.jpeg",
+            "https://res.cloudinary.com/dazwaorxw/image/upload/v1776031767/neceser_ogn1ti.jpg",
         ),
         (
             "Fundas laptop",
@@ -417,7 +417,7 @@ def seed_productos():
             "Funda Laptop 15 Pulgadas",
             Decimal("1299.00"),
             Decimal("11.00"),
-            "img/Producto5.jpeg",
+            "https://res.cloudinary.com/dazwaorxw/image/upload/v1776031771/fundaLaptop_kys2db.jpg",
         ),
         (
             "Porta pasaportes",
@@ -425,15 +425,15 @@ def seed_productos():
             "Porta Pasaporte Atlas",
             Decimal("469.00"),
             Decimal("24.00"),
-            "img/Producto2.jpeg",
+            "https://res.cloudinary.com/dazwaorxw/image/upload/v1776031768/portaPasaporte_yfgmxa.jpg",
         ),
         (
             "Estuches lentes",
             "CL-EST-001",
             "Estuche para Lentes Soft Case",
             Decimal("399.00"),
-            Decimal("23.00"),
-            "img/Producto4.jpeg",
+            Decimal("22.00"),
+            "https://res.cloudinary.com/dazwaorxw/image/upload/v1776031771/estucheLentes_g2wsng.jpg",
         ),
         (
             "Llaveros",
@@ -441,7 +441,7 @@ def seed_productos():
             "Llavero de Piel Artesanal",
             Decimal("189.00"),
             Decimal("45.00"),
-            "img/Producto3.jpeg",
+            "https://res.cloudinary.com/dazwaorxw/image/upload/v1776031771/llavero_jawo3i.jpg",
         ),
         (
             "Pulseras",
@@ -449,7 +449,7 @@ def seed_productos():
             "Pulsera Trenzada de Piel",
             Decimal("249.00"),
             Decimal("34.00"),
-            "img/Producto3.jpeg",
+            "https://res.cloudinary.com/dazwaorxw/image/upload/v1776031768/pulsera_euavph.jpg",
         ),
     ]
 
@@ -475,11 +475,12 @@ def seed_productos():
 
 def seed_materias_primas():
     materias = [
-        # nombre, categoria, unidad, stock_actual, stock_minimo, costo_unit_prom, merma_pct
+        # nombre, categoria, unidad, proveedor, stock_actual, stock_minimo, costo_unit_prom, merma_pct
         (
             "Cuero vacuno liso color café",
             "Cuero",
             "dm2",
+            "Pieles y Acabados del Bajío",
             Decimal("950.00"),
             Decimal("120.00"),
             Decimal("29.50"),
@@ -489,6 +490,7 @@ def seed_materias_primas():
             "Cuero vacuno liso color negro",
             "Cuero",
             "dm2",
+            "Pieles y Acabados del Bajío",
             Decimal("1100.00"),
             Decimal("140.00"),
             Decimal("28.80"),
@@ -498,6 +500,7 @@ def seed_materias_primas():
             "Cuero vacuno graneado miel",
             "Cuero",
             "dm2",
+            "Pieles y Acabados del Bajío",
             Decimal("700.00"),
             Decimal("100.00"),
             Decimal("31.20"),
@@ -507,6 +510,7 @@ def seed_materias_primas():
             "Forro textil poliéster beige",
             "Forro",
             "m",
+            "Textiles y Forros del Centro",
             Decimal("180.00"),
             Decimal("25.00"),
             Decimal("42.00"),
@@ -516,6 +520,7 @@ def seed_materias_primas():
             "Forro textil poliéster negro",
             "Forro",
             "m",
+            "Textiles y Forros del Centro",
             Decimal("220.00"),
             Decimal("30.00"),
             Decimal("42.00"),
@@ -525,6 +530,7 @@ def seed_materias_primas():
             "Microfibra gamuzada camel",
             "Forro",
             "m",
+            "Textiles y Forros del Centro",
             Decimal("90.00"),
             Decimal("15.00"),
             Decimal("68.00"),
@@ -534,6 +540,7 @@ def seed_materias_primas():
             "Cierre metálico 20 cm níquel",
             "Herrajes",
             "pieza",
+            "Herrajes Finos de León",
             Decimal("350.00"),
             Decimal("60.00"),
             Decimal("8.50"),
@@ -543,6 +550,7 @@ def seed_materias_primas():
             "Cierre metálico 35 cm níquel",
             "Herrajes",
             "pieza",
+            "Herrajes Finos de León",
             Decimal("240.00"),
             Decimal("40.00"),
             Decimal("14.50"),
@@ -552,6 +560,7 @@ def seed_materias_primas():
             "Hebilla clásica para cinturón 40 mm",
             "Herrajes",
             "pieza",
+            "Herrajes Finos de León",
             Decimal("180.00"),
             Decimal("30.00"),
             Decimal("32.00"),
@@ -561,6 +570,7 @@ def seed_materias_primas():
             "Broche magnético 18 mm",
             "Herrajes",
             "pieza",
+            "Herrajes Finos de León",
             Decimal("420.00"),
             Decimal("80.00"),
             Decimal("6.80"),
@@ -570,6 +580,7 @@ def seed_materias_primas():
             "Argolla D 25 mm",
             "Herrajes",
             "pieza",
+            "Herrajes Finos de León",
             Decimal("300.00"),
             Decimal("50.00"),
             Decimal("4.20"),
@@ -579,6 +590,7 @@ def seed_materias_primas():
             "Remache doble cabeza 9 mm",
             "Herrajes",
             "pieza",
+            "Herrajes Finos de León",
             Decimal("1000.00"),
             Decimal("200.00"),
             Decimal("1.20"),
@@ -588,6 +600,7 @@ def seed_materias_primas():
             "Pegamento para cuero base solvente",
             "Químicos",
             "litro",
+            "Suministros Químicos Industriales MX",
             Decimal("55.00"),
             Decimal("8.00"),
             Decimal("118.00"),
@@ -597,6 +610,7 @@ def seed_materias_primas():
             "Tinta para canto color café",
             "Químicos",
             "litro",
+            "Suministros Químicos Industriales MX",
             Decimal("18.00"),
             Decimal("3.00"),
             Decimal("165.00"),
@@ -606,6 +620,7 @@ def seed_materias_primas():
             "Hilo encerado café 0.8 mm",
             "Costura",
             "m",
+            "Textiles y Forros del Centro",
             Decimal("8000.00"),
             Decimal("1200.00"),
             Decimal("0.55"),
@@ -615,6 +630,7 @@ def seed_materias_primas():
             "Hilo encerado negro 0.8 mm",
             "Costura",
             "m",
+            "Textiles y Forros del Centro",
             Decimal("8200.00"),
             Decimal("1200.00"),
             Decimal("0.55"),
@@ -624,6 +640,7 @@ def seed_materias_primas():
             "Espuma laminada 3 mm",
             "Refuerzo",
             "m",
+            "Textiles y Forros del Centro",
             Decimal("110.00"),
             Decimal("15.00"),
             Decimal("36.00"),
@@ -633,6 +650,7 @@ def seed_materias_primas():
             "Entretela rígida adhesiva",
             "Refuerzo",
             "m",
+            "Textiles y Forros del Centro",
             Decimal("130.00"),
             Decimal("20.00"),
             Decimal("24.00"),
@@ -642,6 +660,7 @@ def seed_materias_primas():
             "Caja kraft mediana",
             "Empaque",
             "pieza",
+            "Empaques y Accesorios de Piel Occidente",
             Decimal("250.00"),
             Decimal("50.00"),
             Decimal("11.50"),
@@ -651,6 +670,7 @@ def seed_materias_primas():
             "Bolsa cubrepolvo de tela",
             "Empaque",
             "pieza",
+            "Empaques y Accesorios de Piel Occidente",
             Decimal("180.00"),
             Decimal("40.00"),
             Decimal("9.80"),
@@ -662,6 +682,7 @@ def seed_materias_primas():
         nombre,
         categoria_nombre,
         unidad_nombre,
+        proveedor_nombre,
         stock,
         minimo,
         costo,
@@ -671,12 +692,23 @@ def seed_materias_primas():
             nombre=categoria_nombre
         ).first()
         unidad = UnidadMedida.query.filter_by(nombre=unidad_nombre).first()
+        proveedor = Proveedor.query.filter_by(nombre=proveedor_nombre).first()
+
+        if not categoria:
+            raise ValueError(f"No existe la categoría: {categoria_nombre}")
+
+        if not unidad:
+            raise ValueError(f"No existe la unidad de medida: {unidad_nombre}")
+
+        if not proveedor:
+            raise ValueError(f"No existe el proveedor: {proveedor_nombre}")
 
         db.session.add(
             MateriaPrima(
                 nombre=nombre,
                 id_categoria_materia_prima=categoria.id_categoria_materia_prima,
                 id_unidad_medida=unidad.id_unidad_medida,
+                id_proveedor=proveedor.id_proveedor,
                 stock_actual=stock,
                 stock_minimo=minimo,
                 costo_unit_prom=costo,

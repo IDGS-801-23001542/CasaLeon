@@ -49,21 +49,13 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {{ ui.field(form.nombre, placeholder="Nombre completo") }}
                 {{ ui.field(form.email, placeholder="correo@casaleon.com", type="email") }}
-                {{ ui.field(form.telefono, placeholder="4771234567", inputmode="numeric") }}
+                {{ ui.field(form.telefono, placeholder="4771234567", inputmode="numeric", maxlength="10",
+                pattern="[0-9]*") }}
                 {{ ui.select_field(form.rol) }}
+                {{ ui.field(form.password, placeholder="Déjala vacía si no deseas cambiarla", type="password") }}
                 {{ ui.select_field(form.activo) }}
-
-                <div class="md:col-span-2">
-                    {{ ui.field(form.password, placeholder="Déjala vacía si no deseas cambiarla", type="password") }}
-                </div>
             </div>
 
-            <div class="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3">
-                <p class="text-sm text-blue-700">
-                    La contraseña solo se actualizará si escribes una nueva. El teléfono debe contener únicamente
-                    números.
-                </p>
-            </div>
 
             <div class="flex flex-col sm:flex-row gap-3 pt-2">
                 <a href="{{ url_for('usuarios.listado_usuarios') }}"

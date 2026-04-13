@@ -151,52 +151,8 @@
         Guardar estado
       </button>
     </form>
+
   </div>
-
-  {% if merma_db.estado == "DISPONIBLE" %}
-  <div class="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
-    <h2 class="text-2xl font-bold text-gray-800 mb-4">Vender merma</h2>
-
-    <form
-      method="POST"
-      action="{{ url_for('merma.vender_merma', id_merma=merma_db.id_merma) }}"
-      class="grid grid-cols-1 md:grid-cols-3 gap-4"
-    >
-      <div>
-        <label class="block mb-2 text-sm font-medium text-gray-900">Método de pago</label>
-        <select
-          name="metodo_pago"
-          class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        >
-          <option value="EFECTIVO">EFECTIVO</option>
-          <option value="TARJETA">TARJETA</option>
-          <option value="TRANSFERENCIA">TRANSFERENCIA</option>
-          <option value="MIXTO">MIXTO</option>
-        </select>
-      </div>
-
-      <div class="md:col-span-2">
-        <label class="block mb-2 text-sm font-medium text-gray-900">Observaciones</label>
-        <input
-          type="text"
-          name="observaciones"
-          placeholder="Observaciones opcionales de la venta"
-          class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-
-      <div class="md:col-span-3">
-        <button
-          type="submit"
-          class="px-4 py-3 bg-emerald-600 text-white rounded-xl hover:shadow-lg transition-all"
-        >
-          Vender esta merma
-        </button>
-      </div>
-    </form>
-  </div>
-  {% endif %}
 
 </div>
 {% endblock %}

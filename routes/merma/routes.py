@@ -1,52 +1,22 @@
-from flask import Blueprint
-
-merma = Blueprint(
-    "merma",
-    __name__,
-    template_folder="templates",
-    static_folder="static",
-)
-
-from . import routes
 import csv
-import datetime
 from io import StringIO
 from decimal import Decimal
-from flask import render_template, request, redirect, url_for, flash, make_response, g
+
+from flask import render_template, request, redirect, url_for, flash, make_response
 from sqlalchemy import or_
 
-from models import db, Merma, MermaDetalle, Venta, VentaDetalle
+from models import db, Merma, MermaDetalle
 from utils.auth import login_required
 from utils.audit import log_event
 from . import merma
 
 
-ESTADOS_VALIDOS = ["DISPONIBLE", "REUTILIZADA", "VENDIDA", "DESECHADA"]
+ESTADOS_VALIDOS = ["DISPONIBLE", "REUTILIZADA", "DESECHADA", "VENDIDA"]
 TIPOS_VALIDOS = ["RECUPERABLE", "NO_RECUPERABLE"]
 
 
 def money(value):
     return f"{float(value or 0):,.2f}"
-
-
-def generar_folio_venta_merma():
-    ahora = datetime.datetime.now()
-    base = ahora.strftime("VEN%Y%m%d")
-    ultima = (
-        Venta.query
-        .filter(Venta.folio.like(f"{base}%"))
-        .order_by(Venta.id_venta.desc())
-        .first()
-    )
-
-    consecutivo = 1
-    if ultima and ultima.folio:
-        try:
-            consecutivo = int(ultima.folio.split("-")[-1]) + 1
-        except Exception:
-            consecutivo = 1
-
-    return f"{base}-{consecutivo:04d}"
 
 
 @merma.route("/private/merma")
@@ -66,13 +36,17 @@ def listado_merma():
 
     if q:
         like_term = f"%{q}%"
-        query = query.join(Merma.detalles).filter(
-            or_(
-                Merma.observaciones.ilike(like_term),
-                MermaDetalle.materia_prima_nombre.ilike(like_term),
-                MermaDetalle.clasificacion.ilike(like_term),
+        query = (
+            query.join(Merma.detalles)
+            .filter(
+                or_(
+                    Merma.observaciones.ilike(like_term),
+                    MermaDetalle.materia_prima_nombre.ilike(like_term),
+                    MermaDetalle.clasificacion.ilike(like_term),
+                )
             )
-        ).distinct()
+            .distinct()
+        )
 
     mermas_db = query.order_by(Merma.creado_en.desc(), Merma.id_merma.desc()).all()
 
@@ -167,96 +141,7 @@ def actualizar_estado_merma(id_merma):
     )
 
     flash("Estado de merma actualizado correctamente.", "success")
-    return redirect(url_for("merma.detalle_merma", id_merma=id_merma))
-
-
-@merma.route("/private/merma/<int:id_merma>/vender", methods=["POST"])
-@login_required(["ADMIN", "EMPLEADO"])
-def vender_merma(id_merma):
-    merma_db = Merma.query.filter_by(id_merma=id_merma).first()
-
-    if not merma_db:
-        flash("Registro de merma no encontrado.", "danger")
-        return redirect(url_for("merma.listado_merma"))
-
-    if merma_db.estado != "DISPONIBLE":
-        flash("Solo se puede vender merma disponible.", "warning")
-        return redirect(url_for("merma.detalle_merma", id_merma=id_merma))
-
-    metodo_pago = (request.form.get("metodo_pago") or "EFECTIVO").strip().upper()
-    observaciones = (request.form.get("observaciones") or "").strip()
-    usuario_id = getattr(g.user, "id_usuario", None)
-
-    if not usuario_id:
-        flash("No se pudo identificar al usuario actual.", "danger")
-        return redirect(url_for("merma.detalle_merma", id_merma=id_merma))
-
-    if metodo_pago not in ["EFECTIVO", "TARJETA", "TRANSFERENCIA", "MIXTO"]:
-        flash("Método de pago inválido.", "danger")
-        return redirect(url_for("merma.detalle_merma", id_merma=id_merma))
-
-    total = Decimal("0")
-    lineas = []
-
-    for detalle in merma_db.detalles:
-        precio_unitario = Decimal(str(detalle.valor_estimado_unit or 0))
-        cantidad = Decimal(str(detalle.cantidad or 0))
-        subtotal = precio_unitario * cantidad
-        total += subtotal
-
-        lineas.append({
-            "producto_nombre": f"MERMA - {detalle.materia_prima_nombre}",
-            "cantidad": cantidad,
-            "precio_unitario": precio_unitario,
-            "subtotal": subtotal,
-        })
-
-    if not lineas:
-        flash("La merma no tiene detalles para vender.", "warning")
-        return redirect(url_for("merma.detalle_merma", id_merma=id_merma))
-
-    venta_db = Venta(
-        folio=generar_folio_venta_merma(),
-        id_usuario=usuario_id,
-        total=total,
-        metodo_pago=metodo_pago,
-        observaciones=observaciones or f"Venta de merma #{merma_db.id_merma}",
-    )
-    db.session.add(venta_db)
-    db.session.flush()
-
-    for item in lineas:
-        detalle_venta = VentaDetalle(
-            id_venta=venta_db.id_venta,
-            id_producto=None,
-            producto_nombre=item["producto_nombre"],
-            precio_unitario=item["precio_unitario"],
-            cantidad=item["cantidad"],
-            subtotal=item["subtotal"],
-        )
-        db.session.add(detalle_venta)
-
-    merma_db.estado = "VENDIDA"
-    db.session.add(merma_db)
-
-    db.session.commit()
-
-    log_event(
-        modulo="Merma",
-        accion="Merma vendida",
-        detalle=f"Merma #{merma_db.id_merma} vendida en la venta {venta_db.folio} por total ${venta_db.total}",
-        severidad="INFO",
-    )
-
-    log_event(
-        modulo="Ventas",
-        accion="Venta de merma procesada",
-        detalle=f"Venta {venta_db.folio} generada a partir de la merma #{merma_db.id_merma}",
-        severidad="INFO",
-    )
-
-    flash("Merma vendida correctamente.", "success")
-    return redirect(url_for("ventas.detalle_venta", id_venta=venta_db.id_venta))
+    return redirect(url_for("merma.listado_merma"))
 
 
 @merma.route("/private/merma/export")
@@ -276,13 +161,17 @@ def exportar_merma():
 
     if q:
         like_term = f"%{q}%"
-        query = query.join(Merma.detalles).filter(
-            or_(
-                Merma.observaciones.ilike(like_term),
-                MermaDetalle.materia_prima_nombre.ilike(like_term),
-                MermaDetalle.clasificacion.ilike(like_term),
+        query = (
+            query.join(Merma.detalles)
+            .filter(
+                or_(
+                    Merma.observaciones.ilike(like_term),
+                    MermaDetalle.materia_prima_nombre.ilike(like_term),
+                    MermaDetalle.clasificacion.ilike(like_term),
+                )
             )
-        ).distinct()
+            .distinct()
+        )
 
     mermas_db = query.order_by(Merma.creado_en.desc(), Merma.id_merma.desc()).all()
 

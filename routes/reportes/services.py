@@ -2,6 +2,8 @@ import hashlib
 import json
 from datetime import datetime, timedelta
 
+from sqlalchemy import func
+
 from models import db, Pedido, PedidoDetalle
 from mongo import get_mongo_db
 
@@ -33,6 +35,21 @@ def _normalize_range(start_date, end_date):
     return start_date, end_date
 
 
+def _safe_float(value, default=0.0):
+    try:
+        return float(value or 0)
+    except Exception:
+        return default
+
+
+def _snapshot_payload_for_hash(snapshot_data):
+    return {
+        "report_date": snapshot_data.get("report_date"),
+        "summary": snapshot_data.get("summary", {}),
+        "top_products": snapshot_data.get("top_products", []),
+    }
+
+
 # =========================
 # QUERY SQL
 # =========================
@@ -54,46 +71,133 @@ def get_sales_data_by_day(fecha):
             PedidoDetalle.subtotal,
         )
         .join(PedidoDetalle, Pedido.id_pedido == PedidoDetalle.id_pedido)
-        .filter(Pedido.estado == "Entregado")
+        .filter(func.lower(func.trim(Pedido.estado)) == "entregado")
         .filter(Pedido.creado_en >= start)
         .filter(Pedido.creado_en <= end)
+        .order_by(Pedido.id_pedido.asc(), PedidoDetalle.id_pedido_detalle.asc())
     )
 
     return query.all()
 
 
+def get_sales_summary_by_range(start_date, end_date):
+    start_date, end_date = _normalize_range(start_date, end_date)
+
+    start = datetime.combine(start_date, datetime.min.time())
+    end = datetime.combine(end_date, datetime.max.time())
+
+    pedidos = (
+        Pedido.query.filter(func.lower(func.trim(Pedido.estado)) == "entregado")
+        .filter(Pedido.creado_en >= start)
+        .filter(Pedido.creado_en <= end)
+        .all()
+    )
+
+    total_sales = sum(_safe_float(p.total) for p in pedidos)
+    total_orders = len(pedidos)
+
+    return {
+        "total_sales": round(total_sales, 2),
+        "total_orders": total_orders,
+    }
+
+
+def get_top_products_by_range(start_date, end_date):
+    start_date, end_date = _normalize_range(start_date, end_date)
+
+    start = datetime.combine(start_date, datetime.min.time())
+    end = datetime.combine(end_date, datetime.max.time())
+
+    results = (
+        db.session.query(
+            PedidoDetalle.id_producto,
+            PedidoDetalle.producto_nombre,
+            func.sum(PedidoDetalle.cantidad).label("cantidad"),
+            func.sum(PedidoDetalle.subtotal).label("monto"),
+        )
+        .join(Pedido, Pedido.id_pedido == PedidoDetalle.id_pedido)
+        .filter(func.lower(func.trim(Pedido.estado)) == "entregado")
+        .filter(Pedido.creado_en >= start)
+        .filter(Pedido.creado_en <= end)
+        .group_by(PedidoDetalle.id_producto, PedidoDetalle.producto_nombre)
+        .order_by(
+            func.sum(PedidoDetalle.cantidad).desc(),
+            func.sum(PedidoDetalle.subtotal).desc(),
+        )
+        .limit(5)
+        .all()
+    )
+
+    top_products = []
+
+    for r in results:
+        cantidad = _safe_float(r.cantidad)
+        monto = _safe_float(r.monto)
+
+        if monto <= 0:
+            monto = 0.0
+
+        top_products.append(
+            {
+                "id_producto": r.id_producto,
+                "nombre": (r.producto_nombre or "Producto sin nombre").strip(),
+                "cantidad_vendida": round(cantidad, 4),
+                "monto_vendido": round(monto, 2),
+            }
+        )
+
+    return top_products
+
+
 # =========================
-# CÁLCULOS
+# CÁLCULOS SNAPSHOT
 # =========================
 
 
 def build_snapshot_structure(rows, fecha):
-    total_sales = 0
+    total_sales = 0.0
     pedidos_ids = set()
     productos = {}
 
     for r in rows:
         pedidos_ids.add(r.id_pedido)
-        total_sales += float(r.subtotal or 0)
 
-        key = r.id_producto
+        cantidad = _safe_float(r.cantidad)
+        precio_unitario = _safe_float(r.precio_unitario)
+        subtotal = _safe_float(r.subtotal)
+
+        if subtotal <= 0 and cantidad > 0 and precio_unitario > 0:
+            subtotal = cantidad * precio_unitario
+
+        total_sales += subtotal
+
+        key = (
+            r.id_producto
+            if r.id_producto is not None
+            else f"sin_id::{r.producto_nombre or 'SIN_NOMBRE'}"
+        )
+        nombre_producto = (r.producto_nombre or "Producto sin nombre").strip()
 
         if key not in productos:
             productos[key] = {
                 "id_producto": r.id_producto,
-                "nombre": r.producto_nombre,
-                "cantidad_vendida": 0,
-                "monto_vendido": 0,
+                "nombre": nombre_producto,
+                "cantidad_vendida": 0.0,
+                "monto_vendido": 0.0,
             }
 
-        productos[key]["cantidad_vendida"] += float(r.cantidad or 0)
-        productos[key]["monto_vendido"] += float(r.subtotal or 0)
+        productos[key]["cantidad_vendida"] += cantidad
+        productos[key]["monto_vendido"] += subtotal
 
     top_productos = sorted(
         productos.values(),
         key=lambda x: (x["cantidad_vendida"], x["monto_vendido"]),
         reverse=True,
     )[:5]
+
+    for item in top_productos:
+        item["cantidad_vendida"] = round(item["cantidad_vendida"], 4)
+        item["monto_vendido"] = round(item["monto_vendido"], 2)
 
     return {
         "report_date": fecha.strftime("%Y-%m-%d"),
@@ -112,8 +216,9 @@ def build_snapshot_structure(rows, fecha):
 
 
 def generate_hash(snapshot_data):
-    data_string = json.dumps(snapshot_data, sort_keys=True)
-    return hashlib.sha256(data_string.encode()).hexdigest()
+    payload = _snapshot_payload_for_hash(snapshot_data)
+    data_string = json.dumps(payload, sort_keys=True, ensure_ascii=False)
+    return hashlib.sha256(data_string.encode("utf-8")).hexdigest()
 
 
 # =========================
@@ -174,9 +279,7 @@ def generate_daily_snapshot(fecha):
     fecha_str = fecha.strftime("%Y-%m-%d")
 
     rows = get_sales_data_by_day(fecha)
-
     snapshot = build_snapshot_structure(rows, fecha)
-
     hash_value = generate_hash(snapshot)
 
     existing = get_existing_snapshot(fecha_str)
@@ -249,10 +352,7 @@ def build_line_chart_data(start_date, end_date):
 
     max_sales = max((item["total_sales"] for item in full_series), default=0)
 
-    if total_days == 1:
-        step_x = 0
-    else:
-        step_x = (width - (padding_x * 2)) / (total_days - 1)
+    step_x = 0 if total_days == 1 else (width - (padding_x * 2)) / (total_days - 1)
 
     points = []
     polyline_parts = []

@@ -24,13 +24,25 @@ def cargar_catalogos_materia_prima(form):
         .all()
     )
     unidades = (
-        UnidadMedida.query.filter_by(activo=1).order_by(UnidadMedida.nombre.asc()).all()
+        UnidadMedida.query.filter_by(activo=1)
+        .order_by(UnidadMedida.nombre.asc())
+        .all()
+    )
+    proveedores = (
+        Proveedor.query.filter_by(activo=1)
+        .order_by(Proveedor.nombre.asc())
+        .all()
     )
 
     form.id_categoria_materia_prima.choices = [
         (c.id_categoria_materia_prima, c.nombre) for c in categorias
     ]
-    form.id_unidad_medida.choices = [(u.id_unidad_medida, u.nombre) for u in unidades]
+    form.id_unidad_medida.choices = [
+        (u.id_unidad_medida, u.nombre) for u in unidades
+    ]
+    form.id_proveedor.choices = [
+        (p.id_proveedor, p.nombre) for p in proveedores
+    ]
 
 
 def obtener_proveedores_activos():
@@ -46,7 +58,12 @@ def materia_prima_view():
     proveedores_db = obtener_proveedores_activos()
     search = request.args.get("search", "").strip()
 
-    query = MateriaPrima.query.join(CategoriaMateriaPrima).join(UnidadMedida)
+    query = (
+        MateriaPrima.query
+        .join(CategoriaMateriaPrima)
+        .join(UnidadMedida)
+        .join(Proveedor, MateriaPrima.id_proveedor == Proveedor.id_proveedor)
+    )
 
     if search:
         like_term = f"%{search}%"
@@ -55,6 +72,7 @@ def materia_prima_view():
                 MateriaPrima.nombre.ilike(like_term),
                 CategoriaMateriaPrima.nombre.ilike(like_term),
                 UnidadMedida.nombre.ilike(like_term),
+                Proveedor.nombre.ilike(like_term),
             )
         )
 
@@ -125,10 +143,23 @@ def crear_materia_prima():
                     form=create_form,
                 )
 
+            proveedor_db = Proveedor.query.filter_by(
+                id_proveedor=create_form.id_proveedor.data,
+                activo=1,
+            ).first()
+
+            if not proveedor_db:
+                flash("El proveedor seleccionado no es válido.", "danger")
+                return render_template(
+                    "private/materia_prima/materia_prima_create.html",
+                    form=create_form,
+                )
+
             materia_db = MateriaPrima(
                 nombre=nombre,
                 id_categoria_materia_prima=create_form.id_categoria_materia_prima.data,
                 id_unidad_medida=create_form.id_unidad_medida.data,
+                id_proveedor=create_form.id_proveedor.data,
                 stock_actual=create_form.stock_actual.data,
                 stock_minimo=create_form.stock_minimo.data,
                 costo_unit_prom=create_form.costo_unit_prom.data,
@@ -142,8 +173,8 @@ def crear_materia_prima():
                 modulo="Inventario",
                 accion="Materia prima creada",
                 detalle=(
-                    f"Materia prima '{materia_db.nombre}' creada con stock "
-                    f"{materia_db.stock_actual} "
+                    f"Materia prima '{materia_db.nombre}' creada con proveedor "
+                    f"'{proveedor_db.nombre}', stock {materia_db.stock_actual} "
                     f"{materia_db.unidad_medida_rel.nombre if materia_db.unidad_medida_rel else ''}"
                 ),
                 severidad="INFO",
@@ -181,9 +212,11 @@ def actualizar_materia_prima():
             materia_db.id_categoria_materia_prima
         )
         create_form.id_unidad_medida.data = materia_db.id_unidad_medida
+        create_form.id_proveedor.data = materia_db.id_proveedor
         create_form.stock_actual.data = materia_db.stock_actual
         create_form.stock_minimo.data = materia_db.stock_minimo
         create_form.costo_unit_prom.data = materia_db.costo_unit_prom
+        create_form.activo.data = materia_db.activo
 
         return render_template(
             "private/materia_prima/materia_prima_update.html",
@@ -207,14 +240,29 @@ def actualizar_materia_prima():
                 materia_db=materia_db,
             )
 
+        proveedor_db = Proveedor.query.filter_by(
+            id_proveedor=create_form.id_proveedor.data,
+            activo=1,
+        ).first()
+
+        if not proveedor_db:
+            flash("El proveedor seleccionado no es válido.", "danger")
+            return render_template(
+                "private/materia_prima/materia_prima_update.html",
+                form=create_form,
+                materia_db=materia_db,
+            )
+
         materia_db.nombre = nombre
         materia_db.id_categoria_materia_prima = (
             create_form.id_categoria_materia_prima.data
         )
         materia_db.id_unidad_medida = create_form.id_unidad_medida.data
+        materia_db.id_proveedor = create_form.id_proveedor.data
         materia_db.stock_actual = create_form.stock_actual.data
         materia_db.stock_minimo = create_form.stock_minimo.data
         materia_db.costo_unit_prom = create_form.costo_unit_prom.data
+        materia_db.activo = create_form.activo.data
 
         db.session.add(materia_db)
         db.session.commit()
@@ -222,7 +270,10 @@ def actualizar_materia_prima():
         log_event(
             modulo="Inventario",
             accion="Materia prima actualizada",
-            detalle=f"Materia prima '{materia_db.nombre}' actualizada",
+            detalle=(
+                f"Materia prima '{materia_db.nombre}' actualizada con proveedor "
+                f"'{proveedor_db.nombre}'"
+            ),
             severidad="INFO",
         )
 
@@ -259,9 +310,11 @@ def eliminar_materia_prima():
             materia_db.id_categoria_materia_prima
         )
         create_form.id_unidad_medida.data = materia_db.id_unidad_medida
+        create_form.id_proveedor.data = materia_db.id_proveedor
         create_form.stock_actual.data = materia_db.stock_actual
         create_form.stock_minimo.data = materia_db.stock_minimo
         create_form.costo_unit_prom.data = materia_db.costo_unit_prom
+        create_form.activo.data = materia_db.activo
 
         return render_template(
             "private/materia_prima/materia_prima_delete.html",

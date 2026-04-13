@@ -15,7 +15,6 @@ class Rol(db.Model):
         return f"<Rol {self.codigo}>"
 
 
-
 class Usuario(db.Model):
     __tablename__ = "Usuario"
 
@@ -129,9 +128,15 @@ class Producto(db.Model):
     imagen = db.Column(db.String(255))
 
     recetas = db.relationship("Receta", backref="producto_ref", lazy=True)
-    pedidos_detalle = db.relationship("PedidoDetalle", backref="producto_ref_pedido", lazy=True)
-    ventas_detalle = db.relationship("VentaDetalle", backref="producto_ref_venta", lazy=True)
-    ordenes_produccion = db.relationship("OrdenProduccion", backref="producto_ref_orden", lazy=True)
+    pedidos_detalle = db.relationship(
+        "PedidoDetalle", backref="producto_ref_pedido", lazy=True
+    )
+    ventas_detalle = db.relationship(
+        "VentaDetalle", backref="producto_ref_venta", lazy=True
+    )
+    ordenes_produccion = db.relationship(
+        "OrdenProduccion", backref="producto_ref_orden", lazy=True
+    )
 
     def __repr__(self):
         return f"<Producto {self.id_producto} - {self.nombre}>"
@@ -141,7 +146,9 @@ class Pedido(db.Model):
     __tablename__ = "pedidos"
 
     id_pedido = db.Column(db.Integer, primary_key=True)
-    id_cliente = db.Column(db.Integer, db.ForeignKey("Cliente.id_cliente"), nullable=False)
+    id_cliente = db.Column(
+        db.Integer, db.ForeignKey("Cliente.id_cliente"), nullable=False
+    )
 
     folio = db.Column(db.String(30), unique=True, nullable=False)
     estado = db.Column(db.String(30), nullable=False, default="Pendiente")
@@ -175,8 +182,12 @@ class PedidoDetalle(db.Model):
     __tablename__ = "pedido_detalles"
 
     id_pedido_detalle = db.Column(db.Integer, primary_key=True)
-    id_pedido = db.Column(db.Integer, db.ForeignKey("pedidos.id_pedido"), nullable=False)
-    id_producto = db.Column(db.Integer, db.ForeignKey("productos.id_producto"), nullable=False)
+    id_pedido = db.Column(
+        db.Integer, db.ForeignKey("pedidos.id_pedido"), nullable=False
+    )
+    id_producto = db.Column(
+        db.Integer, db.ForeignKey("productos.id_producto"), nullable=False
+    )
 
     producto_nombre = db.Column(db.String(120), nullable=False)
     precio_unitario = db.Column(db.Numeric(12, 2), nullable=False)
@@ -194,7 +205,9 @@ class Venta(db.Model):
 
     id_venta = db.Column(db.Integer, primary_key=True)
     folio = db.Column(db.String(30), unique=True, nullable=False)
-    id_usuario = db.Column(db.Integer, db.ForeignKey("Usuario.id_usuario"), nullable=False)
+    id_usuario = db.Column(
+        db.Integer, db.ForeignKey("Usuario.id_usuario"), nullable=False
+    )
     total = db.Column(db.Numeric(12, 2), nullable=False, default=0)
     metodo_pago = db.Column(db.String(30), nullable=False, default="EFECTIVO")
     observaciones = db.Column(db.String(255))
@@ -217,7 +230,9 @@ class VentaDetalle(db.Model):
 
     id_venta_detalle = db.Column(db.Integer, primary_key=True)
     id_venta = db.Column(db.Integer, db.ForeignKey("ventas.id_venta"), nullable=False)
-    id_producto = db.Column(db.Integer, db.ForeignKey("productos.id_producto"), nullable=False)
+    id_producto = db.Column(
+        db.Integer, db.ForeignKey("productos.id_producto"), nullable=False
+    )
     producto_nombre = db.Column(db.String(120), nullable=False)
     precio_unitario = db.Column(db.Numeric(12, 2), nullable=False, default=0)
     cantidad = db.Column(db.Numeric(14, 2), nullable=False, default=1)
@@ -239,7 +254,9 @@ class CategoriaMateriaPrima(db.Model):
     materias_primas = db.relationship("MateriaPrima", backref="categoria_mp", lazy=True)
 
     def __repr__(self):
-        return f"<CategoriaMateriaPrima {self.id_categoria_materia_prima} - {self.nombre}>"
+        return (
+            f"<CategoriaMateriaPrima {self.id_categoria_materia_prima} - {self.nombre}>"
+        )
 
 
 class UnidadMedida(db.Model):
@@ -249,7 +266,9 @@ class UnidadMedida(db.Model):
     nombre = db.Column(db.String(20), nullable=False, unique=True)
     activo = db.Column(db.Integer, nullable=False, default=1)
 
-    materias_primas = db.relationship("MateriaPrima", backref="unidad_medida_rel", lazy=True)
+    materias_primas = db.relationship(
+        "MateriaPrima", backref="unidad_medida_rel", lazy=True
+    )
 
     def __repr__(self):
         return f"<UnidadMedida {self.id_unidad_medida} - {self.nombre}>"
@@ -273,18 +292,31 @@ class MateriaPrima(db.Model):
         nullable=False,
     )
 
+    id_proveedor = db.Column(
+        db.Integer,
+        db.ForeignKey("proveedores.id_proveedor"),
+        nullable=False,
+    )
+
     stock_actual = db.Column(db.Numeric(14, 2), nullable=False, default=0)
     stock_minimo = db.Column(db.Numeric(14, 2), nullable=False, default=0)
     costo_unit_prom = db.Column(db.Numeric(12, 2), nullable=False, default=None)
     merma_pct = db.Column(db.Numeric(5, 2), nullable=True, default=0)
     activo = db.Column(db.Integer, nullable=False, default=1)
 
-    receta_detalles = db.relationship("RecetaDetalle", backref="materia_prima_ref_receta", lazy=True)
-    ordenes_detalle = db.relationship("OrdenProduccionDetalle", backref="materia_prima_ref_orden", lazy=True)
-    mermas_detalle = db.relationship("MermaDetalle", backref="materia_prima_ref_merma", lazy=True)
+    receta_detalles = db.relationship(
+        "RecetaDetalle", backref="materia_prima_ref_receta", lazy=True
+    )
+    ordenes_detalle = db.relationship(
+        "OrdenProduccionDetalle", backref="materia_prima_ref_orden", lazy=True
+    )
+    mermas_detalle = db.relationship(
+        "MermaDetalle", backref="materia_prima_ref_merma", lazy=True
+    )
 
     def __repr__(self):
         return f"<MateriaPrima {self.id_materia_prima} - {self.nombre}>"
+
 
 class MovimientoMateriaPrima(db.Model):
     __tablename__ = "movimientos_materia_prima"
@@ -312,15 +344,18 @@ class MovimientoMateriaPrima(db.Model):
     proveedor = db.relationship("Proveedor")
 
     def __repr__(self):
-        return f"<MovimientoMateriaPrima {self.id_movimiento_materia_prima} - {self.tipo}>"
-
+        return (
+            f"<MovimientoMateriaPrima {self.id_movimiento_materia_prima} - {self.tipo}>"
+        )
 
 
 class Receta(db.Model):
     __tablename__ = "recetas"
 
     id_receta = db.Column(db.Integer, primary_key=True)
-    id_producto = db.Column(db.Integer, db.ForeignKey("productos.id_producto"), nullable=True, unique=True)
+    id_producto = db.Column(
+        db.Integer, db.ForeignKey("productos.id_producto"), nullable=True, unique=True
+    )
     nombre = db.Column(db.String(150), nullable=False)
     rendimiento = db.Column(db.Numeric(14, 2), nullable=False, default=1)
     costo_estimado = db.Column(db.Numeric(12, 2), nullable=False, default=0)
@@ -343,8 +378,12 @@ class RecetaDetalle(db.Model):
     __tablename__ = "receta_detalles"
 
     id_receta_detalle = db.Column(db.Integer, primary_key=True)
-    id_receta = db.Column(db.Integer, db.ForeignKey("recetas.id_receta"), nullable=False)
-    id_materia_prima = db.Column(db.Integer, db.ForeignKey("materias_primas.id_materia_prima"), nullable=False)
+    id_receta = db.Column(
+        db.Integer, db.ForeignKey("recetas.id_receta"), nullable=False
+    )
+    id_materia_prima = db.Column(
+        db.Integer, db.ForeignKey("materias_primas.id_materia_prima"), nullable=False
+    )
     cantidad = db.Column(db.Numeric(14, 2), nullable=False, default=0)
 
     materia_prima = db.relationship("MateriaPrima")
@@ -492,7 +531,8 @@ class AuditoriaLog(db.Model):
 
     def __repr__(self):
         return f"<AuditoriaLog {self.id_log} - {self.modulo} - {self.accion}>"
-    
+
+
 class Lote(db.Model):
     __tablename__ = "lotes"
 
