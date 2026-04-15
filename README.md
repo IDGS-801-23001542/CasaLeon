@@ -1,53 +1,44 @@
-# CasaLeon
-Proyecto Integrador IDGS801
+## Estado del proyecto
 
-# Casa León — Sistema Integral de Gestión para Marroquinería (IDGS801)
+✅ Proyecto finalizado
 
-Plataforma web para la gestión operativa y comercial de una fábrica de marroquinería en León, Guanajuato.  
-Integra dos entornos conectados:
+Casa León se encuentra completamente desarrollado como un sistema integral funcional que cubre:
 
-- **Tienda (Cliente):** catálogo, registro/login, carrito/checkout simulado, historial de pedidos.
-- **Backoffice (Staff):** panel de administración/empleado, ventas POS, pedidos, inventario, producción y reportes.
+- Gestión de compras de materia prima
+- Inventario tipo Kardex (MP y PT)
+- Producción basada en recetas (BOM)
+- Ventas internas (POS)
+- Tienda en línea (catálogo, carrito, pedidos)
+- Reportes e indicadores
+- Auditoría y trazabilidad
+- Seguridad (roles, sesiones, validaciones, CSRF)
+- Integración de autenticación avanzada (2FA y OAuth)
 
----
-
-## Estado actual (avance)
-✅ Base de datos MySQL en 3FN con inventario tipo Kardex + triggers.  
-✅ Autenticación funcional con roles (**ADMIN / EMPLEADO / CLIENTE**) usando `auth_tokens` (cookie HttpOnly).  
-✅ UI base con **Tailwind + Flowbite** (Home público, Login/Register, dashboards por rol).  
-✅ Build automático de Tailwind al iniciar Flask (sin correr `npm run watch`).
-
-🟡 Próximo:
-- Módulo **Cliente**: catálogo real, producto detalle, carrito, checkout, pedidos.
-- Módulo **Empleado**: ventas POS, gestión de pedidos, consulta inventario.
-- Módulo **Admin**: usuarios staff, catálogos, recetas (BOM), compras, reportes, auditoría.
+El sistema fue implementado bajo una arquitectura web con Flask, utilizando MySQL para datos transaccionales y MongoDB para almacenamiento documental.
 
 ---
 
-## Tecnologías
-**Backend**
-- Python + Flask
-- Flask-WTF (CSRF / forms)
-- SQLAlchemy
-- MySQL 8 (pieles_avance)
+## Módulos implementados
 
-**Frontend**
-- Tailwind CSS
-- Flowbite
-
-**DB**
-- MySQL (contabilidad dura: inventario, compras, ventas, producción, kardex)
-- NoSQL (planeado): MongoDB para carrito/pedidos (documentos)
+✔ Autenticación y control de acceso  
+✔ Gestión de usuarios y roles  
+✔ Proveedores y materia prima  
+✔ Recetas y producción  
+✔ Inventario (Kardex)  
+✔ Ventas POS  
+✔ Tienda en línea  
+✔ Reportes  
+✔ Auditoría y logs  
 
 ---
 
-## Requisitos
-- Python 3.11+ (recomendado)
-- MySQL 8.x
-- Node.js 18+ (solo para compilar Tailwind con `npx`)
-- Git / GitHub Desktop
-- Instalar dependencias Node (para Tailwind/Flowbite)
-Esto es necesario para que npx @tailwindcss/cli exista y se genere static/css/output.css.
-npm install
-- acuerdense del... .\.env\Scripts\activate
+## Notas finales
 
+Este proyecto representa la integración de desarrollo web, seguridad y administración de bases de datos en un entorno funcional completo.
+
+## Equipo
+
+- Erick Alvarado García  
+- Juan Pablo García Hernández  
+- Ingrid Melannie Rivera Ríos  
+- Martín Alejandro Muñoz Silva  
