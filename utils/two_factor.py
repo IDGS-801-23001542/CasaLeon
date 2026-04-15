@@ -1,76 +1,56 @@
-from twilio.rest import Client
+import base64
+from io import BytesIO
+
+import pyotp
+import qrcode
 from flask import current_app
 
 
-def is_two_factor_enabled() -> bool:
-    return bool(current_app.config.get("TWO_FA_ENABLED", False))
+def user_requires_2fa(user) -> bool:
+    if not user:
+        return False
+
+    rol_codigo = None
+    if getattr(user, "rol", None):
+        rol_codigo = getattr(user.rol, "codigo", None)
+
+    if rol_codigo in ("ADMIN", "EMPLEADO"):
+        return True
+
+    return bool(getattr(user, "two_factor_required", 0) == 1)
 
 
-def _get_twilio_client():
-    account_sid = current_app.config.get("TWILIO_ACCOUNT_SID")
-    auth_token = current_app.config.get("TWILIO_AUTH_TOKEN")
-
-    if not account_sid or not auth_token:
-        raise ValueError("Faltan credenciales de Twilio en la configuración.")
-
-    return Client(account_sid, auth_token)
+def generate_totp_secret() -> str:
+    return pyotp.random_base32()
 
 
-def _get_verify_service_sid() -> str:
-    service_sid = current_app.config.get("TWILIO_VERIFY_SERVICE_SID")
-    if not service_sid:
-        raise ValueError("Falta TWILIO_VERIFY_SERVICE_SID en la configuración.")
-    return service_sid
+def build_totp_uri(email: str, secret: str) -> str:
+    issuer = current_app.config.get("TOTP_ISSUER", "Casa Leon")
+    totp = pyotp.TOTP(secret)
+    return totp.provisioning_uri(name=email, issuer_name=issuer)
 
 
-def normalize_phone_mx(phone: str) -> str:
-    """
-    Normaliza un número mexicano al formato E.164.
-    Ejemplos:
-      4771234567      -> +524771234567
-      52 477 123 4567 -> +524771234567
-      +524771234567   -> +524771234567
-    """
-    raw = (phone or "").strip()
-    if not raw:
-        raise ValueError("El número telefónico está vacío.")
+def verify_totp_code(secret: str, code: str) -> bool:
+    if not secret or not code:
+        return False
 
-    if raw.startswith("+"):
-        digits = "+" + "".join(ch for ch in raw if ch.isdigit())
-        if len(digits) < 12 or len(digits) > 16:
-            raise ValueError("Número telefónico inválido.")
-        return digits
-
-    only_digits = "".join(ch for ch in raw if ch.isdigit())
-
-    if len(only_digits) == 10:
-        return f"+52{only_digits}"
-
-    if len(only_digits) == 12 and only_digits.startswith("52"):
-        return f"+{only_digits}"
-
-    raise ValueError("Número telefónico inválido para México.")
+    totp = pyotp.TOTP(secret)
+    return totp.verify((code or "").strip(), valid_window=1)
 
 
-def send_sms_verification(phone: str) -> str:
-    client = _get_twilio_client()
-    service_sid = _get_verify_service_sid()
-    phone_e164 = normalize_phone_mx(phone)
-
-    verification = client.verify.v2.services(service_sid).verifications.create(
-        to=phone_e164,
-        channel="sms",
+def build_qr_base64(uri: str) -> str:
+    qr = qrcode.QRCode(
+        version=1,
+        box_size=10,
+        border=4,
     )
-    return verification.status
+    qr.add_data(uri)
+    qr.make(fit=True)
 
+    img = qr.make_image(fill_color="black", back_color="white")
 
-def check_sms_verification(phone: str, code: str) -> bool:
-    client = _get_twilio_client()
-    service_sid = _get_verify_service_sid()
-    phone_e164 = normalize_phone_mx(phone)
+    buffer = BytesIO()
+    img.save(buffer, format="PNG")
+    encoded = base64.b64encode(buffer.getvalue()).decode("utf-8")
 
-    result = client.verify.v2.services(service_sid).verification_checks.create(
-        to=phone_e164,
-        code=(code or "").strip(),
-    )
-    return result.status == "approved"
+    return f"data:image/png;base64,{encoded}"

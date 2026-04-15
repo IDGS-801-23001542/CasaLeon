@@ -20,7 +20,6 @@ from wtforms.validators import (
     Regexp,
     EqualTo,
 )
-
 from flask_wtf.file import FileAllowed
 
 
@@ -162,7 +161,6 @@ class RegisterClienteForm(FlaskForm):
             digitos = "".join(char for char in field.data if char.isdigit())
             if len(digitos) < 10 or len(digitos) > 15:
                 raise ValidationError("Ingresa un teléfono válido de 10 a 15 dígitos.")
-                raise ValidationError("Ingresa un teléfono válido de 10 a 15 dígitos.")
 
     def validate_password(self, field):
         field.data = (field.data or "").strip()
@@ -170,6 +168,20 @@ class RegisterClienteForm(FlaskForm):
             raise ValidationError("La contraseña no debe contener espacios.")
 
     def validate_confirm_password(self, field):
+        field.data = (field.data or "").strip()
+
+
+class TwoFactorCodeForm(FlaskForm):
+    code = StringField(
+        "Código",
+        validators=[
+            DataRequired(message="Ingresa el código de verificación."),
+            Length(min=6, max=6, message="El código debe tener 6 dígitos."),
+            Regexp(r"^\d{6}$", message="El código debe contener 6 dígitos."),
+        ],
+    )
+
+    def validate_code(self, field):
         field.data = (field.data or "").strip()
 
 
@@ -319,7 +331,6 @@ class CheckoutForm(FlaskForm):
             field.data = _normalize_spaces(field.data)
             digitos = "".join(char for char in field.data if char.isdigit())
             if len(digitos) < 10 or len(digitos) > 15:
-                raise ValidationError("Ingresa un teléfono válido de 10 a 15 dígitos.")
                 raise ValidationError("Ingresa un teléfono válido de 10 a 15 dígitos.")
 
     def validate_calle(self, field):
@@ -516,7 +527,6 @@ class UpdateClienteForm(FlaskForm):
             field.data = _normalize_spaces(field.data)
             digitos = "".join(char for char in field.data if char.isdigit())
             if len(digitos) < 10 or len(digitos) > 15:
-                raise ValidationError("Ingresa un teléfono válido de 10 a 15 dígitos.")
                 raise ValidationError("Ingresa un teléfono válido de 10 a 15 dígitos.")
 
     def validate_calle(self, field):
@@ -863,7 +873,6 @@ class ProductoForm(FlaskForm):
             field.data = _normalize_spaces(field.data)
 
 
-# MATERIA PRIMA
 class MateriaPrimaForm(FlaskForm):
     nombre = StringField(
         "Nombre",
@@ -932,7 +941,6 @@ class MateriaPrimaForm(FlaskForm):
         field.data = _normalize_spaces(field.data)
 
 
-# RECETAS
 class RecetaForm(FlaskForm):
     nombre = StringField(
         "Nombre de la Receta",
@@ -962,7 +970,6 @@ class RecetaForm(FlaskForm):
         field.data = _normalize_spaces(field.data)
 
 
-# PRODUCCIÓN
 class ProduccionForm(FlaskForm):
     id_producto = SelectField(
         "Producto",

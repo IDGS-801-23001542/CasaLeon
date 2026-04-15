@@ -127,7 +127,7 @@ def seed_staff():
         Usuario(
             id_rol=admin_rol.id_rol,
             nombre="Martín López Herrera",
-            email="admin@casaleon.com",
+            email="casaleonidgs@gmail.com",
             telefono="4771010101",
             password_hash=generate_password_hash("Admin123"),
             activo=1,
@@ -135,7 +135,7 @@ def seed_staff():
         Usuario(
             id_rol=empleado_rol.id_rol,
             nombre="Ana Sofía Ramírez",
-            email="empleado@casaleon.com",
+            email="tribilindsm@gmail.com",
             telefono="4772020202",
             password_hash=generate_password_hash("Empleado123"),
             activo=1,

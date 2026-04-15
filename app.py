@@ -1,9 +1,9 @@
 from decimal import Decimal
 from flask import Flask, render_template, g
-from flask_migrate import Migrate
 from dotenv import load_dotenv
 
 from config import DevelopmentConfig
+from extensions import mail, migrate
 from models import db, Usuario, Cliente
 from mongo import init_mongo, ensure_report_indexes
 from services.mongo_store import count_cart_items
@@ -22,17 +22,16 @@ from routes.merma import merma
 from routes.ventas import ventas
 from routes.reportes import reportes
 
-migrate = Migrate()
-
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_object(DevelopmentConfig)
 
-    load_dotenv(".env.local")
+    load_dotenv(".env.local", override=True)
+    app.config.from_object(DevelopmentConfig)
 
     db.init_app(app)
     migrate.init_app(app, db)
+    mail.init_app(app)
 
     init_mongo(app)
 

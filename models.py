@@ -25,6 +25,13 @@ class Usuario(db.Model):
     telefono = db.Column(db.String(10), nullable=False, unique=True)
     password_hash = db.Column(db.String(255), nullable=False)
     activo = db.Column(db.Integer, nullable=False, default=1)
+
+    email_verificado = db.Column(db.Integer, nullable=False, default=1)
+
+    two_factor_required = db.Column(db.Integer, nullable=False, default=0)
+    two_factor_enabled = db.Column(db.Integer, nullable=False, default=0)
+    two_factor_secret = db.Column(db.String(64), nullable=True)
+
     creado_en = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
 
     rol = db.relationship("Rol")
@@ -49,6 +56,7 @@ class Cliente(db.Model):
     pais = db.Column(db.String(80))
     cp = db.Column(db.String(10))
     password_hash = db.Column(db.String(255))
+    email_verificado = db.Column(db.Integer, nullable=False, default=0)
     creado_en = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
     activo = db.Column(db.Integer, nullable=False, default=1)
 
@@ -129,13 +137,22 @@ class Producto(db.Model):
 
     recetas = db.relationship("Receta", backref="producto_ref", lazy=True)
     pedidos_detalle = db.relationship(
-        "PedidoDetalle", backref="producto_ref_pedido", lazy=True
+        "PedidoDetalle",
+        backref="producto_ref_pedido",
+        lazy=True,
+        overlaps="producto"
     )
     ventas_detalle = db.relationship(
-        "VentaDetalle", backref="producto_ref_venta", lazy=True
+        "VentaDetalle",
+        backref="producto_ref_venta",
+        lazy=True,
+        overlaps="producto"
     )
     ordenes_produccion = db.relationship(
-        "OrdenProduccion", backref="producto_ref_orden", lazy=True
+        "OrdenProduccion",
+        backref="producto_ref_orden",
+        lazy=True,
+        overlaps="producto"
     )
 
     def __repr__(self):
@@ -194,7 +211,10 @@ class PedidoDetalle(db.Model):
     cantidad = db.Column(db.Integer, nullable=False, default=1)
     subtotal = db.Column(db.Numeric(12, 2), nullable=False, default=0)
 
-    producto = db.relationship("Producto")
+    producto = db.relationship(
+        "Producto",
+        overlaps="pedidos_detalle,producto_ref_pedido"
+    )
 
     def __repr__(self):
         return f"<PedidoDetalle {self.id_pedido_detalle} - {self.producto_nombre}>"
@@ -238,7 +258,10 @@ class VentaDetalle(db.Model):
     cantidad = db.Column(db.Numeric(14, 2), nullable=False, default=1)
     subtotal = db.Column(db.Numeric(12, 2), nullable=False, default=0)
 
-    producto = db.relationship("Producto")
+    producto = db.relationship(
+        "Producto",
+        overlaps="producto_ref_venta,ventas_detalle"
+    )
 
     def __repr__(self):
         return f"<VentaDetalle {self.id_venta_detalle} - {self.producto_nombre}>"
@@ -254,9 +277,7 @@ class CategoriaMateriaPrima(db.Model):
     materias_primas = db.relationship("MateriaPrima", backref="categoria_mp", lazy=True)
 
     def __repr__(self):
-        return (
-            f"<CategoriaMateriaPrima {self.id_categoria_materia_prima} - {self.nombre}>"
-        )
+        return f"<CategoriaMateriaPrima {self.id_categoria_materia_prima} - {self.nombre}>"
 
 
 class UnidadMedida(db.Model):
@@ -335,7 +356,7 @@ class MovimientoMateriaPrima(db.Model):
         nullable=True,
     )
 
-    tipo = db.Column(db.String(20), nullable=False)  # ENTRADA / SALIDA
+    tipo = db.Column(db.String(20), nullable=False)
     cantidad = db.Column(db.Numeric(14, 2), nullable=False, default=0)
     motivo = db.Column(db.String(255))
     creado_en = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
@@ -344,9 +365,7 @@ class MovimientoMateriaPrima(db.Model):
     proveedor = db.relationship("Proveedor")
 
     def __repr__(self):
-        return (
-            f"<MovimientoMateriaPrima {self.id_movimiento_materia_prima} - {self.tipo}>"
-        )
+        return f"<MovimientoMateriaPrima {self.id_movimiento_materia_prima} - {self.tipo}>"
 
 
 class Receta(db.Model):
@@ -362,7 +381,10 @@ class Receta(db.Model):
     activo = db.Column(db.Integer, nullable=False, default=1)
     creado_en = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
 
-    producto = db.relationship("Producto")
+    producto = db.relationship(
+        "Producto",
+        overlaps="producto_ref,recetas"
+    )
     detalles = db.relationship(
         "RecetaDetalle",
         backref="receta",
@@ -386,7 +408,10 @@ class RecetaDetalle(db.Model):
     )
     cantidad = db.Column(db.Numeric(14, 2), nullable=False, default=0)
 
-    materia_prima = db.relationship("MateriaPrima")
+    materia_prima = db.relationship(
+        "MateriaPrima",
+        overlaps="materia_prima_ref_receta,receta_detalles"
+    )
 
     def __repr__(self):
         return f"<RecetaDetalle {self.id_receta_detalle}>"
@@ -411,7 +436,10 @@ class OrdenProduccion(db.Model):
     observaciones = db.Column(db.String(255))
     creado_en = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
 
-    producto = db.relationship("Producto")
+    producto = db.relationship(
+        "Producto",
+        overlaps="ordenes_produccion,producto_ref_orden"
+    )
     detalles = db.relationship(
         "OrdenProduccionDetalle",
         backref="orden_produccion",
@@ -452,7 +480,10 @@ class OrdenProduccionDetalle(db.Model):
     costo_unitario = db.Column(db.Numeric(12, 2), nullable=False, default=0)
     subtotal = db.Column(db.Numeric(12, 2), nullable=False, default=0)
 
-    materia_prima = db.relationship("MateriaPrima")
+    materia_prima = db.relationship(
+        "MateriaPrima",
+        overlaps="materia_prima_ref_orden,ordenes_detalle"
+    )
 
     def __repr__(self):
         return f"<OrdenProduccionDetalle {self.id_orden_produccion_detalle}>"
@@ -505,7 +536,10 @@ class MermaDetalle(db.Model):
     valor_estimado_unit = db.Column(db.Numeric(12, 2), nullable=False, default=0)
     valor_estimado_total = db.Column(db.Numeric(12, 2), nullable=False, default=0)
 
-    materia_prima = db.relationship("MateriaPrima")
+    materia_prima = db.relationship(
+        "MateriaPrima",
+        overlaps="materia_prima_ref_merma,mermas_detalle"
+    )
 
     def __repr__(self):
         return f"<MermaDetalle {self.id_merma_detalle} - {self.materia_prima_nombre}>"

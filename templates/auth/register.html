@@ -45,9 +45,7 @@
               required=True,
               maxlength="150",
               minlength="2",
-              autocomplete="name",
-              pattern="[A-Za-zÁÉÍÓÚáéíóúÑñÜü\\s]+",
-              title="Solo letras y espacios"
+              autocomplete="name"
             ) }}
             {% for error in form.nombre.errors %}
               <p class="mt-2 text-sm text-red-600">{{ error }}</p>
@@ -77,9 +75,7 @@
                 placeholder="4771234567",
                 maxlength="15",
                 autocomplete="tel",
-                inputmode="tel",
-                pattern="^\\+?[0-9\\s\\-]+$",
-                title="Solo números, espacios, guiones y un + opcional"
+                inputmode="tel"
               ) }}
               {% for error in form.telefono.errors %}
                 <p class="mt-2 text-sm text-red-600">{{ error }}</p>
