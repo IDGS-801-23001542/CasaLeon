@@ -12,7 +12,7 @@ Casa León se encuentra completamente desarrollado como un sistema integral func
 - Reportes e indicadores
 - Auditoría y trazabilidad
 - Seguridad (roles, sesiones, validaciones, CSRF)
-- Integración de autenticación avanzada (2FA y OAuth)
+- Integración de autenticación 
 
 El sistema fue implementado bajo una arquitectura web con Flask, utilizando MySQL para datos transaccionales y MongoDB para almacenamiento documental.
 
