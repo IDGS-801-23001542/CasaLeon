@@ -20,7 +20,7 @@ class DevelopmentConfig(Config):
         "DATABASE_URL",
         "mysql+pymysql://root:root@127.0.0.1/fabrica_pieles2"
     )
-    TOKEN_EXPIRES_MINUTES = 10
+    TOKEN_EXPIRES_MINUTES = 120
 
 cloudinary.config(
     cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
